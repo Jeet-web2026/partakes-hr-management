@@ -1,0 +1,76 @@
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
+@import "@fontsource/figtree/400.css";
+@import "@fontsource/figtree/500.css";
+@import "@fontsource/figtree/600.css";
+@import "@fontsource/figtree/700.css";
+
+@source "../../../../app/Filament/Dashboard/**/*";
+@source "../../../../app/Filament/Widgets/**/*";
+@source "../../../../resources/views/filament/**/*";
+@source "../../../../resources/views/vendor/filament-panels/**/*";
+@source "../../../../resources/views/components/*";
+@source "../../../../public/assets/*.js";
+
+@theme {
+    --color-background: hsl(240 10% 4%);
+    --color-card: hsl(240 6% 10%);
+    --color-muted: hsl(240 4% 16%);
+    --color-muted-foreground: hsl(240 5% 65%);
+    --color-foreground: hsl(0 0% 98%);
+    --color-border: hsl(240 4% 20%);
+    --color-primary: hsl(217 91% 60%);
+    --color-primary-foreground: hsl(0 0% 100%);
+    --color-destructive: hsl(0 72% 51%);
+}
+
+.fi-main {
+    background-color: rgb(10, 21, 39) !important;
+}
+
+.fi-body {
+    background-color: rgb(10, 21, 39) !important;
+}
+
+.fi-topbar {
+    background-color: rgb(18, 28, 46) !important;
+    border-bottom: 0.5px solid #f7f7f740 !important;
+}
+
+.fi-sidebar-nav {
+    background-color: #121c2e !important;
+    border-right: 0.2px solid #f7f7f740;
+}
+
+.fi-page-header-main-ctn {
+    padding-top: 0px !important;
+}
+
+.fi-body,
+.fi-body *,
+.fi-sidebar,
+.fi-sidebar *,
+.fi-main,
+.fi-main * {
+    font-family: "Figtree", sans-serif;
+    font-optical-sizing: auto;
+}
+
+.fi-header {
+    display: none !important;
+}
+.fi-sidebar-nav-groups {
+    gap: 5px !important;
+}
+
+.fi-section-content-ctn {
+    background-color: #121c2e;
+    border-radius: 12px !important;
+}
+
+.fi-main-sidebar{
+    z-index: 28 !important;
+}
+
+.fi-sidebar-close-overlay{
+    z-index: 25 !important;
+}

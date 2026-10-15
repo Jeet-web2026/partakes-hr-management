@@ -1,0 +1,148 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class UserOrgaRelaSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        DB::table('tbl_user_orga_rela')->insert([
+            [
+                'id' => 1,
+                'Orga_User_Assc_UIN' => 100101,
+                'Orga_UIN' => 1500000001,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1428017315,
+                'Expy' => null,
+                'Stau_UIN' => 100202,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 2,
+                'Orga_User_Assc_UIN' => 100100,
+                'Orga_UIN' => 1500000001,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1492774680,
+                'Expy' => null,
+                'Stau_UIN' => 100202,
+                'CrOn' => null,
+                'CrBy' => '1677851592',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 3,
+                'Orga_User_Assc_UIN' => 100100,
+                'Orga_UIN' => 1500000001,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1496773568,
+                'Expy' => null,
+                'Stau_UIN' => 100202,
+                'CrOn' => null,
+                'CrBy' => '1677851592',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 4,
+                'Orga_User_Assc_UIN' => 100101,
+                'Orga_UIN' => 1500000046,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1500000001,
+                'Expy' => null,
+                'Stau_UIN' => 100201,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 5,
+                'Orga_User_Assc_UIN' => 100101,
+                'Orga_UIN' => 1724774817,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1500000001,
+                'Expy' => null,
+                'Stau_UIN' => 100201,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 6,
+                'Orga_User_Assc_UIN' => 100100,
+                'Orga_UIN' => 1735816216,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1677566057,
+                'Expy' => null,
+                'Stau_UIN' => 100201,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 7,
+                'Orga_User_Assc_UIN' => 100101,
+                'Orga_UIN' => 1500000001,
+                'Vert_UIN' => 0,
+                'User_UIN' => 776515375,
+                'Expy' => null,
+                'Stau_UIN' => 100202,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 8,
+                'Orga_User_Assc_UIN' => 100103,
+                'Orga_UIN' => 1500000001,
+                'Vert_UIN' => 0,
+                'User_UIN' => 776784458,
+                'Expy' => null,
+                'Stau_UIN' => 100202,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 9,
+                'Orga_User_Assc_UIN' => 100101,
+                'Orga_UIN' => 1589781954,
+                'Vert_UIN' => 0,
+                'User_UIN' => 1766061572,
+                'Expy' => null,
+                'Stau_UIN' => 100201,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+            [
+                'id' => 100,
+                'Orga_User_Assc_UIN' => 100101,
+                'Orga_UIN' => 1500000001,
+                'Vert_UIN' => 0,
+                'User_UIN' => 6857873680,
+                'Expy' => null,
+                'Stau_UIN' => 100201,
+                'CrOn' => null,
+                'CrBy' => '1500000001',
+                'MoOn' => null,
+                'MoBy' => '0',
+            ],
+        ]);
+    }
+}
