@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Dashboard\Pages\Concerns;
+namespace App\Filament\Candidatemanagement\Pages\Common;
 
 use Illuminate\Support\Facades\Session;
 

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Settings\Pages;
 
-use App\Filament\Dashboard\Pages\Concerns\HasCompanyHeader;
+use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Session;
 
