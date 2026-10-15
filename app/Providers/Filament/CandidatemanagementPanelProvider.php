@@ -2,21 +2,20 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
+use Illuminate\Support\Str;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class CandidatemanagementPanelProvider extends PanelProvider
@@ -27,19 +26,15 @@ class CandidatemanagementPanelProvider extends PanelProvider
             ->id('candidatemanagement')
             ->path('')
             ->default()
+            ->sidebarCollapsibleOnDesktop()
+            ->viteTheme('resources/css/filament/dashboard/theme.css')
+            ->brandName('')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#ffffff'),
             ])
             ->discoverResources(in: app_path('Filament/Candidatemanagement/Resources'), for: 'App\Filament\Candidatemanagement\Resources')
             ->discoverPages(in: app_path('Filament/Candidatemanagement/Pages'), for: 'App\Filament\Candidatemanagement\Pages')
-            ->pages([
-                Dashboard::class,
-            ])
             ->discoverWidgets(in: app_path('Filament/Candidatemanagement/Widgets'), for: 'App\Filament\Candidatemanagement\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -51,5 +46,17 @@ class CandidatemanagementPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ]);
+    }
+
+    public function boot(): void
+    {
+        View::composer('filament-panels::livewire.topbar', function ($view) {
+            $view->with([
+                'userData' => Session::get('partaker_user_data', []),
+                'companyInformation' => Session::get('company_information'),
+                'backurlforSettings' => 'https://partakers.in/dashboard',
+                'title' => Str::headline(collect(explode('/', request()->path()))->last()),
+            ]);
+        });
     }
 }

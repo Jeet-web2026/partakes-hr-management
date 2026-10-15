@@ -55,10 +55,9 @@
             </div>
         </div>
 
-        <div class="text-xl font-semibold lg:absolute lg:left-[45%] hidden lg:block">Agreements</div>
 
         <div class="flex flex-col items-end gap-2">
-            <div class="text-xl font-semibold lg:absolute lg:left-[45%] lg:hidden block">Agreements</div>
+
             <!-- Company switcher -->
             <div class="relative flex flex-row items-center order-first lg:order-none" x-data="{ open: false }" @click.outside="open = false">
                 <button
@@ -80,7 +79,7 @@
                         <i class="ri-arrow-left-long-line"></i>
                         Back
                     </a>
-                    
+
                     <a
                         href="{{ $backurlforSettings }}"
                         class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">

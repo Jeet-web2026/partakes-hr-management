@@ -4,13 +4,14 @@ namespace App\Filament\Candidatemanagement\Pages;
 
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use Filament\Pages\Page;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Session;
 
 class CandidateManagement extends Page
 {
     use HasCompanyHeader;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
     protected static ?string $navigationLabel = 'Candidate Management';
     protected static ?int $navigationSort = 1;
     protected string $view = 'filament.candidatemanagement.pages.candidate-management';
@@ -24,8 +25,8 @@ class CandidateManagement extends Page
     {
         $this->userUin = Session::get('partaker_user_uin');
         $this->orgaUin = Session::get('selected_orga_uin');
-
-        if (! $this->userUin || ! $this->orgaUin || ! $this->userData) {
+        
+        if (! $this->userUin && ! $this->orgaUin && ! $this->userData) {
             $this->redirect(route('home'));
         }
     }
