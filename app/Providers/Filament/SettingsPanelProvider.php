@@ -22,7 +22,7 @@ class SettingsPanelProvider extends PanelProvider
     {
         return $panel
             ->id('settings')
-            ->path('settings')
+            ->path('')
             ->sidebarCollapsibleOnDesktop()
             ->brandName('')
             ->viteTheme('resources/css/filament/dashboard/theme.css')
