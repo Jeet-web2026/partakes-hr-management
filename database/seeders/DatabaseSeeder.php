@@ -15,14 +15,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            AgreementCategorySeeder::class,
-            AgreementTypeSeeder::class,
             OrganizationSeeder::class,
-            UserLoginSeeder::class,
             UserOrgaRelaSeeder::class,
             TblMastPinCodeSeeder::class,
-            CountryIndiaSeeder::class,
-            MasterVerticalPageNameSeeder::class
+            CountryIndiaSeeder::class
         ]);
     }
 }
