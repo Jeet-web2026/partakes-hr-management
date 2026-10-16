@@ -287,25 +287,27 @@ $(document).ready(function () {
     // ---------- State (columns / sort / calendar month) ----------
     let sort = null; // {key, dir}
     const visible = {
-        fileNo: false,
-        referenceNo: false,
-        category: false,
-        type: false,
-        firstParty: true,
-        secondParty: true,
-        depositAmount: false,
-        date: true,
-        expiry: true,
-        expiry_by: true,
-        signingDate: false,
-        notaryDate: false,
-        version: true,
-        drafted: false,
-        agreementSigned: false,
-        agreementRecDate: false,
-        agreementReceived: false,
-        jurisdiction: false,
-        remarks: false,
+        FaNm: true,
+        MiNm: false,
+        SuNm: true,
+        Gend: false,
+        DOB: true,
+        MoTu: false,
+        Cutr_UIN: false,
+        PinCod_UIN: false,
+        Mo_No: true,
+        Own_Mo: false,
+        Mo_Type: false,
+        MO_OS: false,
+        Emai: true,
+        Own_Lptp: false,
+        Lptp_OS: false,
+        Drvi_Lisc: false,
+        Vcle_Type_Lisc: false,
+        Rlca: false,
+        Rlca_Area: false,
+        Job_Intr: false,
+        Job_Type: false,
     };
     const today = new Date();
     let calMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -1041,9 +1043,9 @@ $(document).ready(function () {
         const newCompanyId = $item.data("company-id");
         const companyName = $item.data("company");
 
-        $("#addAgreementBtn").attr(
+        $("#generateLinkBtn").attr(
             "href",
-            "/add-agreement?company=" + newCompanyId,
+            "/generate-link?company=" + newCompanyId,
         );
 
         $("#companyName").text(companyName);

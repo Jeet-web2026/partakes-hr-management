@@ -257,7 +257,7 @@
                                 <input
                                     id="searchInputDesktop"
                                     type="text"
-                                    placeholder="Search agreements…"
+                                    placeholder="Search registrations…"
                                     class="h-9 w-[250px] lg:w-[350px] rounded-md border border-white/10 bg-transparent pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary">
 
                             </div>
@@ -351,12 +351,12 @@
                         </div>
 
 
-                        {{-- Add Agreement --}}
+                        {{-- Generate Link --}}
                         <a
-                            id="addAgreementBtn"
-                            href="{{ route('add-agreement', ['company' => $companyInformation->first()?->Orga_UIN]) }}"
-                            aria-label="Add Agreement"
-                            title="Add Agreement"
+                            id="generateLinkBtn"
+                            href="javascript::void()"
+                            aria-label="Generate link"
+                            title="Generate link"
                             class="inline-flex h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-[#3c83f6]-foreground hover:bg-[#3c83f6]/90 transition">
 
                             <svg
@@ -372,7 +372,7 @@
                             </svg>
 
                             <span class="hidden sm:inline">
-                                Add
+                                Generate
                             </span>
 
                         </a>
@@ -404,100 +404,109 @@
 
                                 <div class="border-t border-white/10 my-1"></div>
 
-
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="fileNo" class="accent-primary">
-                                    File No
+                                    <input type="checkbox" data-col="FaNm" class="accent-primary" checked>
+                                    First Name
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="referenceNo" class="accent-primary">
-                                    Reference No
+                                    <input type="checkbox" data-col="MiNm" class="accent-primary">
+                                    Middle Name
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="category" class="accent-primary">
-                                    Category
+                                    <input type="checkbox" data-col="SuNm" class="accent-primary" checked>
+                                    Surname
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="type" class="accent-primary">
-                                    Agreement Type
+                                    <input type="checkbox" data-col="Gend" class="accent-primary">
+                                    Gender
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="firstParty" class="accent-primary" checked>
-                                    1st Party
+                                    <input type="checkbox" data-col="DOB" class="accent-primary" checked>
+                                    Date of Birth
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="secondParty" class="accent-primary" checked>
-                                    2nd Party
+                                    <input type="checkbox" data-col="MoTu" class="accent-primary">
+                                    Mother Tongue
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="depositAmount" class="accent-primary" checked>
-                                    Deposited Amount
+                                    <input type="checkbox" data-col="Cutr_UIN" class="accent-primary">
+                                    Country Name
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="date" class="accent-primary" checked>
-                                    Agreement Date
+                                    <input type="checkbox" data-col="PinCod_UIN" class="accent-primary">
+                                    Pincode of Present Location
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="expiry" class="accent-primary" checked>
-                                    Expiry Date
+                                    <input type="checkbox" data-col="Mo_No" class="accent-primary" checked>
+                                    Mobile Number
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="expiry_by" class="accent-primary" checked>
-                                    Expires In
+                                    <input type="checkbox" data-col="Own_Mo" class="accent-primary">
+                                    You Have Own Mobile
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="signingDate" class="accent-primary">
-                                    Signing Date
+                                    <input type="checkbox" data-col="Mo_Type" class="accent-primary">
+                                    Type of Mobile
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="notaryDate" class="accent-primary">
-                                    Notary Date
+                                    <input type="checkbox" data-col="MO_OS" class="accent-primary">
+                                    Operating System
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="version" class="accent-primary" checked>
-                                    Version
+                                    <input type="checkbox" data-col="Emai" class="accent-primary" checked>
+                                    Email Address
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="drafted" class="accent-primary">
-                                    Drafted By
+                                    <input type="checkbox" data-col="Own_Lptp" class="accent-primary">
+                                    You Have Own Laptop for Personal Use in Running Condition
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="agreementSigned" class="accent-primary">
-                                    Agreement Signed
+                                    <input type="checkbox" data-col="Lptp_OS" class="accent-primary">
+                                    Laptop OS
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="agreementRecDate" class="accent-primary">
-                                    Signed Document Received Date
+                                    <input type="checkbox" data-col="Drvi_Lisc" class="accent-primary">
+                                    You Have Valid Driving Licence
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="agreementReceived" class="accent-primary">
-                                    Agreement Received
+                                    <input type="checkbox" data-col="Vcle_Type_Lisc" class="accent-primary">
+                                    Vehicle Type Licence
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="jurisdiction" class="accent-primary">
-                                    Jurisdiction
+                                    <input type="checkbox" data-col="Rlca" class="accent-primary">
+                                    Are You Ready to Relocate for Your Job
                                 </label>
 
                                 <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
-                                    <input type="checkbox" data-col="remarks" class="accent-primary">
-                                    Internal Notes
+                                    <input type="checkbox" data-col="Rlca_Area" class="accent-primary">
+                                    Relocation Area
+                                </label>
+
+                                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
+                                    <input type="checkbox" data-col="Job_Intr" class="accent-primary" checked>
+                                    Interested for Job
+                                </label>
+
+                                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 text-sm cursor-pointer">
+                                    <input type="checkbox" data-col="Job_Type" class="accent-primary" checked>
+                                    Job Type
                                 </label>
 
                             </div>
@@ -537,7 +546,7 @@
                 <input
                     id="searchInput"
                     type="text"
-                    placeholder="Search agreements..."
+                    placeholder="Search registrations..."
                     class="h-10 w-full rounded-md border border-white/10 bg-transparent pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
 
             </div>
@@ -549,102 +558,106 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        <th class="px-3 py-3">Executed Agreement</th>
+                        <th class="px-3 py-3">Attached Bio Data</th>
 
-                        <th data-col="fileNo" class="px-5 py-3 hidden">
-                            File No
-                        </th>
-
-                        <th data-col="referenceNo" class="px-5 py-3 hidden">
-                            Reference No
-                        </th>
-
-                        <th data-col="category" class="px-5 py-3 hidden">
-                            Category
-                        </th>
-
-                        <th data-col="type" class="px-5 py-3 hidden">
-                            Agreement Type
-                        </th>
-
-                        <th data-col="firstParty" class="px-5 py-3">
-                            <button data-sort="firstParty"
+                        <th data-col="FaNm" class="px-5 py-3">
+                            <button data-sort="FaNm"
                                 class="sort-btn inline-flex items-center gap-1 uppercase tracking-wider hover:text-white">
-                                1st Party
+                                First Name
                                 <span class="sort-icon"></span>
                             </button>
                         </th>
 
-                        <th data-col="secondParty" class="px-5 py-3">
-                            <button data-sort="secondParty"
+                        <th data-col="MiNm" class="px-5 py-3 hidden">
+                            Middle Name
+                        </th>
+
+                        <th data-col="SuNm" class="px-5 py-3">
+                            <button data-sort="SuNm"
                                 class="sort-btn inline-flex items-center gap-1 uppercase tracking-wider hover:text-white">
-                                2nd Party
+                                Surname
                                 <span class="sort-icon"></span>
                             </button>
                         </th>
 
-                        <th data-col="depositAmount" class="px-5 py-3 hidden">
-                            Deposited Amount
+                        <th data-col="Gend" class="px-5 py-3 hidden">
+                            Gender
                         </th>
 
-                        <th data-col="date" class="px-5 py-3">
-                            <button data-sort="date"
+                        <th data-col="DOB" class="px-5 py-3">
+                            <button data-sort="DOB"
                                 class="sort-btn inline-flex items-center gap-1 uppercase tracking-wider hover:text-white">
-                                Agreement Date
+                                Date of Birth
                                 <span class="sort-icon"></span>
                             </button>
                         </th>
 
-                        <th data-col="expiry" class="px-5 py-3">
-                            <button data-sort="expiry"
+                        <th data-col="MoTu" class="px-5 py-3 hidden">
+                            Mother Tongue
+                        </th>
+
+                        <th data-col="Cutr_UIN" class="px-5 py-3 hidden">
+                            Country Name
+                        </th>
+
+                        <th data-col="PinCod_UIN" class="px-5 py-3 hidden">
+                            Pincode of Present Location
+                        </th>
+
+                        <th data-col="Mo_No" class="px-5 py-3">
+                            Mobile Number
+                        </th>
+
+                        <th data-col="Own_Mo" class="px-5 py-3 hidden">
+                            You Have Own Mobile
+                        </th>
+
+                        <th data-col="Mo_Type" class="px-5 py-3 hidden">
+                            Type of Mobile
+                        </th>
+
+                        <th data-col="MO_OS" class="px-5 py-3 hidden">
+                            Operating System
+                        </th>
+
+                        <th data-col="Emai" class="px-5 py-3">
+                            Email Address
+                        </th>
+
+                        <th data-col="Own_Lptp" class="px-5 py-3 hidden">
+                            You Have Own Laptop for Personal Use in Running Condition
+                        </th>
+
+                        <th data-col="Lptp_OS" class="px-5 py-3 hidden">
+                            Laptop OS
+                        </th>
+
+                        <th data-col="Drvi_Lisc" class="px-5 py-3 hidden">
+                            You Have Valid Driving Licence
+                        </th>
+
+                        <th data-col="Vcle_Type_Lisc" class="px-5 py-3 hidden">
+                            Vehicle Type Licence
+                        </th>
+
+                        <th data-col="Rlca" class="px-5 py-3 hidden">
+                            Are You Ready to Relocate for Your Job
+                        </th>
+
+                        <th data-col="Rlca_Area" class="px-5 py-3 hidden">
+                            Relocation Area
+                        </th>
+
+                        <th data-col="Job_Intr" class="px-5 py-3">
+                            <button data-sort="Job_Intr"
                                 class="sort-btn inline-flex items-center gap-1 uppercase tracking-wider hover:text-white">
-                                Expiry Date
+                                Interested for Job
                                 <span class="sort-icon"></span>
                             </button>
                         </th>
 
-                        <th data-col="expiry_by" class="px-5 py-3">
-                            <button data-sort="expiry_by"
-                                class="sort-btn inline-flex items-center gap-1 uppercase tracking-wider hover:text-white">
-                                Expires In
-                                <span class="sort-icon"></span>
-                            </button>
-                        </th>
-
-                        <th data-col="signingDate" class="px-5 py-3 hidden">
-                            Signing Date
-                        </th>
-
-                        <th data-col="notaryDate" class="px-5 py-3 hidden">
-                            Notary Date
-                        </th>
-
-                        <th data-col="version" class="px-5 py-3">
-                            Version
-                        </th>
-
-                        <th data-col="drafted" class="px-5 py-3 hidden">
-                            Drafted By
-                        </th>
-
-                        <th data-col="agreementSigned" class="px-5 py-3 hidden">
-                            Agreement Signed
-                        </th>
-
-                        <th data-col="agreementRecDate" class="px-5 py-3 hidden">
-                            Signed Document Received Date
-                        </th>
-
-                        <th data-col="agreementReceived" class="px-5 py-3 hidden">
-                            Agreement Received
-                        </th>
-
-                        <th data-col="jurisdiction" class="px-5 py-3 hidden">
-                            Jurisdiction
-                        </th>
-
-                        <th data-col="remarks" class="px-5 py-3 hidden">
-                            Internal Notes
+                        <th data-col="Job_Type" class="px-5 py-3">
+                            Job Type
                         </th>
 
                         <th class="px-5 py-3 text-right">
