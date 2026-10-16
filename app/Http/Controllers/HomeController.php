@@ -55,7 +55,7 @@ class HomeController extends Controller
         if ($companyInformation->count() === 1) {
             Session::put('selected_orga_uin', $companyInformation->first()->Orga_UIN);
 
-            return redirect()->route('all-agreements');
+           return redirect()->to(CandidateManagement::getUrl());
         }
 
 
@@ -83,7 +83,7 @@ class HomeController extends Controller
 
         Session::put('selected_orga_uin', $request->input('Orga_UIN'));
 
-        return redirect()->route('all-agreements');
+        return redirect()->to(CandidateManagement::getUrl());
     }
 
     public function allAgreements()
