@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class OrganisationDetails extends Model
 {
     protected $table = "tbl_mast_orga";
+    protected $primaryKey = 'Orga_UIN';
+    public $incrementing = false;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'Orga_Type_UIN',

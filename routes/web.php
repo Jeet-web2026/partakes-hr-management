@@ -15,6 +15,11 @@ Route::controller(HomeController::class)->group(function () {
 Route::middleware('partaker.session')->group(function () {
     Route::controller(HomeController::class)->group(function () {
         Route::get('agreements-name/data', 'agreementNamesData')->name('agreements-name.data');
+        Route::get('/generate-link', 'generateLink')
+            ->name('tiny-url.store');
+        Route::get('/t/{token}', 'redirect')
+            ->where('token', '[a-z0-9]{6,12}')
+            ->name('tiny-url.redirect');
     });
 
     Route::controller(AgreementNameController::class)->group(function () {

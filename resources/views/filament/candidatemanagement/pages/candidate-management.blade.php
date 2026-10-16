@@ -355,6 +355,10 @@
                         <a
                             id="generateLinkBtn"
                             href="javascript::void()"
+                            data-url="{{ route('tiny-url.store') }}"
+                            data-csrf="{{ csrf_token() }}"
+                            data-share-type="candidate"
+                            data-share-id="{{ $recordId ?? '' }}"
                             aria-label="Generate link"
                             title="Generate link"
                             class="inline-flex h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-[#3c83f6]-foreground hover:bg-[#3c83f6]/90 transition">
@@ -376,6 +380,56 @@
                             </span>
 
                         </a>
+
+                        <div id="linkModal" wire:ignore
+                            class="hidden fixed inset-0 z-[100] items-center justify-center p-4"
+                            role="dialog" aria-modal="true" aria-labelledby="linkModalTitle">
+
+                            <div data-close-modal class="absolute inset-0 bg-black/60"></div>
+
+                            <div class="relative w-full max-w-md rounded-lg border border-white/10 bg-card shadow-xl">
+
+                                <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                                    <h3 id="linkModalTitle" class="text-base font-semibold">Share link</h3>
+                                    <button type="button" data-close-modal aria-label="Close"
+                                        class="text-muted-foreground hover:text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M18 6 6 18" />
+                                            <path d="m6 6 12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div class="px-5 py-4 space-y-3 text-sm">
+
+                                    <p id="linkLoading" class="text-muted-foreground">Generating link...</p>
+
+                                    <p id="linkError" class="hidden text-red-400"></p>
+
+                                    <div id="linkResult" class="hidden space-y-3">
+                                        <div class="flex items-center gap-2">
+                                            <input id="linkInput" type="text" readonly
+                                                class="flex-1 min-w-0 rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm">
+                                            <button id="linkCopyBtn" type="button"
+                                                class="rounded-md bg-[#3c83f6] px-3 py-2 text-sm font-medium hover:bg-[#3c83f6]/90 transition">
+                                                Copy
+                                            </button>
+                                        </div>
+                                        <p class="text-xs text-muted-foreground">
+                                            Expires: <span id="linkExpiry"></span> (valid for 24 hours)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end px-5 py-3 border-t border-white/10">
+                                    <button type="button" data-close-modal
+                                        class="rounded-md border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
 
                         {{-- Columns --}}

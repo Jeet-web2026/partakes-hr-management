@@ -1228,4 +1228,76 @@ $(document).ready(function () {
     $("#closeStatusFilter").on("click", function () {
         $("#statusMenuForFilter").addClass("hidden");
     });
+
+    const btn = document.getElementById("generateLinkBtn");
+    const modal = document.getElementById("linkModal");
+    const loading = document.getElementById("linkLoading");
+    const errorEl = document.getElementById("linkError");
+    const result = document.getElementById("linkResult");
+    const input = document.getElementById("linkInput");
+    const expiry = document.getElementById("linkExpiry");
+    const copyBtn = document.getElementById("linkCopyBtn");
+
+    function openModal() {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    }
+
+    function closeModal() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+
+    function showState(state, message) {
+        loading.classList.toggle("hidden", state !== "loading");
+        result.classList.toggle("hidden", state !== "result");
+        errorEl.classList.toggle("hidden", state !== "error");
+        if (state === "error") errorEl.textContent = message;
+    }
+
+    btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        openModal();
+        showState("loading");
+        copyBtn.textContent = "Copy";
+
+        try {
+            const res = await fetch(btn.dataset.url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": btn.dataset.csrf,
+                },
+            });
+
+            const data = await res.json();
+            if (!res.ok)
+                throw new Error(data.message || "Could not generate link.");
+
+            input.value = data.short_url;
+            expiry.textContent = new Date(data.expires_at).toLocaleString();
+            showState("result");
+        } catch (err) {
+            showState("error", err.message);
+        }
+    });
+
+    copyBtn.addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(input.value);
+        } catch {
+            input.select();
+            document.execCommand("copy");
+        }
+        copyBtn.textContent = "Copied";
+    });
+
+    modal
+        .querySelectorAll("[data-close-modal]")
+        .forEach((el) => el.addEventListener("click", closeModal));
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+    });
 });

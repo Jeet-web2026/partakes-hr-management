@@ -2,13 +2,11 @@
 
 namespace App\Providers;
 
-use App\Models\AgmtDraft;
-use App\Models\Agreement;
 use App\Models\AgreementName;
+use App\Models\HrMastJobAply;
+use App\Models\OrganisationDetails;
 use App\Models\ShareLink;
-use App\Observers\AgmtDraftObserver;
 use App\Observers\AgreementNameObserver;
-use App\Observers\AgreementObserver;
 use App\Observers\ShareLinkObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
@@ -33,14 +31,15 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        Agreement::observe(AgreementObserver::class);
-        AgmtDraft::observe(AgmtDraftObserver::class);
         AgreementName::observe(AgreementNameObserver::class);
         ShareLink::observe(ShareLinkObserver::class);
 
         Relation::morphMap([
-            'agreement' => Agreement::class,
-            'draft'     => AgmtDraft::class,
+            'candidate' => HrMastJobAply::class,
+        ]);
+
+        Relation::enforceMorphMap([
+            'organisation' => OrganisationDetails::class,
         ]);
     }
 }

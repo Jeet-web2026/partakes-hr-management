@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Filament\Candidatemanagement\Pages\CandidateManagement;
-use App\Filament\Dashboard\Pages\Dashboard;
+use App\Models\OrganisationDetails;
 use App\Models\UserOrgaRela;
 use App\Services\Agreement\AgreementService;
+use App\Services\Common\TinyUrlService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Session;
@@ -14,7 +16,8 @@ use Illuminate\Support\Facades\Session;
 class HomeController extends Controller
 {
     public function __construct(
-        protected AgreementService $agreementService
+        protected AgreementService $agreementService,
+        private TinyUrlService $tinyUrlService
     ) {}
 
     public function index(Request $request)
@@ -136,7 +139,7 @@ class HomeController extends Controller
             dateFilterType: $validated['date_filter_type'] ?? 'agreement_date',
             perPage: $validated['per_page'] ?? 100,
             companyId: $orgaUin,
-             statuses: $validated['statuses'] ?? []
+            statuses: $validated['statuses'] ?? []
         );
 
         return response()->json($agreements);
@@ -196,5 +199,39 @@ class HomeController extends Controller
         );
 
         return response()->json($draftAgreements);
+    }
+
+    public function generateLink(): JsonResponse
+    {
+        $orgaUin = Session::get('selected_orga_uin');
+        abort_if(! $orgaUin, 403);
+
+        $organisation = OrganisationDetails::where('Orga_UIN', $orgaUin)->firstOrFail();
+
+        $link = $this->tinyUrlService->createFor(
+            $organisation,
+            $orgaUin,
+            Session::get('partaker_user_uin'),
+        );
+
+        return response()->json([
+            'short_url'  => $this->tinyUrlService->shortUrlFor($link),
+            'expires_at' => $link->Link_Expy_On->toIso8601String(),
+        ], 201);
+    }
+
+    public function redirect(string $token): RedirectResponse
+    {
+        $link = $this->tinyUrlService->resolve($token);
+
+        abort_if(! $link, 410, 'This link has expired or does not exist.');
+
+        $record = $link->foreign;
+        abort_if(! $record, 404);
+
+        return match ($link->Link_Type) {
+            'candidate' => redirect()->route('candidate.share.show', $record->getKey()),
+            default     => abort(404),
+        };
     }
 }
