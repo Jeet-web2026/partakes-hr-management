@@ -55,7 +55,7 @@ class HomeController extends Controller
         if ($companyInformation->count() === 1) {
             Session::put('selected_orga_uin', $companyInformation->first()->Orga_UIN);
 
-           return redirect()->to(CandidateManagement::getUrl());
+            return redirect()->to(CandidateManagement::getUrl());
         }
 
 
@@ -224,14 +224,11 @@ class HomeController extends Controller
     {
         $link = $this->tinyUrlService->resolve($token);
 
-        abort_if(! $link, 410, 'This link has expired or does not exist.');
-
-        $record = $link->foreign;
-        abort_if(! $record, 404);
+        abort_if($link, 410, 'This link has expired or does not exist.');
 
         return match ($link->Link_Type) {
-            'candidate' => redirect()->route('candidate.share.show', $record->getKey()),
-            default     => abort(404),
+            'organisation' => redirect()->route('job-apply.show', $link->Link_Token),
+            default        => abort(404),
         };
     }
 }
