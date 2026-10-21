@@ -83,26 +83,36 @@
 
 
                                     {{-- Date type --}}
-                                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3 text-sm">
+                                    <div class="mb-3 text-sm">
 
-                                        <label class="flex items-center gap-1.5 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="dateFilterType"
-                                                value="agreement_date"
-                                                checked
-                                                class="accent-blue-600">
-                                            Agreement Date
-                                        </label>
+                                        {{-- Status dropdown --}}
+                                        <div class="flex flex-col gap-1 w-full">
+                                            <select
+                                                id="statusFilter"
+                                                wire:model.live="statusFilter"
+                                                class="block w-full rounded-md border border-gray-800 bg-slate-900 px-3 py-2 text-sm
+                                                focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-900 cursor-pointer">
+                                                <option value="">All Statuses</option>
+                                                @foreach ($this->getStatuses() as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                        {{-- Date (shown once a status is selected) --}}
+                                        @if ($statusFilter)
+                                        <div class="flex flex-col gap-1 w-full sm:w-56">
+                                            <label for="statusDate" class="font-medium text-gray-700">
+                                                {{ $statuses[$statusFilter] }} Date
+                                            </label>
                                             <input
-                                                type="radio"
-                                                name="dateFilterType"
-                                                value="expiry_date"
-                                                class="accent-blue-600">
-                                            Expiry Date
-                                        </label>
+                                                id="statusDate"
+                                                type="date"
+                                                wire:model.live="statusDate"
+                                                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm
+                                                focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
+                                        </div>
+                                        @endif
 
                                     </div>
 
@@ -174,27 +184,32 @@
 
                                         <label class="flex items-center gap-2 cursor-pointer">
                                             <input type="checkbox" class="status-checkbox accent-blue-600" value="new">
-                                            New
+                                            New Candidate
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="renew">
-                                            Renew
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="short_listed">
+                                            Candidate Short Listed
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="expired">
-                                            Expired
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="interview_scheduled">
+                                            Schedule Interview
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="sign_pending">
-                                            Sign Pending
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="selected">
+                                            Candidate Selected
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="received">
-                                            Hard Copy Received
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="offer_issued">
+                                            Offer Letter Issued
+                                        </label>
+
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="offer_accepted">
+                                            Offer Accepted
                                         </label>
 
                                     </div>

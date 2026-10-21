@@ -21,13 +21,33 @@ class CandidateManagement extends Page
     public string $userUin;
     public string $orgaUin;
 
+    public string $statusFilter = '';
+    public ?string $statusDate = null;
+
     public function mount(): void
     {
         $this->userUin = Session::get('partaker_user_uin');
         $this->orgaUin = Session::get('selected_orga_uin');
-        
+
         if (! $this->userUin && ! $this->orgaUin && ! $this->userData) {
             $this->redirect(route('home'));
         }
+    }
+
+    public function getStatuses(): array
+    {
+        return [
+            'new_candidate'       => 'New Candidate',
+            'short_listed'        => 'Candidate Short Listed',
+            'interview_scheduled' => 'Schedule Interview',
+            'selected'            => 'Candidate Selected',
+            'offer_issued'        => 'Offer Letter Issued',
+            'offer_accepted'      => 'Offer Accepted',
+        ];
+    }
+
+    public function updatedStatusFilter(): void
+    {
+        $this->statusDate = null;
     }
 }
