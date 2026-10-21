@@ -47,7 +47,7 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css">
     <style>
         * {
             font-family: 'Figtree', sans-serif;
@@ -65,16 +65,7 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
             </p>
         </div>
 
-        @if ($errors->any())
-        <div role="alert" class="mb-6 rounded-md border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-300">
-            <p class="font-semibold">There are some errors in your submission:</p>
-            <ul class="mt-2 list-disc pl-5">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
+        <x-globalresponse />
 
         <form method="POST"
             action="{{ route('application-management.store', ['token' => $token]) }}"
@@ -183,27 +174,27 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
                     <h2 id="devices-heading" class="{{ $sectionTitle }}">Devices, licence and relocation</h2>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 p-6">
 
                     {{-- Own mobile --}}
-                    <fieldset class="space-y-3">
+                    <div class="space-y-5">
                         <legend class="{{ $label }}">Do you have your own mobile? <span class="text-red-500">*</span></legend>
-                        <div class="flex flex-wrap gap-3">
-                            @foreach ($yesNo as $value => $text)
-                            <label class="cursor-pointer">
-                                <input type="radio" name="Own_Mo" value="{{ $value }}" required
-                                    @checked(old('Own_Mo')===$value) class="peer sr-only">
-                                <span class="{{ $chip }}">{{ $text }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                        @error('Own_Mo') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                        <fieldset class="flex md:flex-row flex-col gap-3">
+                            <div class="flex flex-wrap gap-3 w-1/4">
+                                @foreach ($yesNo as $value => $text)
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="Own_Mo" value="{{ $value }}" required
+                                        @checked(old('Own_Mo')===$value) class="peer sr-only">
+                                    <span class="{{ $chip }}">{{ $text }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                            @error('Own_Mo') <p class="{{ $error }}">{{ $message }}</p> @enderror
 
-                        <div data-show-when="Own_Mo" data-show-value="1" class="grid gap-5 sm:grid-cols-2">
-                            <div>
-                                <label for="Mo_Type" class="{{ $label }}">Type of mobile <span class="text-red-500">*</span></label>
+                            {{-- Type of mobile: unlocked when Own_Mo = Yes --}}
+                            <div data-requires="Own_Mo" data-requires-value="1" class="w-2/4">
                                 <select id="Mo_Type" name="Mo_Type" required class="{{ $fieldClass('Mo_Type') }}">
-                                    <option value="">Select type</option>
+                                    <option value="">Select mobile type</option>
                                     @foreach ($mobileTypes as $value => $text)
                                     <option value="{{ $value }}" @selected(old('Mo_Type')===$value)>{{ $text }}</option>
                                     @endforeach
@@ -211,94 +202,106 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
                                 @error('Mo_Type') <p class="{{ $error }}">{{ $message }}</p> @enderror
                             </div>
 
-                            <div data-show-when="Mo_Type" data-show-value="smart_phone">
-                                <label for="MO_OS" class="{{ $label }}">Operating system <span class="text-red-500">*</span></label>
-                                <select id="MO_OS" name="MO_OS" required class="{{ $fieldClass('MO_OS') }}">
-                                    <option value="">Select OS</option>
+                            {{-- Operating system: unlocked when Mo_Type = Smart Phone --}}
+                            <div data-requires="Mo_Type" data-requires-value="Smart Phone" class="w-2/4">
+                                <select id="MO_OS" name="MO_OS" required class="{{ $fieldClass('MO_OS') }} w-full">
+                                    <option value="">Select OS of the mobile</option>
                                     @foreach ($mobileOs as $value => $text)
                                     <option value="{{ $value }}" @selected(old('MO_OS')===$value)>{{ $text }}</option>
                                     @endforeach
                                 </select>
                                 @error('MO_OS') <p class="{{ $error }}">{{ $message }}</p> @enderror
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
 
                     {{-- Own laptop --}}
-                    <fieldset class="space-y-3">
+                    <fieldset class="space-y-5">
                         <legend class="{{ $label }}">Do you have your own laptop for personal use in running condition? <span class="text-red-500">*</span></legend>
-                        <div class="flex flex-wrap gap-3">
-                            @foreach ($yesNo as $value => $text)
-                            <label class="cursor-pointer">
-                                <input type="radio" name="Own_Lptp" value="{{ $value }}" required
-                                    @checked(old('Own_Lptp')===$value) class="peer sr-only">
-                                <span class="{{ $chip }}">{{ $text }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                        @error('Own_Lptp') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                        <div class="flex flex-col gap-3 md:flex-row md:items-start">
 
-                        <div data-show-when="Own_Lptp" data-show-value="1" class="sm:w-1/2">
-                            <label for="Lptp_OS" class="{{ $label }}">Laptop OS <span class="text-red-500">*</span></label>
-                            <select id="Lptp_OS" name="Lptp_OS" required class="{{ $fieldClass('Lptp_OS') }}">
-                                <option value="">Select OS</option>
-                                @foreach ($laptopOs as $value => $text)
-                                <option value="{{ $value }}" @selected(old('Lptp_OS')===$value)>{{ $text }}</option>
+                            <div class="flex flex-wrap gap-3">
+                                @foreach ($yesNo as $value => $text)
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="Own_Lptp" value="{{ $value }}" required
+                                        @checked(old('Own_Lptp')===$value) class="peer sr-only">
+                                    <span class="{{ $chip }}">{{ $text }}</span>
+                                </label>
                                 @endforeach
-                            </select>
-                            @error('Lptp_OS') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                            </div>
+                            @error('Own_Lptp') <p class="{{ $error }}">{{ $message }}</p> @enderror
+
+                            {{-- Laptop OS: unlocked when Own_Lptp = Yes --}}
+                            <div data-requires="Own_Lptp" data-requires-value="1" class="md:w-3/4">
+                                <select id="Lptp_OS" name="Lptp_OS" required class="{{ $fieldClass('Lptp_OS') }} w-full" aria-label="Laptop OS">
+                                    <option value="">Select OS of the laptop</option>
+                                    @foreach ($laptopOs as $value => $text)
+                                    <option value="{{ $value }}" @selected(old('Lptp_OS')===$value)>{{ $text }}</option>
+                                    @endforeach
+                                </select>
+                                @error('Lptp_OS') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                            </div>
+
                         </div>
                     </fieldset>
 
                     {{-- Driving licence --}}
-                    <fieldset class="space-y-3">
+                    <fieldset class="space-y-5">
                         <legend class="{{ $label }}">Do you have a valid driving licence? <span class="text-red-500">*</span></legend>
-                        <div class="flex flex-wrap gap-3">
-                            @foreach ($yesNo as $value => $text)
-                            <label class="cursor-pointer">
-                                <input type="radio" name="Drvi_Lisc" value="{{ $value }}" required
-                                    @checked(old('Drvi_Lisc')===$value) class="peer sr-only">
-                                <span class="{{ $chip }}">{{ $text }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                        @error('Drvi_Lisc') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                        <div class="flex flex-col md:flex-row md:items-start gap-3">
 
-                        <div data-show-when="Drvi_Lisc" data-show-value="1" class="sm:w-1/2">
-                            <label for="Vcle_Type_Lisc" class="{{ $label }}">Vehicle type licence <span class="text-red-500">*</span></label>
-                            <select id="Vcle_Type_Lisc" name="Vcle_Type_Lisc" required class="{{ $fieldClass('Vcle_Type_Lisc') }}">
-                                <option value="">Select licence type</option>
-                                @foreach ($licenceTypes as $value => $text)
-                                <option value="{{ $value }}" @selected(old('Vcle_Type_Lisc')===$value)>{{ $text }}</option>
+                            <div class="flex flex-wrap gap-3">
+                                @foreach ($yesNo as $value => $text)
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="Drvi_Lisc" value="{{ $value }}" required
+                                        @checked(old('Drvi_Lisc')===$value) class="peer sr-only">
+                                    <span class="{{ $chip }}">{{ $text }}</span>
+                                </label>
                                 @endforeach
-                            </select>
-                            @error('Vcle_Type_Lisc') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                            </div>
+                            @error('Drvi_Lisc') <p class="{{ $error }}">{{ $message }}</p> @enderror
+
+                            {{-- Vehicle licence type: unlocked when Drvi_Lisc = Yes --}}
+                            <div data-requires="Drvi_Lisc" data-requires-value="1" class="md:w-3/4">
+                                <select id="Vcle_Type_Lisc" name="Vcle_Type_Lisc" required class="{{ $fieldClass('Vcle_Type_Lisc') }} w-full" aria-label="Vehicle type licence">
+                                    <option value="">Select licence type</option>
+                                    @foreach ($licenceTypes as $value => $text)
+                                    <option value="{{ $value }}" @selected(old('Vcle_Type_Lisc')===$value)>{{ $text }}</option>
+                                    @endforeach
+                                </select>
+                                @error('Vcle_Type_Lisc') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                            </div>
+
                         </div>
                     </fieldset>
 
                     {{-- Relocation --}}
-                    <fieldset class="space-y-3">
+                    <fieldset class="space-y-5">
                         <legend class="{{ $label }}">Are you ready to relocate for your job? <span class="text-red-500">*</span></legend>
-                        <div class="flex flex-wrap gap-3">
-                            @foreach ($yesNo as $value => $text)
-                            <label class="cursor-pointer">
-                                <input type="radio" name="Rlca" value="{{ $value }}" required
-                                    @checked(old('Rlca')===$value) class="peer sr-only">
-                                <span class="{{ $chip }}">{{ $text }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                        @error('Rlca') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                        <div class="flex flex-col gap-3 md:flex-row md:items-start">
 
-                        <div data-show-when="Rlca" data-show-value="1" class="sm:w-1/2">
-                            <label for="Rlca_Area" class="{{ $label }}">Relocation area <span class="text-red-500">*</span></label>
-                            <select id="Rlca_Area" name="Rlca_Area" required class="{{ $fieldClass('Rlca_Area') }}">
-                                <option value="">Select area</option>
-                                @foreach ($relocationAreas as $value => $text)
-                                <option value="{{ $value }}" @selected(old('Rlca_Area')===$value)>{{ $text }}</option>
+                            <div class="flex flex-wrap gap-3">
+                                @foreach ($yesNo as $value => $text)
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="Rlca" value="{{ $value }}" required
+                                        @checked(old('Rlca')===$value) class="peer sr-only">
+                                    <span class="{{ $chip }}">{{ $text }}</span>
+                                </label>
                                 @endforeach
-                            </select>
-                            @error('Rlca_Area') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                            </div>
+                            @error('Rlca') <p class="{{ $error }}">{{ $message }}</p> @enderror
+
+                            {{-- Relocation area: unlocked when Rlca = Yes --}}
+                            <div data-requires="Rlca" data-requires-value="1" class="md:w-3/4">
+                                <select id="Rlca_Area" name="Rlca_Area" required class="{{ $fieldClass('Rlca_Area') }} w-full" aria-label="Relocation area">
+                                    <option value="">Select area</option>
+                                    @foreach ($relocationAreas as $value => $text)
+                                    <option value="{{ $value }}" @selected(old('Rlca_Area')===$value)>{{ $text }}</option>
+                                    @endforeach
+                                </select>
+                                @error('Rlca_Area') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                            </div>
+
                         </div>
                     </fieldset>
 
@@ -356,36 +359,63 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
         </form>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
     <script>
         (function() {
-            function valueOf(name) {
-                var checked = document.querySelector('input[name="' + name + '"]:checked');
-                if (checked) return checked.value;
+            var form = document.querySelector('form');
+            var submitBtn = form.querySelector('button[type="submit"]');
 
-                var select = document.querySelector('select[name="' + name + '"]');
+            function currentValue(name) {
+                var checked = form.querySelector('input[name="' + name + '"]:checked');
+                if (checked) return checked.value;
+                var select = form.querySelector('select[name="' + name + '"]');
                 return select ? select.value : '';
             }
 
-            function syncConditionalFields() {
-                document.querySelectorAll('[data-show-when]').forEach(function(wrap) {
-                    var parent = wrap.parentElement.closest('[data-show-when]');
-                    var parentShown = !parent || !parent.classList.contains('hidden');
-                    var show = parentShown && valueOf(wrap.dataset.showWhen) === wrap.dataset.showValue;
+            function clearField(field) {
+                if (field.type === 'radio') field.checked = false;
+                else field.value = '';
+            }
 
-                    wrap.classList.toggle('hidden', !show);
-                    wrap.querySelectorAll('input, select').forEach(function(field) {
-                        field.disabled = !show;
+            function sync(fromUser) {
+                // DOM order matters: a parent answer is cleared before its dependents are checked.
+                form.querySelectorAll('[data-requires]').forEach(function(block) {
+                    var unlocked = currentValue(block.dataset.requires) === block.dataset.requiresValue;
+                    var wasUnlocked = !block.classList.contains('is-locked');
+
+                    block.classList.toggle('is-locked', !unlocked);
+                    block.classList.toggle('opacity-50', !unlocked);
+
+                    block.querySelectorAll('input, select').forEach(function(field) {
+                        field.disabled = !unlocked;
+                        // Clear stale answers when the question above changes, so they aren't reused.
+                        if (!unlocked && fromUser) clearField(field);
                     });
+
+                    // Move the cursor to the newly unlocked field.
+                    if (fromUser && unlocked && !wasUnlocked) {
+                        var first = block.querySelector('select, input');
+                        if (first) first.focus();
+                    }
                 });
             }
 
-            document.querySelectorAll('input[type="radio"], select').forEach(function(el) {
-                el.addEventListener('change', syncConditionalFields);
+            form.addEventListener('change', function(e) {
+                if (e.target.matches('input[type="radio"], select')) sync(true);
             });
 
-            syncConditionalFields();
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting…';
+            });
+
+            sync(false);
+
+            var summary = document.getElementById('error-summary');
+            if (summary) summary.focus();
         })();
     </script>
+    <script src="{{ asset('assets/common.js') }}"></script>
 </body>
 
 </html>

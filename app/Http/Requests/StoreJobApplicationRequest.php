@@ -74,9 +74,14 @@ class StoreJobApplicationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'Bio_Data_Path.mimes' => 'The bio data must be a PDF file.',
-            'Bio_Data_Path.max'   => 'The bio data must not be larger than 2 MB.',
-            'Mo_No.regex'         => 'Enter a valid mobile number.',
+            'MO_OS.required_if'          => 'Select the operating system for your smart phone.',
+            'Lptp_OS.required_if'        => 'Select the operating system for your laptop.',
+            'Mo_Type.required_if'        => 'Select the type of your mobile phone.',
+            'Vcle_Type_Lisc.required_if' => 'Select the vehicle licence type.',
+            'Rlca_Area.required_if'      => 'Select where you are willing to relocate.',
+            'Bio_Data_Path.mimes'        => 'The bio data must be a PDF file.',
+            'Bio_Data_Path.max'          => 'The bio data must not be larger than 2 MB.',
+            'Mo_No.regex'                => 'Enter a valid mobile number.',
         ];
     }
 
@@ -89,5 +94,27 @@ class StoreJobApplicationRequest extends FormRequest
         }
 
         return CountryMaster::where('Admn_Cutr_Mast_UIN', $countryId)->value('Name') === 'India';
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'Own_Mo'         => 'own mobile',
+            'Mo_Type'        => 'mobile type',
+            'MO_OS'          => 'mobile operating system',
+            'Own_Lptp'       => 'own laptop',
+            'Lptp_OS'        => 'laptop operating system',
+            'Drvi_Lisc'      => 'driving licence',
+            'Vcle_Type_Lisc' => 'vehicle licence type',
+            'Rlca'           => 'relocation answer',
+            'Rlca_Area'      => 'relocation area',
+            'Job_Intr'       => 'job interest',
+            'Job_Type'       => 'job type',
+            'Bio_Data_Path'  => 'bio data',
+            'Cutr_UIN'       => 'country',
+            'PinCod_UIN'     => 'pincode',
+            'Mo_No'          => 'mobile number',
+            'Emai'           => 'email address',
+        ];
     }
 }

@@ -29,7 +29,7 @@ class JobApplicationManagementController extends Controller
 
         return redirect()
             ->back()
-            ->with('status', 'Your application has been submitted.');
+            ->with('success', 'Your application has been submitted.');
     }
 
     public function redirect(string $token): RedirectResponse
