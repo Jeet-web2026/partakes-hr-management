@@ -1042,11 +1042,9 @@ $(document).ready(function () {
     function selectCompany($item) {
         const newCompanyId = $item.data("company-id");
         const companyName = $item.data("company");
+        const buttonId = document.getElementById("generateLinkBtn");
 
-        $("#generateLinkBtn").attr(
-            "href",
-            "/generate-link?company=" + newCompanyId,
-        );
+        $(buttonId).attr("href", "/generate-link?company=" + newCompanyId);
 
         $("#companyName").text(companyName);
 
@@ -1237,6 +1235,7 @@ $(document).ready(function () {
     const input = document.getElementById("linkInput");
     const expiry = document.getElementById("linkExpiry");
     const copyBtn = document.getElementById("linkCopyBtn");
+    const baseUrl = btn.dataset.url;
 
     function openModal() {
         modal.classList.remove("hidden");
@@ -1262,7 +1261,7 @@ $(document).ready(function () {
         copyBtn.textContent = "Copy";
 
         try {
-            const res = await fetch(btn.dataset.url, {
+            const res = await fetch(`${baseUrl}${btn.getAttribute("href")}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

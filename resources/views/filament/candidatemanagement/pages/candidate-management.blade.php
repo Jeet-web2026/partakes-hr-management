@@ -370,7 +370,7 @@
                         <a
                             id="generateLinkBtn"
                             href="javascript::void()"
-                            data-url="{{ route('tiny-url.store') }}"
+                            data-url="{{ url('') }}"
                             data-csrf="{{ csrf_token() }}"
                             data-share-type="candidate"
                             data-share-id="{{ $recordId ?? '' }}"

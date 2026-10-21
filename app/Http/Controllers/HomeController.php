@@ -202,9 +202,9 @@ class HomeController extends Controller
         return response()->json($draftAgreements);
     }
 
-    public function generateLink(): JsonResponse
+    public function generateLink(Request $request): JsonResponse
     {
-        $orgaUin = Session::get('selected_orga_uin');
+        $orgaUin = $request->query('company');
         abort_if(! $orgaUin, 403);
 
         $organisation = OrganisationDetails::where('Orga_UIN', $orgaUin)->firstOrFail();
