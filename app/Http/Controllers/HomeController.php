@@ -3,17 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Filament\Candidatemanagement\Pages\CandidateManagement;
-use App\Models\CountryMaster;
 use App\Models\OrganisationDetails;
 use App\Models\UserOrgaRela;
 use App\Services\Agreement\AgreementService;
 use App\Services\Common\TinyUrlService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Session;
-use Illuminate\View\View;
 
 class HomeController extends Controller
 {
@@ -219,25 +216,5 @@ class HomeController extends Controller
             'short_url'  => $this->tinyUrlService->shortUrlFor($link),
             'expires_at' => $link->Link_Expy_On->toIso8601String(),
         ], 201);
-    }
-
-    public function redirect(string $token): RedirectResponse
-    {
-        $link = $this->tinyUrlService->resolve($token);
-
-        abort_if(!$link, 410, 'This link has expired or does not exist.');
-
-        return match ($link->Link_Type) {
-            'organisation' => redirect()->route('job-apply.show', $link->Link_Token),
-            default        => abort(404),
-        };
-    }
-
-    public function show(string $token): View
-    {
-        return view('application-management.apply-job', [
-            'token' => $token,
-            'countries' => CountryMaster::orderBy('Name')->get(['Admn_Cutr_Mast_UIN', 'Name']),
-        ]);
     }
 }

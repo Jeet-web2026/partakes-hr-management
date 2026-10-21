@@ -20,12 +20,12 @@ $motherTongues = [
 'kannada' => 'Kannada', 'malayalam' => 'Malayalam', 'gujarati' => 'Gujarati',
 'punjabi' => 'Punjabi', 'urdu' => 'Urdu', 'odia' => 'Odia', 'other' => 'Other',
 ];
-$mobileTypes = ['smart_phone' => 'Smart Phone', 'feature_phone' => 'Feature Phone', 'satellite_phone' => 'Satellite Phone'];
-$mobileOs = ['android' => 'Android', 'ios' => 'iOS'];
-$laptopOs = ['android' => 'Android', 'ios' => 'iOS', 'windows' => 'Windows'];
-$licenceTypes = ['two_wheeler' => 'Two Wheeler', 'four_wheeler' => 'Four Wheeler', 'heavy_vehicle' => 'Heavy Vehicle'];
-$relocationAreas = ['within_state' => 'Within State', 'outside_state' => 'Outside State', 'outside_country' => 'Outside Country'];
-$jobTypes = ['full_time' => 'Full Time', 'part_time' => 'Part Time', 'both' => 'Both', 'consultant' => 'Consultant'];
+$mobileTypes = ['Smart Phone' => 'Smart Phone', 'Featured Phone' => 'Feature Phone', 'Satellite Phone' => 'Satellite Phone'];
+$mobileOs = ['Android' => 'Android', 'iOS' => 'iOS'];
+$laptopOs = ['Android' => 'Android', 'iOS' => 'iOS', 'Windows' => 'Windows'];
+$licenceTypes = ['Two Wheeler' => 'Two Wheeler', 'Four Wheeler' => 'Four Wheeler', 'Heavy Vehicle' => 'Heavy Vehicle'];
+$relocationAreas = ['Within State' => 'Within State', 'Outside State' => 'Outside State', 'Outside Country' => 'Outside Country'];
+$jobTypes = ['Full Time' => 'Full Time', 'Part Time' => 'Part Time', 'Both' => 'Both', 'Consultant' => 'Consultant'];
 $yesNo = ['1' => 'Yes', '0' => 'No'];
 @endphp
 <!DOCTYPE html>
@@ -67,12 +67,17 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
 
         @if ($errors->any())
         <div role="alert" class="mb-6 rounded-md border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-300">
-            Please correct the highlighted fields and submit again.
+            <p class="font-semibold">There are some errors in your submission:</p>
+            <ul class="mt-2 list-disc pl-5">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
         @endif
 
         <form method="POST"
-            action=""
+            action="{{ route('application-management.store', ['token' => $token]) }}"
             enctype="multipart/form-data"
             class="space-y-6">
             @csrf
@@ -353,7 +358,6 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
 
     <script>
         (function() {
-            // Returns the selected value of a radio group or select by field name.
             function valueOf(name) {
                 var checked = document.querySelector('input[name="' + name + '"]:checked');
                 if (checked) return checked.value;
@@ -362,8 +366,6 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
                 return select ? select.value : '';
             }
 
-            // Shows or hides each conditional block and disables its fields when hidden,
-            // so hidden fields are neither validated nor submitted.
             function syncConditionalFields() {
                 document.querySelectorAll('[data-show-when]').forEach(function(wrap) {
                     var parent = wrap.parentElement.closest('[data-show-when]');

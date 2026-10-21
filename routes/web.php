@@ -4,6 +4,7 @@ use App\Http\Controllers\AgreementNameController;
 use App\Http\Controllers\DashboardManagementController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JobApplicationManagementController;
 use App\Http\Controllers\Optimization\OptimizationController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,9 +47,14 @@ Route::middleware('partaker.session')->group(function () {
     });
 });
 
-Route::get('/t/{token}', [HomeController::class, 'redirect'])
-    ->where('token', '[a-z0-9]{6,12}')
-    ->name('tiny-url.redirect');
+Route::controller(JobApplicationManagementController::class)->group(function () {
+    Route::get('/t/{token}', 'redirect')
+        ->where('token', '[a-z0-9]{6,12}')
+        ->name('tiny-url.redirect');
 
-Route::get('/job-apply/{token}', [HomeController::class, 'show'])
-    ->name('job-apply.show');
+    Route::get('/job-apply/{token}', 'show')
+        ->name('job-apply.show');
+
+    Route::post('/apply/{token}', 'store')
+        ->name('application-management.store');
+});
