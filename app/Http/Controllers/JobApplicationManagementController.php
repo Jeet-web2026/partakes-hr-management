@@ -13,19 +13,20 @@ class JobApplicationManagementController extends Controller
 {
     public function __construct(private JobApplicationService $applications, private TinyUrlService $tinyUrlService) {}
 
-    public function show(string $token): View
+    public function show(string $token, string $orguin): View
     {
         return view('application-management.apply-job', [
             'token'     => $token,
+            'orguin' => $orguin,
             'countries' => CountryMaster::orderBy('Name')->get(['Admn_Cutr_Mast_UIN', 'Name']),
         ]);
     }
 
-    public function store(string $token, StoreJobApplicationRequest $request): RedirectResponse
+    public function store(string $token, string $orguin, StoreJobApplicationRequest $request): RedirectResponse
     {
         $validated = $request->safe()->except('Bio_Data_Path');
 
-        $this->applications->create($validated, $request->file('Bio_Data_Path'));
+        $this->applications->create($validated, $request->file('Bio_Data_Path'), $token, $orguin);
 
         return redirect()
             ->back()
@@ -39,7 +40,10 @@ class JobApplicationManagementController extends Controller
         abort_if(!$link, 410, 'This link has expired or does not exist.');
 
         return match ($link->Link_Type) {
-            'organisation' => redirect()->route('job-apply.show', $link->Link_Token),
+            'organisation' => redirect()->route('job-apply.show', [
+                'token' => $link->Link_UIN,
+                'orguin' => $link->Link_Foreign_Id_UIN
+            ]),
             default        => abort(404),
         };
     }

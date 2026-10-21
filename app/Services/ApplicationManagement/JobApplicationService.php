@@ -11,7 +11,7 @@ class JobApplicationService
 {
     private const UPLOAD_DIRECTORY = 'job-applications/bio-data';
 
-    public function create(array $data, UploadedFile $bioData): HrMastJobAply
+    public function create(array $data, UploadedFile $bioData, string $token, string $orguin): HrMastJobAply
     {
         $disk = $this->disk();
         $path = $bioData->store(self::UPLOAD_DIRECTORY, $disk);
@@ -19,6 +19,8 @@ class JobApplicationService
         try {
             return HrMastJobAply::create($this->prepare($data) + [
                 'Bio_Data_Path' => $path,
+                'Link_UIN'    => $token,
+                'Orga_UIN' => $orguin
             ]);
         } catch (Throwable $e) {
             Storage::disk($disk)->delete($path);
@@ -26,7 +28,7 @@ class JobApplicationService
             throw $e;
         }
     }
-    
+
     private function prepare(array $data): array
     {
         $ownMobile = (bool) (int) ($data['Own_Mo'] ?? 0);

@@ -68,7 +68,7 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
         <x-globalresponse />
 
         <form method="POST"
-            action="{{ route('application-management.store', ['token' => $token]) }}"
+            action="{{ route('application-management.store', ['token' => $token, 'orguin' => $orguin]) }}"
             enctype="multipart/form-data"
             class="space-y-6">
             @csrf

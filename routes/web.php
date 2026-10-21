@@ -52,9 +52,9 @@ Route::controller(JobApplicationManagementController::class)->group(function () 
         ->where('token', '[a-z0-9]{6,12}')
         ->name('tiny-url.redirect');
 
-    Route::get('/job-apply/{token}', 'show')
+    Route::get('job-apply/{token}/{orguin}', 'show')
         ->name('job-apply.show');
 
-    Route::post('/apply/{token}', 'store')
+    Route::post('submit-application/{token}/{orguin}', 'store')
         ->name('application-management.store');
 });
