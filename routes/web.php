@@ -49,3 +49,6 @@ Route::middleware('partaker.session')->group(function () {
 Route::get('/t/{token}', [HomeController::class, 'redirect'])
     ->where('token', '[a-z0-9]{6,12}')
     ->name('tiny-url.redirect');
+
+Route::get('/job-apply/{token}', [HomeController::class, 'show'])
+    ->name('job-apply.show');
