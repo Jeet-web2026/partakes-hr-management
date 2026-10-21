@@ -58,7 +58,6 @@ class HomeController extends Controller
             return redirect()->to(CandidateManagement::getUrl());
         }
 
-
         return view('organisation-select', compact('companyInformation'));
     }
 
