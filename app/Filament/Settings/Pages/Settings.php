@@ -12,7 +12,7 @@ class Settings extends Page
 
     protected static ?string $navigationLabel = 'Agreement Name';
 
-    protected static ?int $navigationSort =13;
+    protected static ?int $navigationSort = 13;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
@@ -26,7 +26,7 @@ class Settings extends Page
         $this->userUin = Session::get('partaker_user_uin');
         $this->orgaUin = Session::get('selected_orga_uin');
 
-        if (! $this->userUin || ! $this->orgaUin || ! $this->userData) {
+        if (! $this->userUin && ! $this->orgaUin && ! $this->userData) {
             $this->redirect(route('home'));
         }
     }
