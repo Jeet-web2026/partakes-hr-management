@@ -12,7 +12,7 @@ $(document).ready(function () {
     }
     let AGREEMENTS = [];
     let currentPage = 1;
-    let perPage = 5;
+    let perPage = 50;
 
     // ---------- Search & Date filter state ----------
     let searchTerm = "";
@@ -278,10 +278,10 @@ $(document).ready(function () {
 
     const sortValue = (r, key) =>
         ({
-            firstParty: r.parties[0]?.org ?? "",
-            secondParty: r.parties[1]?.org ?? "",
-            date: r.date,
-            expiry: r.expiry,
+            FaNm: r.firstName ?? "",
+            SuNm: r.surname ?? "",
+            DOB: r.dateOfBirth ?? "",
+            Job_Intr: r.jobInterest ?? "",
         })[key];
 
     // ---------- State (columns / sort / calendar month) ----------
@@ -324,12 +324,192 @@ $(document).ready(function () {
             });
         });
 
-    // ---------- Render table ----------
-    // Server already applies search filtering, so we only sort client-side here.
+    // ---------- Helpers ----------
+    const esc = (v) =>
+        String(v ?? "—").replace(
+            /[&<>"']/g,
+            (c) =>
+                ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;",
+                })[c],
+        );
+
+    const yesNo = (v) =>
+        v === true || v === 1 ? "Yes" : v === false || v === 0 ? "No" : "—";
+    const cap = (v) => (v ? v.charAt(0).toUpperCase() + v.slice(1) : "—");
+
+    const cellClass = (key) =>
+        `px-5 py-4 text-muted-foreground${visible[key] ? "" : " hidden"}`;
+
+    // ---------- Sorting (keys match data-sort in the <thead>) ----------
+
+    // ---------- Desktop column definitions (same order as <thead>) ----------
+    const columns = [
+        { key: "FaNm", render: (r) => esc(r.firstName) },
+        { key: "MiNm", render: (r) => esc(r.middleName) },
+        { key: "SuNm", render: (r) => esc(r.surname) },
+        { key: "Gend", render: (r) => esc(cap(r.gender)) },
+        { key: "DOB", render: (r) => esc(fmtDate(r.dateOfBirth)) },
+        { key: "MoTu", render: (r) => esc(cap(r.motherTongue)) },
+        { key: "Cutr_UIN", render: (r) => esc(r.country) },
+        { key: "PinCod_UIN", render: (r) => esc(r.pincode) },
+        { key: "Mo_No", render: (r) => esc(r.mobile) },
+        { key: "Own_Mo", render: (r) => yesNo(r.ownMobile) },
+        { key: "Mo_Type", render: (r) => esc(r.mobileType) },
+        { key: "MO_OS", render: (r) => esc(r.mobileOs) },
+        { key: "Emai", render: (r) => esc(r.email) },
+        { key: "Own_Lptp", render: (r) => yesNo(r.ownLaptop) },
+        { key: "Lptp_OS", render: (r) => esc(r.laptopOs) },
+        { key: "Drvi_Lisc", render: (r) => yesNo(r.drivingLicence) },
+        { key: "Vcle_Type_Lisc", render: (r) => esc(r.licenceType) },
+        { key: "Rlca", render: (r) => yesNo(r.relocate) },
+        { key: "Rlca_Area", render: (r) => esc(r.relocationArea) },
+        { key: "Job_Intr", render: (r) => esc(r.jobInterest) },
+        { key: "Job_Type", render: (r) => esc(r.jobType) },
+    ];
+
+    // ---------- Row builders ----------
+    function bioDataCell(r) {
+        return r.bioDataUrl
+            ? `<a href="${esc(r.bioDataUrl)}" target="_blank" rel="noopener"
+               class="text-2xl text-blue-400 hover:text-blue-300" title="View bio data">
+               <i class="ri-pass-valid-line"></i>
+           </a>`
+            : `<span class="text-slate-500">—</span>`;
+    }
+
+    function desktopRow(r) {
+        const dataCells = columns
+            .map(
+                (col) =>
+                    `<td data-col="${col.key}" class="${cellClass(col.key)}">${col.render(r)}</td>`,
+            )
+            .join("");
+
+        return `
+        <tr class="border-b border-white/10 hover:bg-white/5 last:border-b-0">
+            <td class="px-3 py-4 text-center">${bioDataCell(r)}</td>
+            ${dataCells}
+            <td class="px-5 py-4 text-right">
+                <div class="relative inline-block" data-menu>
+                    <button data-menu-toggle="row-${esc(r.id)}"
+                        class="h-9 w-9 inline-flex items-center justify-center rounded hover:bg-white/10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="12" cy="5" r="1"/>
+                            <circle cx="12" cy="19" r="1"/>
+                        </svg>
+                    </button>
+
+                    <div id="row-${esc(r.id)}"
+                        class="hidden absolute right-0 mt-1 w-36 rounded-md border border-white/10 bg-card shadow-xl z-20 p-1">
+                        ${menuItemPdf(r)}
+                    </div>
+                </div>
+            </td>
+        </tr>`;
+    }
+
+    function menuItemPdf(r) {
+        if (!r.bioDataUrl) {
+            return `<span class="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-500">
+                    <i class="ri-file-pdf-line"></i> No file
+                </span>`;
+        }
+
+        return `<a href="${esc(r.bioDataUrl)}" target="_blank" rel="noopener"
+               class="flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
+               <i class="ri-file-pdf-line"></i>
+               View PDF
+            </a>`;
+    }
+
+    function mobileCard(r) {
+        const name = r.fullName || "Unknown";
+        const initials = name
+            .split(" ")
+            .filter(Boolean)
+            .map((w) => w.charAt(0))
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+
+        return `
+        <div class="rounded-xl border border-white/10 bg-card overflow-hidden" data-mobile-card="${esc(r.id)}">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="h-9 w-9 shrink-0 rounded-full bg-blue-500/15 text-blue-300 text-xs font-semibold flex items-center justify-center">
+                        ${esc(initials)}
+                    </div>
+                    <div class="font-semibold text-lg truncate">${esc(name)}</div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="rounded-md bg-white/5 px-2 py-1 text-[10px] font-medium text-muted-foreground">
+                        ${esc(r.appliedOn)}
+                    </span>
+
+                    <div class="relative" data-menu>
+                        <button data-menu-toggle="mobile-row-${esc(r.id)}"
+                            class="h-8 w-8 flex items-center justify-center rounded hover:bg-white/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="1"/>
+                                <circle cx="12" cy="5" r="1"/>
+                                <circle cx="12" cy="19" r="1"/>
+                            </svg>
+                        </button>
+
+                        <div id="mobile-row-${esc(r.id)}"
+                            class="hidden absolute right-0 top-9 w-36 rounded-md border border-white/10 bg-card shadow-xl z-50 p-1">
+                            ${menuItemPdf(r)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="grid grid-cols-2 gap-4 px-4 pb-4 pt-2">
+                <div>
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 mb-1">Mobile</div>
+                    <div class="text-xs text-muted-foreground truncate">${esc(r.mobile)}</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 mb-1">Email</div>
+                    <div class="text-xs text-muted-foreground truncate">${esc(r.email)}</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 mb-1">Job interest</div>
+                    <div class="text-xs text-muted-foreground truncate">${esc(r.jobInterest)}</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 mb-1">Job type</div>
+                    <div class="text-xs text-muted-foreground truncate">${esc(r.jobType)}</div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-white/5 px-4 py-2.5 flex items-center justify-between">
+                <div class="text-xs text-muted-foreground">
+                    DOB: <span class="text-white/70">${esc(fmtDate(r.dateOfBirth))}</span>
+                </div>
+                <div>${bioDataCell(r)}</div>
+            </div>
+        </div>`;
+    }
+
+    // ---------- Main render ----------
     function renderTable(data = AGREEMENTS) {
         let rows = data;
 
-        // Sorting
         if (sort) {
             rows = [...rows].sort((a, b) => {
                 const av = sortValue(a, sort.key);
@@ -341,441 +521,25 @@ $(document).ready(function () {
             });
         }
 
-        // =========================
-        // DESKTOP TABLE
-        // =========================
-
         const tbody = document.getElementById("tbody");
-
-        if (!tbody) return;
-
-        tbody.innerHTML = rows
-            .map(
-                (r) => `
-            <tr class="border-b border-white/10 hover:bg-white/5 last:border-b-0">
-
-                <!-- Agreement -->
-                <td class="px-5 py-4">
-                    <div class="min-w-0">
-                        <a href="/view-agreement/${r.id}">
-                            <div class="truncate font-medium">
-                                ${r.name}
-                            </div>
-                        </a>
-                    </div>
-                </td>
-
-                <td data-col="fileNo"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.fileNo ?? "—"}
-                </td>
-
-                <td data-col="referenceNo"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.refNo ?? "—"}
-                </td>
-
-                <td data-col="category"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.categoryLabel ?? "—"}
-                </td>
-
-                <td data-col="type"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.type ?? "—"}
-                </td>
-
-                <td data-col="firstParty"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${r.parties?.[0]?.org ?? "—"}
-                </td>
-
-                <td data-col="secondParty"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${r.parties?.[1]?.org ?? "—"}
-                </td>
-
-                 <td data-col="depositAmount"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${r.depositAmount ?? "—"}
-                </td>
-
-                <td data-col="date"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${fmtDate(r.date)}
-                </td>
-
-                <td data-col="expiry"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${fmtDate(r.expiry)}
-                </td>
-
-                <td data-col="expiry_by"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${expiryBadge(r.daysLeft, r.parentAgreement)}
-                </td>
-
-                <td data-col="signingDate"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${fmtDate(r.signingDate)}
-                </td>
-
-                <td data-col="notaryDate"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${fmtDate(r.notaryDate)}
-                </td>
-
-                <td data-col="version"
-                    class="px-5 py-4 text-muted-foreground">
-                    ${r.version ?? "—"}
-                </td>
-
-                <td data-col="drafted"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.drafted ?? "—"}
-                </td>
-
-                <td data-col="agreementSigned"
-                    class="px-5 py-4 text-muted-foreground hidden capitalize">
-                    ${r.agmtSigned ?? "—"}
-                </td>
-
-                <td data-col="agreementRecDate"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                     ${fmtDate(r.agmtRecDate)}
-                </td>
-
-                <td data-col="agreementReceived"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.agmtRecType ?? "—"}
-                </td>
-
-                <td data-col="jurisdiction"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    ${r.jurisdiction ?? "—"}
-                </td>
-
-                <td data-col="remarks"
-                    class="px-5 py-4 text-muted-foreground hidden">
-                    <span class="line-clamp-2">
-                        ${r.remarks ?? "—"}
-                    </span>
-                </td>
-
-                <!-- Action -->
-                <td class="px-5 py-4 text-right">
-                    <div class="relative inline-block" data-menu>
-
-                        <button
-                            data-menu-toggle="row-${r.id}"
-                            class="h-9 w-9 inline-flex items-center justify-center rounded hover:bg-white/10">
-
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round">
-
-                                <circle cx="12" cy="12" r="1"/>
-                                <circle cx="12" cy="5" r="1"/>
-                                <circle cx="12" cy="19" r="1"/>
-
-                            </svg>
-                        </button>
-
-                        <div
-                            id="row-${r.id}"
-                            class="hidden absolute right-0 mt-1 w-36 rounded-md border border-white/10 bg-card shadow-xl z-20 p-1">
-
-                            <a href="/edit-agreement/${r.id}"
-                                class="flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
-                                <i class="ri-edit-box-line"></i>
-                                Edit
-                            </a>
-
-                            <a href="/renewal-agreement/${r.id}"
-                                class="flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
-                                <i class="ri-file-add-line"></i>
-                                Renew
-                            </a>
-
-                            <a href="#"
-                                data-id="${r.id}"
-                                class="generate-link-btn flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
-                                <i class="ri-links-line"></i>
-                                Generate Link
-                            </a>
-
-                            <a href="#"
-                                data-id="${r.id}"
-                                class="delete-agreement-btn flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5 text-red-400">
-                                <i class="ri-delete-bin-5-line"></i>
-                                Delete
-                            </a>
-
-                        </div>
-                    </div>
-                </td>
-
-            </tr>
-        `,
-            )
-            .join("");
-
-        // =========================
-        // MOBILE CARDS
-        // =========================
-
         const mobileList = document.getElementById("mobileAgreementList");
 
-        mobileList.innerHTML = rows
-            .map((r) => {
-                const name = r.name ?? "Unknown";
-
-                // Generate initials
-                const initials = name
-                    .split(" ")
-                    .map((word) => word.charAt(0))
-                    .join("")
-                    .substring(0, 2)
-                    .toUpperCase();
-
-                const phone = r.phone ?? r.mobile ?? r.phoneNumber ?? null;
-
-                const email = r.email ?? r.emailAddress ?? null;
-
-                const firstParty = r.parties?.[0]?.org ?? "—";
-
-                const secondParty = r.parties?.[1]?.org ?? "—";
-
-                return `
-                <div
-                    class="rounded-xl border border-white/10 bg-card overflow-hidden"
-                    data-mobile-card="${r.id}">
-
-                    <!-- Card Header -->
-                    <div class="flex items-center justify-between px-4 py-3">
-
-                        <a
-                            href="/view-agreement/${r.id}"
-                            class="flex items-center gap-3 min-w-0">
-
-                            <!-- Name -->
-                            <div class="min-w-0">
-
-                                <div
-                                    class="font-semibold text-lg truncate">
-
-                                    ${name}
-
-                                </div>
-
-                            </div>
-
-                        </a>
-
-
-                        <!-- Right Side -->
-                        <div class="flex items-center gap-2 shrink-0">
-
-                            <!-- Date -->
-                            <span
-                                class="rounded-md bg-white/5 px-2 py-1
-                                text-[10px] font-medium
-                                text-muted-foreground capitalize">
-
-                                ${fmtDate(r.date)}
-
-                            </span>
-
-
-                            <!-- Menu -->
-                            <div class="relative" data-menu>
-
-                                <button
-                                    data-menu-toggle="mobile-row-${r.id}"
-                                    class="h-8 w-8 flex items-center justify-center
-                                    rounded hover:bg-white/10">
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2">
-
-                                        <circle cx="12" cy="12" r="1"/>
-                                        <circle cx="12" cy="5" r="1"/>
-                                        <circle cx="12" cy="19" r="1"/>
-
-                                    </svg>
-
-                                </button>
-
-
-                                <div
-                                    id="mobile-row-${r.id}"
-                                    class="hidden absolute right-0 top-9
-                                    w-36 rounded-md border border-white/10
-                                    bg-card shadow-xl z-50 p-1">
-
-
-                                    <a
-                                        href="/edit-agreement/${r.id}"
-                                        class="block px-3 py-2 text-sm rounded hover:bg-white/5">
-                                        <i class="ri-edit-box-line"></i>
-                                        Edit
-
-                                    </a>
-
-                                    <a
-                                        href="/renewal-agreement/${r.id}"
-                                        class="block px-3 py-2 text-sm rounded hover:bg-white/5">
-                                        <i class="ri-file-add-line"></i>
-                                        Renew
-
-                                    </a>
-
-                                    <a href="#"
-                                        data-id="${r.id}"
-                                        class="generate-link-btn flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
-                                        <i class="ri-links-line"></i>
-                                        Generate Link
-                                    </a>
-
-                                    <a
-                                        href="#"
-                                        data-id="${r.id}"
-                                        class="delete-agreement-btn block px-3 py-2 text-sm rounded hover:bg-white/5 text-red-400">
-                                        <i class="ri-delete-bin-5-line"></i>
-                                        Delete
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Card Body -->
-                    <div class="grid grid-cols-2 gap-4 px-4 pb-4 pt-2">
-
-                        <!-- Personal Info -->
-                        
-
-
-                        <!-- Organization -->
-                        <div>
-
-                            <div
-                                class="text-[10px] font-semibold uppercase
-                                tracking-wider text-cyan-400 mb-2">
-
-                                Parties
-
-                            </div>
-
-                            <div
-                                class="text-xs text-muted-foreground truncate">
-
-                                ${firstParty}
-
-                            </div>
-
-                            ${
-                                secondParty !== "—"
-                                    ? `
-                                    <div
-                                        class="text-xs text-muted-foreground
-                                        truncate mt-1">
-
-                                        ${secondParty}
-
-                                    </div>
-                                    `
-                                    : ""
-                            }
-
-                        </div>
-                        <div>
-
-                            <div class="flex flex-row items-center gap-3">
-                            
-                            <div
-                                class="text-[10px] font-semibold uppercase
-                                tracking-wider text-cyan-400">
-
-                                File no.
-
-                            </div>
-
-                            <div class="text-[10px] text-muted-foreground">
-                                ${r.fileNo ?? ""}
-                            </div>
-                            
-                            </div>
-                            <div class="flex flex-row items-center gap-3 mt-4">
-                            
-                            <div
-                                class="text-[10px] font-semibold uppercase
-                                tracking-wider text-cyan-400">
-
-                               Verson
-
-                            </div>
-
-                            <div class="text-[10px] text-muted-foreground">
-                                ${r.version ?? ""}
-                            </div>
-                            
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Bottom Info -->
-                    <div
-                        class="border-t border-white/5
-                        px-4 py-2.5 flex items-center
-                        justify-between">
-
-                        <div class="text-xs text-muted-foreground">
-
-                            Expiry:
-                            <span class="text-white/70">
-                                ${fmtDate(r.expiry)}
-                            </span>
-
-                        </div>
-
-                        <div>
-                            ${expiryBadge(r.daysLeft, r.parentAgreement)}
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-            })
-            .join("");
-
-        // =========================
-        // EXISTING FUNCTIONS
-        // =========================
-
-        document.getElementById("entriesLabel").textContent =
-            `Showing 1 to ${rows.length} of ${rows.length} entries`;
+        if (tbody) {
+            tbody.innerHTML = rows.length
+                ? rows.map(desktopRow).join("")
+                : `<tr><td colspan="${columns.length + 2}" class="px-5 py-10 text-center text-muted-foreground">No applications found.</td></tr>`;
+        }
+
+        if (mobileList) {
+            mobileList.innerHTML = rows.length
+                ? rows.map(mobileCard).join("")
+                : `<div class="py-10 text-center text-sm text-muted-foreground">No applications found.</div>`;
+        }
+
+        const label = document.getElementById("entriesLabel");
+        if (label) {
+            label.textContent = `Showing 1 to ${rows.length} of ${rows.length} entries`;
+        }
 
         applyColumnVisibility();
         renderSortIcons();

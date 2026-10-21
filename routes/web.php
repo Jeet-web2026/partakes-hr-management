@@ -57,4 +57,12 @@ Route::controller(JobApplicationManagementController::class)->group(function () 
 
     Route::post('submit-application/{token}/{orguin}', 'store')
         ->name('application-management.store');
+
+    Route::get('/job-applications', 'index')
+        ->name('job-applications.index')
+        ->middleware('partaker.session');
+
+    Route::get('/job-applications/{application}/bio-data', 'bioData')
+        ->middleware('signed', 'partaker.session')
+        ->name('job-applications.bio-data');
 });

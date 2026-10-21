@@ -3,8 +3,10 @@
 namespace App\Services\ApplicationManagement;
 
 use App\Models\HrMastJobAply;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Throwable;
 
 class JobApplicationService
@@ -81,6 +83,85 @@ class JobApplicationService
     }
 
     private function disk(): string
+    {
+        return config('filesystems.job_application_disk', config('filesystems.default'));
+    }
+
+    public function paginateApplications(array $filters = []): LengthAwarePaginator
+    {
+        $search = $filters['search'] ?? null;
+
+        $query = HrMastJobAply::query()
+            ->when($filters['company_id'] ?? null, fn($q, $companyId) => $q->where('Orga_UIN', $companyId))
+            ->when($search, function ($q, $term) {
+                $q->where(function ($q) use ($term) {
+                    $like = "%{$term}%";
+                    $q->where('FaNm', 'like', $like)
+                        ->orWhere('MiNm', 'like', $like)
+                        ->orWhere('SuNm', 'like', $like)
+                        ->orWhere('Emai', 'like', $like)
+                        ->orWhere('Mo_No', 'like', $like)
+                        ->orWhere('Job_Intr', 'like', $like);
+                });
+            })
+            ->when($filters['job_type'] ?? null, fn($q, $jobType) => $q->where('Job_Type', $jobType))
+            ->when($filters['date_from'] ?? null, fn($q, $from) => $q->whereDate('CrBy', '>=', $from))
+            ->when($filters['date_to'] ?? null, fn($q, $to) => $q->whereDate('CrBy', '<=', $to))
+            ->latest('Aply_UIN');
+
+        $perPage = min((int) ($filters['per_page'] ?? 100), 250);
+
+        return $query->paginate($perPage)->through(function (HrMastJobAply $application) {
+            return [
+                'id'          => (string) $application->Aply_UIN,
+                'fullName'    => trim(implode(' ', array_filter([
+                    $application->FaNm,
+                    $application->MiNm,
+                    $application->SuNm,
+                ]))),
+                'firstName'   => $application->FaNm,
+                'middleName'  => $application->MiNm,
+                'surname'     => $application->SuNm,
+                'gender'      => $application->Gend,
+                'dateOfBirth' => $application->DOB?->format('Y-m-d'),
+                'motherTongue' => $application->MoTu,
+                'country'     => $application->Cutr_UIN,
+                'pincode'     => $application->PinCod_UIN,
+                'mobile'      => $application->Mo_No,
+                'email'       => $application->Emai,
+
+                'ownMobile'   => $application->Own_Mo,
+                'mobileType'  => $application->Mo_Type,
+                'mobileOs'    => $application->MO_OS,
+
+                'ownLaptop'   => $application->Own_Lptp,
+                'laptopOs'    => $application->Lptp_OS,
+
+                'drivingLicence' => $application->Drvi_Lisc,
+                'licenceType'    => $application->Vcle_Type_Lisc,
+
+                'relocate'        => $application->Rlca,
+                'relocationArea'  => $application->Rlca_Area,
+
+                'jobInterest' => $application->Job_Intr,
+                'jobType'     => $application->Job_Type,
+
+                'bioDataUrl' => $application->Bio_Data_Path
+                    ? URL::temporarySignedRoute(
+                        'job-applications.bio-data',
+                        now()->addMinutes(15),
+                        ['application' => $application->Aply_UIN]
+                    )
+                    : null,
+
+                'companyId'  => $application->Orga_UIN,
+                'linkId'     => $application->Link_UIN,
+                'appliedOn'  => $application->CrBy?->format('Y-m-d H:i'),
+            ];
+        });
+    }
+
+    public function bioDataDisk(): string
     {
         return config('filesystems.job_application_disk', config('filesystems.default'));
     }

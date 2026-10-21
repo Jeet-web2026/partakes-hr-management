@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexJobApplicationRequest;
 use App\Http\Requests\StoreJobApplicationRequest;
 use App\Models\CountryMaster;
+use App\Models\HrMastJobAply;
 use App\Services\ApplicationManagement\JobApplicationService;
 use App\Services\Common\TinyUrlService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class JobApplicationManagementController extends Controller
 {
@@ -46,5 +51,28 @@ class JobApplicationManagementController extends Controller
             ]),
             default        => abort(404),
         };
+    }
+
+    public function index(IndexJobApplicationRequest $request): JsonResponse
+    {
+        return response()->json(
+            $this->applications->paginateApplications($request->validated())
+        );
+    }
+
+    public function bioData(HrMastJobAply $application): StreamedResponse
+    {
+        abort_unless($application->Bio_Data_Path, 404);
+
+        $disk = $this->applications->bioDataDisk();
+
+        abort_unless(Storage::disk($disk)->exists($application->Bio_Data_Path), 404);
+
+        return Storage::disk($disk)->response(
+            $application->Bio_Data_Path,
+            'bio-data-' . $application->Aply_UIN . '.pdf',
+            ['Content-Type' => 'application/pdf'],
+            'inline'
+        );
     }
 }
