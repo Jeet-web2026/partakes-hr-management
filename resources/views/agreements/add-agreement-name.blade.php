@@ -1,5 +1,5 @@
 <x-base-component tailwind="true" jQuery="true" subheading="Add Agreement Name" metadata="Add Agreement Name — Renewal Tracker" metadescription="description" bIcons="true">
-    <x-secondary-header backurl="/settings/settings" :companyInformation="$companyInformation" :userData="$userData" title="Agreements" backurlforSettings="https://partakers.in/dashboard" />
+    <x-secondary-header backurl="/s" :companyInformation="$companyInformation" :userData="$userData" title="Agreements" backurlforSettings="https://partakers.in/dashboard" />
 
     <main class="mx-auto max-w-5xl px-6 py-8">
 
@@ -84,7 +84,7 @@
             </section>
 
             <div class="flex flex-wrap justify-end gap-3 pt-2">
-                <a href="/settings/settings" class="btn btn-ghost">Cancel</a>
+                <a href="/s" class="btn btn-ghost">Cancel</a>
                 <button id="submitAgreementCreateBtn" type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Submit</button>
             </div>
         </form>

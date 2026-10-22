@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Feedback;
 use Illuminate\Support\Str;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -35,6 +36,9 @@ class CandidatemanagementPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Candidatemanagement/Resources'), for: 'App\Filament\Candidatemanagement\Resources')
             ->discoverPages(in: app_path('Filament/Candidatemanagement/Pages'), for: 'App\Filament\Candidatemanagement\Pages')
             ->discoverWidgets(in: app_path('Filament/Candidatemanagement/Widgets'), for: 'App\Filament\Candidatemanagement\Widgets')
+            ->pages([
+                Feedback::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
