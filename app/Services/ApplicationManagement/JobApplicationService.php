@@ -108,7 +108,10 @@ class JobApplicationService
             ->when($filters['job_type'] ?? null, fn($q, $jobType) => $q->where('Job_Type', $jobType))
             ->when($filters['date_from'] ?? null, fn($q, $from) => $q->whereDate('CrBy', '>=', $from))
             ->when($filters['date_to'] ?? null, fn($q, $to) => $q->whereDate('CrBy', '<=', $to))
-            ->when($filters['statuses'] ?? null)
+            ->when(
+                $filters['statuses'] ?? null,
+                fn($q, $statuses) => $q->whereIn('App_Stus', (array) $statuses)
+            )
             ->latest('Aply_UIN');
 
         $perPage = min((int) ($filters['per_page'] ?? 100), 250);

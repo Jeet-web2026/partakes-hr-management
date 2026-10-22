@@ -172,7 +172,7 @@
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="short_listed">
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="shortlisted">
                                             Candidate Short Listed
                                         </label>
 
@@ -187,12 +187,12 @@
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="offer_issued">
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="offer_letter_issued">
                                             Offer Letter Issued
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="offer_accepted">
+                                            <input type="checkbox" class="status-checkbox accent-blue-600" value="accepted">
                                             Offer Accepted
                                         </label>
 

@@ -20,6 +20,7 @@ class IndexJobApplicationRequest extends FormRequest
             'date_from'  => ['nullable', 'date'],
             'date_to'    => ['nullable', 'date', 'after_or_equal:date_from'],
             'per_page'   => ['nullable', 'integer', Rule::in([50, 100, 250])],
+            'statuses' => ['nullable', 'max:100'],
         ];
     }
 
