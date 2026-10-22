@@ -22,7 +22,8 @@ class JobApplicationService
             return HrMastJobAply::create($this->prepare($data) + [
                 'Bio_Data_Path' => $path,
                 'Link_UIN'    => $token,
-                'Orga_UIN' => $orguin
+                'Orga_UIN' => $orguin,
+                'App_Stus' => 'new'
             ]);
         } catch (Throwable $e) {
             Storage::disk($disk)->delete($path);
@@ -107,6 +108,7 @@ class JobApplicationService
             ->when($filters['job_type'] ?? null, fn($q, $jobType) => $q->where('Job_Type', $jobType))
             ->when($filters['date_from'] ?? null, fn($q, $from) => $q->whereDate('CrBy', '>=', $from))
             ->when($filters['date_to'] ?? null, fn($q, $to) => $q->whereDate('CrBy', '<=', $to))
+            ->when($filters['statuses'] ?? null)
             ->latest('Aply_UIN');
 
         $perPage = min((int) ($filters['per_page'] ?? 100), 250);

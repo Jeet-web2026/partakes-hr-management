@@ -6,6 +6,7 @@ use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Session;
+use Livewire\Attributes\Computed;
 
 class CandidateManagement extends Page
 {
@@ -33,7 +34,7 @@ class CandidateManagement extends Page
             $this->redirect(route('home'));
         }
     }
-
+    #[Computed]
     public function getStatuses(): array
     {
         return [

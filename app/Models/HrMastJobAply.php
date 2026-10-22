@@ -36,7 +36,8 @@ class HrMastJobAply extends Model
         'Job_Type',
         'Bio_Data_Path',
         'Link_UIN',
-        'Orga_UIN'
+        'Orga_UIN',
+        'App_Stus'
     ];
 
     protected $casts = [

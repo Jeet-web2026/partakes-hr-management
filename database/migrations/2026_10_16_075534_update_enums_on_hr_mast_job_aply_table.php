@@ -15,6 +15,7 @@ return new class extends Migration
             $table->enum('Mo_Type', ['Smart Phone', 'Featured Phone', 'Satellite Phone'])->nullable()->change();
             $table->enum('MO_OS', ['Android', 'iOS'])->nullable()->change();
             $table->enum('Lptp_OS', ['Android', 'iOS', 'Windows'])->nullable()->change();
+            $table->enum('App_Stus', ['new', 'shortlisted', 'interview_scheduled', 'selected', 'offer_letter_issued', 'accepted']);
         });
     }
 

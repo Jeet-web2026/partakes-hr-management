@@ -98,22 +98,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
-                                        {{-- Date (shown once a status is selected) --}}
-                                        @if ($statusFilter)
-                                        <div class="flex flex-col gap-1 w-full sm:w-56">
-                                            <label for="statusDate" class="font-medium text-gray-700">
-                                                {{ $statuses[$statusFilter] }} Date
-                                            </label>
-                                            <input
-                                                id="statusDate"
-                                                type="date"
-                                                wire:model.live="statusDate"
-                                                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm
-                                                focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
-                                        </div>
-                                        @endif
-
                                     </div>
 
 
