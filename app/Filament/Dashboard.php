@@ -12,7 +12,7 @@ class Dashboard extends Page
     use HasCompanyHeader;
 
     // Icon shown next to the nav label
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     // Label shown in the left menu
     protected static ?string $navigationLabel = 'Dashboard';
