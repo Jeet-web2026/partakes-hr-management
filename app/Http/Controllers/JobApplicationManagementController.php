@@ -27,15 +27,15 @@ class JobApplicationManagementController extends Controller
         ]);
     }
 
-    public function store(string $token, string $orguin, StoreJobApplicationRequest $request): RedirectResponse
+    public function store(string $token, string $orguin, StoreJobApplicationRequest $request): View
     {
         $validated = $request->safe()->except('Bio_Data_Path');
 
-        $this->applications->create($validated, $request->file('Bio_Data_Path'), $token, $orguin);
+        $application = $this->applications->create($validated, $request->file('Bio_Data_Path'), $token, $orguin);
 
-        return redirect()
-            ->to(url('/t/' . $token))
-            ->with('success', 'Your application has been submitted.');
+        return view('application-management.job-application-success', [
+            'submittedAt' => $application->CrBy->format('M j, Y \a\t g:i A'),
+        ]);
     }
 
     public function redirect(string $token): RedirectResponse
