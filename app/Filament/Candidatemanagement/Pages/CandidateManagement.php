@@ -14,7 +14,7 @@ class CandidateManagement extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
     protected static ?string $navigationLabel = 'Candidate Management';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
     protected string $view = 'filament.candidatemanagement.pages.candidate-management';
     protected static ?string $slug = 'candidate-management';
 

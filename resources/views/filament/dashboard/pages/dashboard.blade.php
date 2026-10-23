@@ -142,7 +142,7 @@
     </main>
 
     <script>
-        var AGREEMENTS_URL = "{{ route('agreements.data') }}";
+        var AGREEMENTS_URL = "";
         var DASHBOARD_STATS_URL = "{{ route('dashboard-data') }}";
     </script>
 

@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Dashboard;
 use App\Filament\Feedback;
 use Illuminate\Support\Str;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -38,6 +39,7 @@ class CandidatemanagementPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Candidatemanagement/Widgets'), for: 'App\Filament\Candidatemanagement\Widgets')
             ->pages([
                 Feedback::class,
+                Dashboard::class
             ])
             ->middleware([
                 EncryptCookies::class,
