@@ -34,7 +34,7 @@ class JobApplicationManagementController extends Controller
         $this->applications->create($validated, $request->file('Bio_Data_Path'), $token, $orguin);
 
         return redirect()
-            ->back()
+            ->to(url('/t/' . $token))
             ->with('success', 'Your application has been submitted.');
     }
 
