@@ -3,6 +3,7 @@
 namespace App\Services\ApplicationManagement;
 
 use App\Models\HrMastJobAply;
+use App\Models\ShareLink;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -19,12 +20,18 @@ class JobApplicationService
         $path = $bioData->store(self::UPLOAD_DIRECTORY, $disk);
 
         try {
-            return HrMastJobAply::create($this->prepare($data) + [
+            $newApplication = HrMastJobAply::create($this->prepare($data) + [
                 'Bio_Data_Path' => $path,
                 'Link_UIN'    => $token,
                 'Orga_UIN' => $orguin,
                 'App_Stus' => 'new'
             ]);
+
+            ShareLink::where('Link_UIN', $token)->update([
+                'Link_Expy_On' => now()
+            ]);
+
+            return $newApplication;
         } catch (Throwable $e) {
             Storage::disk($disk)->delete($path);
 
