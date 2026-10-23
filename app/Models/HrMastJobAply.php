@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HrMastJobAply extends Model
 {
@@ -47,4 +48,9 @@ class HrMastJobAply extends Model
         'Drvi_Lisc' => 'boolean',
         'Rlca'      => 'boolean',
     ];
+
+    public function country(): HasOne
+    {
+        return $this->hasOne(CountryMaster::class, 'Admn_Cutr_Mast_UIN', 'Cutr_UIN');
+    }
 }

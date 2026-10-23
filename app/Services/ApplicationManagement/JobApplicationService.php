@@ -100,6 +100,7 @@ class JobApplicationService
         $search = $filters['search'] ?? null;
 
         $query = HrMastJobAply::query()
+            ->with('country')
             ->when($filters['company_id'] ?? null, fn($q, $companyId) => $q->where('Orga_UIN', $companyId))
             ->when($search, function ($q, $term) {
                 $q->where(function ($q) use ($term) {
@@ -137,7 +138,7 @@ class JobApplicationService
                 'gender'      => $application->Gend,
                 'dateOfBirth' => $application->DOB?->format('Y-m-d'),
                 'motherTongue' => $application->MoTu,
-                'country'     => $application->Cutr_UIN,
+                'country'     => $application->country->Name,
                 'pincode'     => $application->PinCod_UIN,
                 'mobile'      => $application->Mo_No,
                 'email'       => $application->Emai,
