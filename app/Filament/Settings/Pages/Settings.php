@@ -10,11 +10,11 @@ class Settings extends Page
 {
     use HasCompanyHeader;
 
-    protected static ?string $navigationLabel = 'Agreement Name';
+    protected static ?string $navigationLabel = 'Manage Interview';
 
     protected static ?int $navigationSort = 13;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected string $view = 'filament.settings.pages.settings';
 
