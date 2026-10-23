@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Filament\Candidatemanagement\Pages\CandidateManagement;
+use App\Filament\Dashboard;
 use App\Models\OrganisationDetails;
 use App\Models\UserOrgaRela;
 use App\Services\Agreement\AgreementService;
@@ -81,7 +82,7 @@ class HomeController extends Controller
 
         Session::put('selected_orga_uin', $request->input('Orga_UIN'));
 
-        return redirect()->to(CandidateManagement::getUrl());
+        return redirect()->to(Dashboard::getUrl());
     }
 
     public function allAgreements()
