@@ -65,4 +65,7 @@ Route::controller(JobApplicationManagementController::class)->group(function () 
     Route::get('/job-applications/{application}/bio-data', 'bioData')
         ->middleware('signed', 'partaker.session')
         ->name('job-applications.bio-data');
+
+    Route::get('/apply/{submitTime}/success', 'success')
+        ->name('job-application.success');
 });

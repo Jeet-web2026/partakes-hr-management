@@ -27,15 +27,15 @@ class JobApplicationManagementController extends Controller
         ]);
     }
 
-    public function store(string $token, string $orguin, StoreJobApplicationRequest $request): View
+    public function store(string $token, string $orguin, StoreJobApplicationRequest $request): RedirectResponse
     {
         $validated = $request->safe()->except('Bio_Data_Path');
 
         $application = $this->applications->create($validated, $request->file('Bio_Data_Path'), $token, $orguin);
 
-        return view('application-management.job-application-success', [
-            'submittedAt' => $application->CrBy->format('M j, Y \a\t g:i A'),
-        ]);
+        return redirect()
+            ->route('job-application.success', [$application->CrBy->format('M j, Y \a\t g:i A')])
+            ->with('sucesss', "Application sumitted successfully!");
     }
 
     public function redirect(string $token): RedirectResponse
@@ -74,5 +74,12 @@ class JobApplicationManagementController extends Controller
             ['Content-Type' => 'application/pdf'],
             'inline'
         );
+    }
+
+    public function success(string $submitTime): View|RedirectResponse
+    {
+        return view('application-management.job-application-success', [
+            'submittedAt' => $submitTime,
+        ]);
     }
 }
