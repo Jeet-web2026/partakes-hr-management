@@ -22,7 +22,7 @@ class InterviewQuestions extends Page
     protected static ?string $navigationLabel = 'Interview Questions';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
     protected static ?int $navigationSort = 11;
-    protected static ?string $slug = 'settings/interview-questions';
+    protected static ?string $slug = 'interview-questions';
 
     protected string $view = 'filament.settings.pages.interview-questions';
 
