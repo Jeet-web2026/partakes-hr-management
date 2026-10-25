@@ -7,6 +7,7 @@ use App\Filament\Dashboard;
 use App\Models\OrganisationDetails;
 use App\Models\UserOrgaRela;
 use App\Services\Agreement\AgreementService;
+use App\Services\ApplicationManagement\MastIntvStepService;
 use App\Services\Common\TinyUrlService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,8 @@ class HomeController extends Controller
 {
     public function __construct(
         protected AgreementService $agreementService,
-        private TinyUrlService $tinyUrlService
+        private TinyUrlService $tinyUrlService,
+        protected MastIntvStepService $intvStepService,
     ) {}
 
     public function index(Request $request)
@@ -81,6 +83,8 @@ class HomeController extends Controller
         }
 
         Session::put('selected_orga_uin', $request->input('Orga_UIN'));
+
+        $this->intvStepService->ensureDefaultStepsQueued($request->input('Orga_UIN'), $userUin);
 
         return redirect()->to(Dashboard::getUrl());
     }

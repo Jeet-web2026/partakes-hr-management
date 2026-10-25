@@ -30,4 +30,9 @@ class Settings extends Page
             $this->redirect(route('home'));
         }
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 }

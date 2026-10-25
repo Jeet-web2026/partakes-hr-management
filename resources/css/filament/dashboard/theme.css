@@ -74,3 +74,21 @@
 .fi-sidebar-close-overlay{
     z-index: 25 !important;
 }
+
+.fi-ta-ctn {
+    background-color: #0a1428;   /* page/table background */
+    border-color: #1f2a44;       /* border */
+}
+
+.fi-ta-header-cell,
+.fi-ta-header {
+    background-color: #111c33;   /* header row */
+}
+
+.fi-ta-row {
+    background-color: transparent;
+}
+
+.fi-ta-empty-state {
+    background-color: transparent;
+}
