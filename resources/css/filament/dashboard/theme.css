@@ -30,6 +30,7 @@
 
 .fi-body {
     background-color: rgb(10, 21, 39) !important;
+    position: relative;
 }
 
 .fi-topbar {

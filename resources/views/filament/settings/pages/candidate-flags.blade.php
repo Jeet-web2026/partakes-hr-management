@@ -134,95 +134,100 @@
         <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="closeForm"></div>
 
         <div
-            class="rounded-xl border border-white/10 bg-card p-5 shadow-xl"
-            style="position: absolute; left: 0; right: 0; top: 0; z-index: 50;"
-            wire:keydown.escape.window="closeForm">
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            wire:keydown.escape.window="closeForm"
+            @click.self="$wire.closeForm()">
 
-            <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-base font-semibold">{{ $editingUin ? 'Edit flag' : 'Add flag' }}</h3>
-                <button type="button" wire:click="closeForm"
-                    class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
+            <div class="w-full max-w-md rounded-xl border border-white/10 bg-card p-5 shadow-xl">
 
-            <form wire:submit="save" class="space-y-4">
-                <div>
-                    <label class="mb-1 block text-sm font-medium">Stage Name</label>
-                    <select
-                        wire:model="formStage"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                        @foreach (\App\Enums\HrFlagStage::cases() as $stage)
-                        <option value="{{ $stage->value }}" class="bg-slate-800">{{ $stage->label() }}</option>
-                        @endforeach
-                    </select>
-                    @error('formStage')
-                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="mb-1 block text-sm font-medium">Flag Name</label>
-                    <input
-                        type="text"
-                        wire:model="formName"
-                        maxlength="100"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
-                    @error('formName')
-                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="mb-1 block text-sm font-medium">Status</label>
-                    <select
-                        wire:model="formStatus"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                        <option value="active" class="bg-slate-800">Active</option>
-                        <option value="inactive" class="bg-slate-800">Inactive</option>
-                    </select>
-                    @error('formStatus')
-                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="flex justify-end gap-2 pt-2">
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-base font-semibold">{{ $editingUin ? 'Edit flag' : 'Add flag' }}</h3>
                     <button type="button" wire:click="closeForm"
-                        class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                        class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
-                        Save
+                        class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+                        <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
-            </form>
-        </div>
-        @endif
 
-        {{-- Delete confirmation --}}
-        @if ($deletingUin)
-        <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="cancelDelete"></div>
+                <form wire:submit="save" class="space-y-4">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Stage Name</label>
+                        <select
+                            wire:model="formStage"
+                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                            @foreach (\App\Enums\HrFlagStage::cases() as $stage)
+                            <option value="{{ $stage->value }}" class="bg-slate-800">{{ $stage->label() }}</option>
+                            @endforeach
+                        </select>
+                        @error('formStage')
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-        <div
-            class="rounded-xl border border-white/10 bg-card p-5 shadow-xl"
-            style="position: absolute; left: 0; right: 0; top: 0; z-index: 50;"
-            wire:keydown.escape.window="cancelDelete">
-            <h3 class="text-base font-semibold">Delete flag?</h3>
-            <p class="mt-2 text-sm text-muted-foreground">This flag will be removed from your list.</p>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Flag Name</label>
+                        <input
+                            type="text"
+                            wire:model="formName"
+                            maxlength="100"
+                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                        @error('formName')
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-            <div class="mt-5 flex justify-end gap-2">
-                <button type="button" wire:click="cancelDelete"
-                    class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
-                    Cancel
-                </button>
-                <button type="button" wire:click="delete"
-                    class="px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700">
-                    Delete
-                </button>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Status</label>
+                        <select
+                            wire:model="formStatus"
+                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                            <option value="active" class="bg-slate-800">Active</option>
+                            <option value="inactive" class="bg-slate-800">Inactive</option>
+                        </select>
+                        @error('formStatus')
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" wire:click="closeForm"
+                            class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
+                            Save
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
-        @endif
+            @endif
+
+            {{-- Delete confirmation --}}
+            @if ($deletingUin)
+            <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="cancelDelete"></div>
+
+            <div
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                wire:keydown.escape.window="cancelDelete"
+                wire:click.self="cancelDelete">
+
+                <div class="w-full max-w-sm rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+                    <h3 class="text-base font-semibold">Delete flag?</h3>
+                    <p class="mt-2 text-sm text-muted-foreground">This flag will be removed from your list.</p>
+
+                    <div class="mt-5 flex justify-end gap-2">
+                        <button type="button" wire:click="cancelDelete"
+                            class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
+                            Cancel
+                        </button>
+                        <button type="button" wire:click="delete"
+                            class="px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @endif
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
