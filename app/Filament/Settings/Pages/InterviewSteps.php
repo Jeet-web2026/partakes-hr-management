@@ -6,7 +6,6 @@ use App\Enums\InterviewStepStatus;
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use App\Services\ApplicationManagement\MastIntvStepService;
 use BackedEnum;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
@@ -15,6 +14,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Throwable;
 
 class InterviewSteps extends Page
 {
@@ -99,12 +99,16 @@ class InterviewSteps extends Page
         } catch (ValidationException $e) {
             $this->addError('editName', $e->validator->errors()->first());
             return;
+        } catch (Throwable $e) {
+            report($e);
+            session()->now('error', 'Could not update the interview step. Please try again.');
+            return;
         }
 
         unset($this->steps);
         $this->closeEdit();
 
-        Notification::make()->success()->title('Interview step updated')->send();
+        session()->now('success', 'Interview step updated successfully.');
     }
 
     protected function findStep(string $uin)

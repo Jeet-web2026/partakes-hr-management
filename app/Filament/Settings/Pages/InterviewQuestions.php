@@ -42,7 +42,6 @@ class InterviewQuestions extends Page
     public string $search = '';
     public string $formText = '';
     public string $formStatus = 'active';
-    public ?string $successMessage = null;
 
     public function mount(): void
     {
@@ -104,11 +103,11 @@ class InterviewQuestions extends Page
                 'Intv_qstn_Stau' => $this->formStatus,
             ], $this->userUin);
 
-            $this->successMessage = 'Question updated';
+            session()->now('success', 'Question updated successfully.');
         } else {
             $service->create($this->orgaUin, $this->formText, $this->formStatus, $this->userUin);
 
-            $this->successMessage = 'Question added';
+            session()->now('success', 'Question added successfully.');
         }
 
         unset($this->questions);
@@ -133,7 +132,7 @@ class InterviewQuestions extends Page
 
         unset($this->questions);
         $this->deletingUin = null;
-        $this->successMessage = 'Question deleted';
+        session()->now('success', 'Question deleted successfully.');
     }
 
     protected function resetForm(): void

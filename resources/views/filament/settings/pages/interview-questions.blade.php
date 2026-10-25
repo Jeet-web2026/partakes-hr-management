@@ -59,15 +59,6 @@
 
         <x-globalresponse />
 
-        @if ($successMessage)
-        <div class="mb-4 flex items-center justify-between rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
-            <span>{{ $successMessage }}</span>
-            <button type="button" wire:click="$set('successMessage', null)" class="ml-4 hover:text-white">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        @endif
-
         {{-- Table --}}
         <div class="rounded-xl border border-white/10 bg-card overflow-x-auto">
             <table class="w-full text-sm">
