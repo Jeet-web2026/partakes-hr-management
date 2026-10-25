@@ -10,6 +10,7 @@
 @source "../../../../resources/views/vendor/filament-panels/**/*";
 @source "../../../../resources/views/components/*";
 @source "../../../../public/assets/*.js";
+@source '../../../views/filament/settings/**/*.blade.php';
 
 @theme {
     --color-background: hsl(240 10% 4%);
