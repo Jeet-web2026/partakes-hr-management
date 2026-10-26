@@ -121,20 +121,19 @@
 
 
                         {{-- Search --}}
-                        <div class="relative" data-menu>
+                        <div class="relative hidden" data-menu>
 
                             <button
                                 id="searchToggle"
                                 type="button"
                                 data-menu-toggle="searchMenu"
                                 aria-label="Search"
-                                title="Search"
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 hover:bg-white/5 transition sm:hidden">
+                                title="h-9 w-9 items-center justify-center rounded-md border border-white/10 hover:bg-white/5 transition">
                                 <i class="bi bi-search"></i>
                             </button>
 
                             {{-- Desktop Search --}}
-                            <div class="relative hidden sm:block">
+                            <div class="relative hidden">
 
                                 <svg
                                     class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
@@ -321,7 +320,7 @@
         <div id="mobileAgreementList" class="hidden space-y-3"></div>
 
         <!-- Footer -->
-        <div class="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+        <div class="mt-4 flex items-center justify-between text-xs text-muted-foreground hidden">
             @php($total = $this->steps->count())
             <span id="entriesLabel">Showing {{ $total ? 1 : 0 }} to {{ $total }} of {{ $total }} entries</span>
             <div id="pagination" class="hidden items-center gap-1"></div>
