@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             CountryIndiaSeeder::class,
             AgreementCategorySeeder::class,
             AgreementTypeSeeder::class,
-            MasterVerticalPageNameSeeder::class
+            MasterVerticalPageNameSeeder::class,
+            MastUserLogiSeeder::class
         ]);
     }
 }

@@ -6,6 +6,7 @@ use App\Enums\InterviewStepStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MastIntvQstn extends Model
 {
@@ -20,8 +21,12 @@ class MastIntvQstn extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'Question_Text', 'Intv_qstn_Stau', 'Orga_UIN',
-        'Cr_By', 'Mo_By', 'Del_By',
+        'Question_Text',
+        'Intv_qstn_Stau',
+        'Orga_UIN',
+        'Cr_By',
+        'Mo_By',
+        'Del_By',
     ];
 
     protected function casts(): array
@@ -48,5 +53,10 @@ class MastIntvQstn extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('Intv_qstn_Stau', InterviewStepStatus::Active->value);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'Cr_By', 'User_UIN');
     }
 }

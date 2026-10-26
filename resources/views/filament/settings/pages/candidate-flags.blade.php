@@ -13,6 +13,15 @@
         <div class="mb-6 flex items-center justify-between gap-3">
 
             <div class="flex items-center gap-2">
+                <select
+                    wire:model.live="perPage"
+                    aria-label="Rows per page"
+                    title="Rows per page"
+                    class="h-9 rounded-md border border-white/10 bg-transparent px-2 text-sm text-white focus:outline-none">
+                    @foreach (\App\Filament\Settings\Pages\CandidateFlags::PER_PAGE_OPTIONS as $option)
+                    <option value="{{ $option }}" class="bg-slate-800">{{ $option }}</option>
+                    @endforeach
+                </select>
                 {{-- Stage filter --}}
                 <select
                     wire:model.live="stageFilter"

@@ -66,6 +66,7 @@
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <th class="px-5 py-3 w-16">#</th>
                         <th class="px-5 py-3">Question</th>
+                        <th class="px-5 py-3">Created By</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
                     </tr>
@@ -77,6 +78,9 @@
                         <td class="px-5 py-3 whitespace-nowrap text-muted-foreground">{{ $loop->iteration }}</td>
                         <td class="px-5 py-3">
                             <div class="line-clamp-2 max-w-2xl">{{ $question->Question_Text }}</div>
+                        </td>
+                        <td class="px-5 py-3 whitespace-nowrap">
+                            {{ $question->creator?->User_Name ?? '—' }}
                         </td>
                         <td class="px-5 py-3">
                             @if ($question->Intv_qstn_Stau === \App\Enums\InterviewStepStatus::Active)

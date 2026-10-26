@@ -13,6 +13,7 @@ class MastIntvQstnRepository implements MastIntvQstnRepositoryInterface
         $term = trim((string) $search);
 
         return MastIntvQstn::query()
+            ->with('creator')
             ->forOrganisation($orgaUin)
             ->when($term !== '', fn($q) => $q->whereRaw(
                 'LOWER(Question_Text) LIKE ?',

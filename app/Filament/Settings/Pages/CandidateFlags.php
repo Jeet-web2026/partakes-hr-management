@@ -9,22 +9,26 @@ use App\Services\ApplicationManagement\MastHrFlagService;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\WithPagination;
 
 class CandidateFlags extends Page
 {
-    use HasCompanyHeader;
+    use HasCompanyHeader, WithPagination;
 
     protected static ?string $navigationLabel = 'Candidate Flags';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
     protected static ?int $navigationSort = 12;
     protected static ?string $slug = 'candidate-flags';
+    public const PER_PAGE_OPTIONS = [50, 100, 250];
+
+    public int $perPage = 50;
 
     protected string $view = 'filament.settings.pages.candidate-flags';
 
@@ -57,7 +61,25 @@ class CandidateFlags extends Page
         }
     }
 
-    // Only used if your company-switch code dispatches this event.
+    public function updatedPerPage(): void
+    {
+        if (! in_array($this->perPage, self::PER_PAGE_OPTIONS, true)) {
+            $this->perPage = self::PER_PAGE_OPTIONS[0];
+        }
+
+        $this->resetPage();
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStageFilter(): void
+    {
+        $this->resetPage();
+    }
+
     #[On('company-switched')]
     public function refreshOrganisation(): void
     {
@@ -66,12 +88,21 @@ class CandidateFlags extends Page
     }
 
     #[Computed]
-    public function flags(): Collection
+    public function flags(): LengthAwarePaginator
     {
-        return app(MastHrFlagService::class)->listForOrganisation(
+        $all = app(MastHrFlagService::class)->listForOrganisation(
             $this->orgaUin,
             $this->search,
             HrFlagStage::tryFrom($this->stageFilter),
+        );
+
+        $page = LengthAwarePaginator::resolveCurrentPage('page');
+
+        return new LengthAwarePaginator(
+            $all->forPage($page, $this->perPage)->values(),
+            $all->count(),
+            $this->perPage,
+            $page,
         );
     }
 
