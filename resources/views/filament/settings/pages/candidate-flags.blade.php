@@ -62,7 +62,7 @@
                 wire:click="openCreate"
                 aria-label="Add Flag"
                 title="Add Flag"
-                class="inline-flex h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition">
+                class="hidden h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -117,7 +117,7 @@
                                 <button
                                     type="button"
                                     wire:click="confirmDelete('{{ $flag->hr_flag_UIN }}')"
-                                    class="inline-flex h-8 items-center gap-1.5 rounded-md border border-red-500/30 px-3 text-xs text-red-400 hover:bg-red-500/10 transition">
+                                    class="hidden h-8 items-center gap-1.5 rounded-md border border-red-500/30 px-3 text-xs text-red-400 hover:bg-red-500/10 transition">
                                     <i class="bi bi-trash"></i> Delete
                                 </button>
                             </div>
