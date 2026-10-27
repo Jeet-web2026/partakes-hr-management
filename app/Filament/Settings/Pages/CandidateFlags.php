@@ -134,7 +134,7 @@ class CandidateFlags extends Page
     {
         $this->validate([
             'formStage' => ['required', Rule::enum(HrFlagStage::class)],
-            'formName' => ['required', 'string', 'max:100'],
+            'formName' => ['nullable', 'string', 'max:100'],
             'formStatus' => ['required', Rule::enum(InterviewStepStatus::class)],
         ]);
 
