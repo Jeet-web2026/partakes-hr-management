@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Filament\Candidatemanagement\Pages\CandidateManagement;
 use App\Filament\Dashboard;
+use App\Jobs\SeedDefaultInterviewStepsJob;
 use App\Models\OrganisationDetails;
 use App\Models\UserOrgaRela;
 use App\Services\Agreement\AgreementService;
@@ -88,6 +89,7 @@ class HomeController extends Controller
 
         $this->intvStepService->ensureDefaultStepsQueued($request->input('Orga_UIN'), $userUin);
         $this->hrFlagService->ensureDefaultFlagsQueued($request->input('Orga_UIN'), $userUin);
+        SeedDefaultInterviewStepsJob::dispatch($request->input('Orga_UIN'), $userUin);
 
         return redirect()->to(Dashboard::getUrl());
     }
