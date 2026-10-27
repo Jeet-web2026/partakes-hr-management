@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\InterviewStep;
 use App\Repositories\Contracts\InterviewStepRepositoryInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class InterviewStepRepository implements InterviewStepRepositoryInterface
 {
@@ -42,16 +43,31 @@ class InterviewStepRepository implements InterviewStepRepositoryInterface
 
     public function upsertByName(string $name, bool $status, string $orgUin, string $userUin): InterviewStep
     {
-        return InterviewStep::firstOrCreate(
-            [
-                'Orga_UIN'   => $orgUin,
-                'Cr_By'      => $userUin,
-                'Stage_Name' => $name,
-            ],
-            [
-                'Mo_By'        => $userUin,
+        $name = $name;
+
+        return DB::transaction(function () use ($name, $status, $orgUin, $userUin) {
+            $existing = $this->findByOrganisationAndName($orgUin, $name, $userUin);
+
+            if ($existing) {
+                return $existing;
+            }
+
+            return $this->create([
+                'Stage_Name'   => $name,
                 'Stage_Status' => $status,
-            ],
-        );
+                'Orga_UIN'     => $orgUin,
+                'Cr_By'        => $userUin,
+                'Mo_By'        => $userUin,
+            ]);
+        });
+    }
+
+    public function findByOrganisationAndName(string $orgaUin, string $name, string $crBy): ?InterviewStep
+    {
+        return InterviewStep::query()
+            ->forOrganisation($orgaUin)
+             ->where('Cr_By', $crBy)
+            ->where('Stage_Name', $name)
+            ->first();
     }
 }
