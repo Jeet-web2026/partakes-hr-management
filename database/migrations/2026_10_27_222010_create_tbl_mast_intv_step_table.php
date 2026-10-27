@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tbl_mast_intv_stage', function (Blueprint $table) {
             $table->id();
-            $table->string('Stage_Name', 100)->unique();
+            $table->string('Stage_Name', 100);
             $table->boolean('Stage_Status')->default(true)->index();
             $table->uuid('Orga_UIN');
             $table->uuid('Cr_By');
