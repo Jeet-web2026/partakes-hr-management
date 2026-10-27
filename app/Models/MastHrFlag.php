@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\HrFlagStage;
 use App\Enums\InterviewStepStatus;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,6 +24,7 @@ class MastHrFlag extends Model
     protected $fillable = [
         'hr_flag_stge_name',
         'hr_flag_name',
+        'hr_flag_placeholder',
         'hr_flag_stau',
         'Orga_UIN',
         'Cr_By',
@@ -61,5 +63,14 @@ class MastHrFlag extends Model
     public function scopeForStage(Builder $query, HrFlagStage $stage): Builder
     {
         return $query->where('hr_flag_stge_name', $stage->value);
+    }
+
+    protected function displayName(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, array $attributes) => filled($attributes['hr_flag_name'] ?? null)
+                ? $attributes['hr_flag_name']
+                : ("e.g. " . $attributes['hr_flag_placeholder'] ?? null),
+        );
     }
 }

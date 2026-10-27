@@ -57,7 +57,7 @@ class MastHrFlagService
 
                     $this->flags->create([
                         'hr_flag_stge_name' => $stage,
-                        'hr_flag_name' => $name,
+                        'hr_flag_placeholder' => $name,
                         'hr_flag_stau' => InterviewStepStatus::Active,
                         'Orga_UIN' => $orgaUin,
                         'Cr_By' => $userId,

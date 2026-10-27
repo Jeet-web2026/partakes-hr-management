@@ -120,7 +120,7 @@ class CandidateFlags extends Page
         $this->resetErrorBag();
         $this->editingUin = $flag->getKey();
         $this->formStage = $flag->hr_flag_stge_name->value;
-        $this->formName = $flag->hr_flag_name;
+        $this->formName = $flag->hr_flag_name ?? '';
         $this->formStatus = $flag->hr_flag_stau->value;
         $this->showForm = true;
     }

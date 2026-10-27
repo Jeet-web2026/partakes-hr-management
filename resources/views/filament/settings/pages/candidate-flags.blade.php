@@ -97,7 +97,10 @@
                     <tr wire:key="flag-{{ $flag->hr_flag_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                         <td class="px-5 py-3 whitespace-nowrap">{{ $flag->hr_flag_stge_name->label() }}</td>
                         <td class="px-5 py-3">
-                            <div class="line-clamp-2 max-w-2xl">{{ $flag->hr_flag_name }}</div>
+                            <div @class([ 'line-clamp-2 max-w-2xl' , 'italic text-gray-400 dark:text-gray-500'=> blank($flag->hr_flag_name),
+                                ])>
+                                {{ $flag->display_name }}
+                            </div>
                         </td>
                         <td class="px-5 py-3">
                             @if ($flag->hr_flag_stau === \App\Enums\InterviewStepStatus::Active)
