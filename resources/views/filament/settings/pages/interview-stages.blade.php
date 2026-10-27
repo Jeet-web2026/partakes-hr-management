@@ -93,7 +93,7 @@
                         type="text"
                         wire:model="editName"
                         maxlength="100"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary" readonly>
                     @error('editName')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror

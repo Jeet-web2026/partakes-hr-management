@@ -5,6 +5,7 @@ namespace App\Services\ApplicationManagement;
 use App\Models\InterviewStep;
 use App\Repositories\Contracts\InterviewStepRepositoryInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class InterviewStepService
 {
@@ -48,5 +49,32 @@ class InterviewStepService
         }
 
         return count(self::DEFAULT_STEPS);
+    }
+
+    public function listForOrganisation(string $orgaUin): Collection
+    {
+        return InterviewStep::query()
+            ->forOrganisation($orgaUin)
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function updateStep(InterviewStep $stage, array $data, string $userUin): InterviewStep
+    {
+        $duplicate = InterviewStep::query()
+            ->forOrganisation($stage->Orga_UIN)
+            ->where('Stage_Name', $data['Stage_Name'])
+            ->whereKeyNot($stage->getKey())
+            ->exists();
+
+        if ($duplicate) {
+            throw ValidationException::withMessages([
+                'editName' => 'A stage with this name already exists.',
+            ]);
+        }
+
+        $stage->update($data + ['Mo_By' => $userUin]);
+
+        return $stage;
     }
 }

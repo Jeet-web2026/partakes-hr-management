@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
@@ -29,16 +30,32 @@ class InterviewStages extends Page
     protected string $view = 'filament.settings.pages.interview-stages';
 
     #[Locked]
+    public string $userUin = '';
+
+    #[Locked]
+    public string $orgaUin = '';
+
+    #[Locked]
     public ?string $editingId = null;
 
     public string $search = '';
     public string $editName = '';
     public string $editStatus = 'active';
 
+    public function mount(): void
+    {
+        $this->userUin = (string) Session::get('partaker_user_uin');
+        $this->orgaUin = (string) Session::get('selected_orga_uin');
+
+        if (! $this->userUin || ! $this->orgaUin) {
+            $this->redirect(route('home'));
+        }
+    }
+
     #[Computed]
     public function stages(): Collection
     {
-        $stages = app(InterviewStepService::class)->list();
+        $stages = app(InterviewStepService::class)->listForOrganisation($this->orgaUin);
         $term = mb_strtolower(trim($this->search));
 
         if ($term === '') {
@@ -72,6 +89,8 @@ class InterviewStages extends Page
 
     public function save(): void
     {
+        $this->editName = trim($this->editName);
+
         $this->validate([
             'editName' => ['required', 'string', 'max:100'],
             'editStatus' => ['required', Rule::in(['active', 'inactive'])],
@@ -80,10 +99,10 @@ class InterviewStages extends Page
         $stage = $this->findStage((string) $this->editingId);
 
         try {
-            app(InterviewStepService::class)->update($stage, [
+            app(InterviewStepService::class)->updateStep($stage, [
                 self::NAME_COLUMN => $this->editName,
                 self::ACTIVE_COLUMN => $this->editStatus === 'active',
-            ]);
+            ], $this->userUin);
         } catch (ValidationException $e) {
             $this->addError('editName', $e->validator->errors()->first());
             return;
@@ -102,7 +121,7 @@ class InterviewStages extends Page
     protected function findStage(string $id)
     {
         $stage = app(InterviewStepService::class)
-            ->list()
+            ->listForOrganisation($this->orgaUin)
             ->first(fn($item) => (string) $item->getKey() === $id);
 
         abort_unless($stage, 404);
