@@ -92,9 +92,9 @@
                                                 wire:model.live="statusFilter"
                                                 class="block w-full rounded-md border border-gray-800 bg-slate-900 px-3 py-2 text-sm
                                                 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-900 cursor-pointer">
-                                                <option value="">All Statuses</option>
+                                                <option value="">All Stages</option>
                                                 @foreach ($this->getStatuses() as $value => $label)
-                                                <option value="{{ $value }}">{{ $label }}</option>
+                                                <option value="{{ $value }}">{{ $value }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

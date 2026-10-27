@@ -3,6 +3,7 @@
 namespace App\Filament\Candidatemanagement\Pages;
 
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
+use App\Models\MastHrFlag;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Session;
@@ -37,14 +38,16 @@ class CandidateManagement extends Page
     #[Computed]
     public function getStatuses(): array
     {
-        return [
-            'new_candidate'       => 'New Candidate',
-            'short_listed'        => 'Candidate Short Listed',
-            'interview_scheduled' => 'Schedule Interview',
-            'selected'            => 'Candidate Selected',
-            'offer_issued'        => 'Offer Letter Issued',
-            'offer_accepted'      => 'Offer Accepted',
-        ];
+        return MastHrFlag::query()
+            ->forOrganisation($this->orgaUin)
+            ->active()
+            ->orderBy('Cr_On')
+            ->get()
+            ->unique(fn(MastHrFlag $flag) => $flag->hr_flag_stge_name->value)
+            ->mapWithKeys(fn(MastHrFlag $flag) => [
+                $flag->hr_flag_stge_name->value => $flag->hr_flag_name,
+            ])
+            ->all();
     }
 
     public function updatedStatusFilter(): void
