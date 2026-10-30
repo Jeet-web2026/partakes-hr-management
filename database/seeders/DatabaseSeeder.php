@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
             AgreementCategorySeeder::class,
             AgreementTypeSeeder::class,
             MasterVerticalPageNameSeeder::class,
-            MastUserLogiSeeder::class
+            MastUserLogiSeeder::class,
+            MastStauSeeder::class,
+            MastPageSeeder::class
         ]);
     }
 }
