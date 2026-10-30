@@ -53,4 +53,9 @@ class HrMastJobAply extends Model
     {
         return $this->hasOne(CountryMaster::class, 'Admn_Cutr_Mast_UIN', 'Cutr_UIN');
     }
+
+    public function interestedpositionDetails(): HasOne
+    {
+        return $this->hasOne(MastDsig::class, 'Dsig_UIN', 'Job_Intr');
+    }
 }

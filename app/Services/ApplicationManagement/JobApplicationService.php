@@ -100,7 +100,7 @@ class JobApplicationService
         $search = $filters['search'] ?? null;
 
         $query = HrMastJobAply::query()
-            ->with('country')
+            ->with('country', 'interestedpositionDetails')
             ->when($filters['company_id'] ?? null, fn($q, $companyId) => $q->where('Orga_UIN', $companyId))
             ->when($search, function ($q, $term) {
                 $q->where(function ($q) use ($term) {
@@ -156,7 +156,7 @@ class JobApplicationService
                 'relocate'        => $application->Rlca,
                 'relocationArea'  => $application->Rlca_Area,
 
-                'jobInterest' => $application->Job_Intr,
+                'jobInterest' => $application->interestedpositionDetails?->Dsig_Name,
                 'jobType'     => $application->Job_Type,
 
                 'bioDataUrl' => $application->Bio_Data_Path
