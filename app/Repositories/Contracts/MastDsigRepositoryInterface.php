@@ -21,4 +21,6 @@ interface MastDsigRepositoryInterface
     public function update(int $dsigUin, array $data): MastDsig;
 
     public function delete(int $dsigUin): bool;
+
+    public function getActiveByOrganisation(int $orgUin, ?string $search = null): Collection;
 }

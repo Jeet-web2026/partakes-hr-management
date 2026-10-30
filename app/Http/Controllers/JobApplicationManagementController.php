@@ -7,6 +7,7 @@ use App\Http\Requests\StoreJobApplicationRequest;
 use App\Models\CountryMaster;
 use App\Models\HrMastJobAply;
 use App\Services\ApplicationManagement\JobApplicationService;
+use App\Services\ApplicationManagement\MastDsigService;
 use App\Services\Common\TinyUrlService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class JobApplicationManagementController extends Controller
 {
-    public function __construct(private JobApplicationService $applications, private TinyUrlService $tinyUrlService) {}
+    public function __construct(private JobApplicationService $applications, private TinyUrlService $tinyUrlService, private readonly MastDsigService $dsgService) {}
 
     public function show(string $token, string $orguin): View
     {
@@ -24,6 +25,7 @@ class JobApplicationManagementController extends Controller
             'token'     => $token,
             'orguin' => $orguin,
             'countries' => CountryMaster::orderBy('Name')->get(['Admn_Cutr_Mast_UIN', 'Name']),
+            'designations' => $this->dsgService->getActiveByOrganisation($orguin)
         ]);
     }
 

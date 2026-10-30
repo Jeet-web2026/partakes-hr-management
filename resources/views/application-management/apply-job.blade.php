@@ -317,8 +317,15 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
                 <div class="grid gap-5 p-6 sm:grid-cols-2">
                     <div class="sm:col-span-2">
                         <label for="Job_Intr" class="{{ $label }}">Interested in job <span class="text-red-500">*</span></label>
-                        <input id="Job_Intr" name="Job_Intr" type="text" maxlength="255" placeholder="e.g. Backend Developer" required
-                            value="{{ old('Job_Intr') }}" class="{{ $fieldClass('Job_Intr') }}">
+                        <select id="Job_Intr" name="Job_Intr" required class="{{ $fieldClass('Job_Intr') }}">
+                            <option value="" disabled {{ old('Job_Intr') ? '' : 'selected' }}>Select a designation</option>
+                            @foreach ($designations as $designation)
+                            <option value="{{ $designation->Dsig_UIN }}"
+                                {{ (string) old('Job_Intr') === (string) $designation->Dsig_UIN ? 'selected' : '' }}>
+                                {{ $designation->Dsig_Name }}
+                            </option>
+                            @endforeach
+                        </select>
                         @error('Job_Intr') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>
 

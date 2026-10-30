@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\MastDsig;
 use App\Repositories\Contracts\MastDsigRepositoryInterface;
+use App\Services\ApplicationManagement\MastDsigService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -65,5 +66,12 @@ class MastDsigRepository implements MastDsigRepositoryInterface
             ->where('Org_UIN', $orgUin)
             ->when($search, fn(Builder $q) => $q->where('Dsig_Name', 'like', "%{$search}%"))
             ->orderBy('Dsig_Name');
+    }
+
+    public function getActiveByOrganisation(int $orgUin, ?string $search = null): Collection
+    {
+        return $this->baseQuery($orgUin, $search)
+            ->where('Dsig_Stau', MastDsigService::STATUS_ACTIVE)
+            ->get();
     }
 }

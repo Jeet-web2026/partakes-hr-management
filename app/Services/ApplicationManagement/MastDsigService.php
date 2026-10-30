@@ -72,4 +72,9 @@ class MastDsigService
     {
         return $this->designations->delete($designation->getKey());
     }
+
+    public function getActiveByOrganisation(string $orgUin, string $search = ''): Collection
+    {
+        return $this->designations->getActiveByOrganisation((int) $orgUin, $search ?: null);
+    }
 }
