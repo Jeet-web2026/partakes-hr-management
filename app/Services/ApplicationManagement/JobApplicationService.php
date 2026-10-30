@@ -3,9 +3,13 @@
 namespace App\Services\ApplicationManagement;
 
 use App\Models\HrMastJobAply;
+use App\Models\InterviewStep;
+use App\Models\MastHrFlag;
+use App\Models\MastIntvStep;
 use App\Models\ShareLink;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Throwable;
@@ -167,6 +171,12 @@ class JobApplicationService
                     )
                     : null,
 
+
+                'viewDataUrl' => route('applications.view', [
+                    'orguin' => $application->Orga_UIN,
+                    'uin' => $application->Aply_UIN
+                ]),
+
                 'companyId'  => $application->Orga_UIN,
                 'linkId'     => $application->Link_UIN,
                 'appliedOn'  => $application->CrBy?->format('Y-m-d H:i'),
@@ -177,5 +187,52 @@ class JobApplicationService
     public function bioDataDisk(): string
     {
         return config('filesystems.job_application_disk', config('filesystems.default'));
+    }
+
+    public function findForOrganisation(string $orguin, int $uin): HrMastJobAply
+    {
+        return HrMastJobAply::query()
+            ->where('Org_UIN', $orguin)
+            ->where('Job_Appl_UIN', $uin)
+            ->firstOrFail();
+    }
+
+    public function getForView(string $orguin, int $uin): array
+    {
+        $application = HrMastJobAply::query()
+            ->with(['country', 'interestedpositionDetails'])
+            ->where('Aply_UIN', $uin)
+            ->firstOrFail();
+
+        return [
+            'orguin'      => $orguin,
+            'application' => $application,
+            'stages'      => InterviewStep::where('Orga_UIN', $orguin)->orderBy('Stage_Name')->get(),
+            'steps'       => MastIntvStep::where('Orga_UIN', $orguin)->orderBy('Intv_Step_Name')->get(),
+            'flags'       => MastHrFlag::where('Orga_UIN', $orguin)->orderBy('hr_flag_name')->get(),
+            'history'     => [],
+        ];
+    }
+
+    public function updateQuery(string $orguin, int $uin, array $data, int $userId): void
+    {
+        DB::transaction(function () use ($orguin, $uin, $data, $userId) {
+            $application = $this->findForOrganisation($orguin, $uin);
+
+            $application->update([
+                'Stage_UIN' => $data['stage'],
+                'Step_UIN'  => $data['step'],
+            ]);
+
+            $application->flags()->sync($data['flags'] ?? []);
+
+            $application->queryHistory()->create([
+                'Question'    => $data['question'] ?? null,
+                'Stage_UIN'   => $data['stage'],
+                'Step_UIN'    => $data['step'],
+                'Intr_Date'   => now(),
+                'Intr_By_UIN' => $userId,
+            ]);
+        });
     }
 }

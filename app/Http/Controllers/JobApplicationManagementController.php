@@ -12,6 +12,7 @@ use App\Services\Common\TinyUrlService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -83,5 +84,40 @@ class JobApplicationManagementController extends Controller
         return view('application-management.job-application-success', [
             'submittedAt' => $submitTime,
         ]);
+    }
+
+    public function view(string $orguin, int $uin): View
+    {
+        return view(
+            'application-management.candidate-view',
+            $this->applications->getForView($orguin, $uin)
+        );
+    }
+
+    // Streams the PDF so the iframe works without exposing the storage path
+    public function resume(string $orguin, int $uin)
+    {
+        $application = $this->applications->findForOrganisation($orguin, $uin);
+
+        abort_unless($application->Resume_Path && Storage::exists($application->Resume_Path), 404);
+
+        return Storage::response($application->Resume_Path, null, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    public function updateQuery(Request $request, string $orguin, int $uin): RedirectResponse
+    {
+        $data = $request->validate([
+            'question' => ['nullable', 'string', 'max:1000'],
+            'stage'    => ['required', 'integer'],
+            'step'     => ['required', 'integer'],
+            'flags'    => ['nullable', 'array'],
+            'flags.*'  => ['integer'],
+        ]);
+
+        $this->applications->updateQuery($orguin, $uin, $data, auth()->id());
+
+        return back()->with('success', 'Query updated.');
     }
 }

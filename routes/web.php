@@ -42,6 +42,14 @@ Route::middleware('partaker.session')->group(function () {
         Route::get('clear', 'clear')->name('optimize.clear');
     });
 
+
+    Route::prefix('applications')->controller(JobApplicationManagementController::class)
+        ->name('applications.')->group(function () {
+            Route::get('{orguin}/{uin}', 'view')->name('view');
+            Route::get('{orguin}/{uin}/resume', 'resume')->name('resume');
+            Route::post('{orguin}/{uin}/query', 'updateQuery')->name('query.update');
+        });
+
     Route::fallback(function () {
         return redirect()->route('home');
     });

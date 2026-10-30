@@ -416,17 +416,11 @@ $(document).ready(function () {
         </tr>`;
     }
 
-    function menuItemPdf(r) {
-        if (!r.bioDataUrl) {
-            return `<span class="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-500">
-                    <i class="ri-file-pdf-line"></i> No file
-                </span>`;
-        }
-
-        return `<a href="${esc(r.bioDataUrl)}" target="_blank" rel="noopener"
+    function menuItemPdf(r) {   
+        return `<a href="${esc(r.viewDataUrl)}" rel="noopener"
                class="flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
-               <i class="ri-file-pdf-line"></i>
-               View PDF
+               <i class="ri-eye-line"></i>
+               View Profile
             </a>`;
     }
 
