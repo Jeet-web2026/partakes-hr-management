@@ -24,7 +24,7 @@ class InterviewStages extends Page
 
     protected static ?string $navigationLabel = 'Interview Stages';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 9;
     protected static ?string $slug = 'interview-stages';
 
     protected string $view = 'filament.settings.pages.interview-stages';

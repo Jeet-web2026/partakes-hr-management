@@ -20,7 +20,7 @@ class Designations extends Page
 
     protected static ?string $navigationLabel = 'Designations';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 11;
     protected static ?string $slug = 'designations';
 
     protected string $view = 'filament.settings.pages.designations';
