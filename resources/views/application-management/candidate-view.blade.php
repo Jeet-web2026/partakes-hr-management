@@ -12,7 +12,7 @@
         'Country'       => $a->country->Name ?? null,
         'Pincode'       => $a->PinCod_UIN,
         'State'         => $a->State,
-        'District'      => $a->District,
+        'District'      => $a->Distr,
     ];
 
     $job = [

@@ -55,6 +55,8 @@ class StoreJobApplicationRequest extends FormRequest
             'Job_Type' => ['required', Rule::in(self::JOB_TYPES)],
 
             'Bio_Data_Path' => ['required', 'file', 'mimes:pdf', 'max:2048'],
+            'Distr' => ['required', 'string'],
+            'State' => ['required', 'string']
         ];
     }
 

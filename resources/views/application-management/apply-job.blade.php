@@ -132,6 +132,24 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
                     </div>
 
                     <div>
+                        <label for="State" class="{{ $label }}">State <span class="text-red-500">*</span></label>
+                        <input type="text" id="State" name="State" required maxlength="100"
+                            value="{{ old('State') }}"
+                            placeholder="e.g. West Bengal"
+                            class="{{ $fieldClass('State') }}">
+                        @error('State') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="Distr" class="{{ $label }}">District <span class="text-red-500">*</span></label>
+                        <input type="text" id="Distr" name="Distr" required maxlength="100"
+                            value="{{ old('Distr') }}"
+                            placeholder="e.g. Kolkata"
+                            class="{{ $fieldClass('Distr') }}">
+                        @error('Distr') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
                         <label for="Cutr_UIN" class="{{ $label }}">Country <span class="text-red-500">*</span></label>
                         <select id="Cutr_UIN" name="Cutr_UIN" required class="{{ $fieldClass('Cutr_UIN') }}">
                             <option value="">Select country</option>
