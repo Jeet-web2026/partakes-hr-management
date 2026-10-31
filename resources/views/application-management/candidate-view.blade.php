@@ -42,19 +42,18 @@
         </div>
 
         {{-- Tabs --}}
-        <div class="border-b border-white/10">
-            <nav class="-mb-px flex gap-6" role="tablist">
-                @foreach (['detail' => 'Detail', 'resume' => 'Resume', 'query' => 'Query'] as $key => $title)
-                    <button type="button" role="tab" data-tab="{{ $key }}"
-                        class="tab-btn border-b-2 border-transparent px-1 py-3 text-sm font-medium text-slate-400 hover:text-slate-200">
-                        {{ $title }}
-                    </button>
-                @endforeach
-            </nav>
+        <div class="grid grid-cols-3 gap-1 rounded-lg border border-white/10 bg-white/5 p-1" role="tablist">
+            @foreach (['detail' => 'Detail', 'resume' => 'Resume', 'query' => 'Query'] as $key => $title)
+                <button type="button" role="tab" data-tab="{{ $key }}"
+                    class="tab-btn w-full rounded-md px-4 py-2.5 text-center text-sm font-medium text-slate-400 transition">
+                    {{ $title }}
+                </button>
+            @endforeach
         </div>
 
+
         {{-- DETAIL --}}
-        <div data-panel="detail" class="tab-panel space-y-6 py-6">
+        <div data-panel="detail" class="tab-panel space-y-6 pb-6 mt-5">
             @foreach (['Personal Details' => $personal, 'Job Preference' => $job, 'Assets & Licence' => $assets] as $title => $rows)
                 <section class="card p-6">
                     <h2 class="section-title">{{ $title }}</h2>
@@ -175,8 +174,8 @@
             const root = document.getElementById('candidate-view');
             const buttons = root.querySelectorAll('.tab-btn');
             const panels = root.querySelectorAll('.tab-panel');
-            const active = ['border-blue-500', 'text-blue-400'];
-            const idle = ['border-transparent', 'text-slate-400'];
+            const active = ['bg-blue-600', 'text-white'];
+            const idle   = ['text-slate-400', 'hover:bg-white/5', 'hover:text-slate-200'];
 
             function show(name) {
                 if (!root.querySelector('[data-panel="' + name + '"]')) name = 'detail';
@@ -193,6 +192,11 @@
             show(location.hash.replace('#', '') || @json($errors->any() ? 'query' : 'detail'));
         })();
     </script>
+    @endsection
+
+    @section('extrajscdns')
+    <script src="{{ asset('assets/agreement-page-functionality.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @endsection
 
     @section('extracss')
@@ -227,6 +231,8 @@
         }
 
         .checkbox { width: 1rem; height: 1rem; accent-color: #3b82f6; }
+
+        .tab-btn:not(.bg-blue-600):hover { background: rgba(255,255,255,.05); color: #e2e8f0; }
     </style>
     @endsection
 </x-base-component>
