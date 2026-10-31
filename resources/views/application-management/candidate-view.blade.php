@@ -3,28 +3,28 @@
     $a  = $application;
 
     $personal = [
-        'Name'          => trim("{$a->First_Name} {$a->Middle_Name} {$a->Last_Name}"),
-        'Gender'        => $a->Gender,
-        'Mother Tongue' => $a->Mother_Tongue,
+        'Name'          => trim("{$a->FaNm} {$a->MiNm} {$a->SuNm}"),
+        'Gender'        => $a->Gend,
+        'Mother Tongue' => $a->MoTu,
         'Date of Birth' => optional($a->DOB)->format('d-M-Y'),
-        'Email'         => $a->Email,
-        'Mobile Number' => $a->Mobile,
+        'Email'         => $a->Emai,
+        'Mobile Number' => $a->Mo_No,
         'Country'       => $a->country->Name ?? null,
-        'Pincode'       => $a->Pincode,
+        'Pincode'       => $a->PinCod_UIN,
         'State'         => $a->State,
         'District'      => $a->District,
     ];
 
     $job = [
-        'Interested in Job' => $a->Job_Intr,
+        'Interested in Job' => $a->interestedpositionDetails?->Dsig_Name,
         'Job Type'          => $a->Job_Type,
-        'Relocate'          => $yn($a->Relocate) . ($a->Relocate ? ' | ' . $a->Relocate_Scope : ''),
+        'Relocate'          => $yn($a->Rlca) . ($a->Rlca ? ' | ' . $a->Rlca_Area : ''),
     ];
 
     $assets = [
-        'Mobile'                => $yn($a->Has_Mobile) . ($a->Has_Mobile ? ' | ' . $a->Mobile_Type : ''),
-        'Laptop'                => $yn($a->Has_Laptop) . ($a->Has_Laptop ? ' | ' . $a->Laptop_OS : ''),
-        'Valid Driving Licence' => $yn($a->Has_Licence) . ($a->Has_Licence ? ' | ' . $a->Licence_Type : ''),
+        'Mobile'                => $yn($a->Own_Mo) . ($a->Own_Mo ? ' | ' . $a->Mo_Type : ''),
+        'Laptop'                => $yn($a->Own_Lptp) . ($a->Own_Lptp ? ' | ' . $a->Lptp_OS : ''),
+        'Valid Driving Licence' => $yn($a->Drvi_Lisc) . ($a->Drvi_Lisc ? ' | ' . $a->Vcle_Type_Lisc : ''),
     ];
 @endphp
 
@@ -38,7 +38,7 @@
         {{-- Header --}}
         <div class="mb-6">
             <h1 class="text-xl font-semibold text-white">{{ $personal['Name'] }}</h1>
-            <p class="mt-1 text-sm text-slate-400">{{ $a->Job_Intr }}</p>
+            <p class="mt-1 text-sm text-slate-400">{{ $a->interestedpositionDetails?->Dsig_Name }}</p>
         </div>
 
         {{-- Tabs --}}
