@@ -66,7 +66,10 @@ class MastIntvStepService
     }
     public function updateStep(MastIntvStep $step, array $data, string $userId): MastIntvStep
     {
-        $changes = array_intersect_key($data, array_flip(['Intv_Step_Name', 'Intv_Step_Stau']));
+        $changes = array_intersect_key(
+            $data,
+            array_flip(['Intv_Step_Name', 'Intv_Step_Stau', 'Intv_Stage'])
+        );
 
         if (isset($changes['Intv_Step_Name'])) {
             $changes['Intv_Step_Name'] = trim($changes['Intv_Step_Name']);

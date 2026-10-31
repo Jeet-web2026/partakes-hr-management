@@ -4,6 +4,7 @@ namespace App\Filament\Settings\Pages;
 
 use App\Enums\InterviewStepStatus;
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
+use App\Models\InterviewStep;
 use App\Services\ApplicationManagement\MastIntvStepService;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -26,6 +27,8 @@ class InterviewSteps extends Page
     protected static ?string $slug = 'interview-steps';
 
     protected string $view = 'filament.settings.pages.interview-steps';
+
+    public ?string $editStage = null;
 
     #[Locked]
     public string $userUin = '';
@@ -70,14 +73,15 @@ class InterviewSteps extends Page
         $step = $this->findStep($uin);
 
         $this->editingUin = $step->getKey();
-        $this->editName = $step->Intv_Step_Name;
+        $this->editName   = $step->Intv_Step_Name;
         $this->editStatus = $step->Intv_Step_Stau->value;
+        $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
         $this->resetErrorBag();
     }
 
     public function closeEdit(): void
     {
-        $this->reset(['editingUin', 'editName']);
+        $this->reset(['editingUin', 'editName', 'editStage']);
         $this->editStatus = 'active';
         $this->resetErrorBag();
     }
@@ -85,8 +89,12 @@ class InterviewSteps extends Page
     public function save(): void
     {
         $this->validate([
-            'editName' => ['required', 'string', 'max:100'],
+            'editName'   => ['required', 'string', 'max:100'],
             'editStatus' => ['required', Rule::enum(InterviewStepStatus::class)],
+            'editStage'  => [
+                'required',
+                Rule::exists('tbl_mast_intv_stage', 'id')->where('Orga_UIN', $this->orgaUin),
+            ],
         ]);
 
         $step = $this->findStep((string) $this->editingUin);
@@ -95,6 +103,7 @@ class InterviewSteps extends Page
             app(MastIntvStepService::class)->updateStep($step, [
                 'Intv_Step_Name' => $this->editName,
                 'Intv_Step_Stau' => $this->editStatus,
+                'Intv_Stage'     => $this->editStage,
             ], $this->userUin);
         } catch (ValidationException $e) {
             $this->addError('editName', $e->validator->errors()->first());
@@ -120,5 +129,14 @@ class InterviewSteps extends Page
         abort_unless($step, 404);
 
         return $step;
+    }
+
+    #[Computed]
+    public function stages(): Collection
+    {
+        return InterviewStep::query()
+            ->forOrganisation($this->orgaUin)
+            ->orderBy('Stage_Name')
+            ->get();
     }
 }

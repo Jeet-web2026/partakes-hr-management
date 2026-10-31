@@ -289,30 +289,30 @@
 
                 <tbody id="tbody">
                     @forelse ($this->steps as $step)
-                        <tr wire:key="step-{{ $step->Intv_Step_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
-                            <td class="px-5 py-3 whitespace-nowrap">Step {{ $step->Intv_Step_Numb }}</td>
-                            <td class="px-5 py-3 whitespace-nowrap">{{ $step->stage?->Stage_Name }}</td>
-                            <td class="px-5 py-3">{{ $step->Intv_Step_Name }}</td>
-                            <td class="px-5 py-3">
-                                @if ($step->Intv_Step_Stau === \App\Enums\InterviewStepStatus::Active)
-                                    <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
-                                @else
-                                    <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
-                                @endif
-                            </td>
-                            <td class="px-5 py-3 text-right">
-                                <button
-                                    type="button"
-                                    wire:click="openEdit('{{ $step->Intv_Step_UIN }}')"
-                                    class="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 px-3 text-xs hover:bg-white/5 transition">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </button>
-                            </td>
-                        </tr>
+                    <tr wire:key="step-{{ $step->Intv_Step_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
+                        <td class="px-5 py-3 whitespace-nowrap">Step {{ $step->Intv_Step_Numb }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap">{{ $step->stage?->Stage_Name }}</td>
+                        <td class="px-5 py-3">{{ $step->Intv_Step_Name }}</td>
+                        <td class="px-5 py-3">
+                            @if ($step->Intv_Step_Stau === \App\Enums\InterviewStepStatus::Active)
+                            <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
+                            @else
+                            <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
+                            @endif
+                        </td>
+                        <td class="px-5 py-3 text-right">
+                            <button
+                                type="button"
+                                wire:click="openEdit('{{ $step->Intv_Step_UIN }}')"
+                                class="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 px-3 text-xs hover:bg-white/5 transition">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="4" class="px-5 py-10 text-center text-muted-foreground">No interview steps found.</td>
-                        </tr>
+                    <tr>
+                        <td colspan="4" class="px-5 py-10 text-center text-muted-foreground">No interview steps found.</td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -331,57 +331,70 @@
 
     {{-- Edit modal --}}
     @if ($editingUin)
-        <div
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-            wire:keydown.escape.window="closeEdit">
-            <div class="w-full max-w-md rounded-xl border border-white/10 bg-card p-5 shadow-xl">
-                <div class="mb-4 flex items-center justify-between">
-                    <h3 class="text-base font-semibold">Edit interview step</h3>
-                    <button type="button" wire:click="closeEdit"
-                            class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
+    <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        wire:keydown.escape.window="closeEdit">
+        <div class="w-full max-w-md rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-base font-semibold">Edit interview step</h3>
+                <button type="button" wire:click="closeEdit"
+                    class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <form wire:submit="save" class="space-y-4">
+                <div>
+                    <label class="mb-1 block text-sm font-medium">Stage</label>
+                    <select
+                        wire:model="editStage"
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                        @foreach ($this->stages as $stage)
+                            <option value="{{ $stage->id }}" class="bg-slate-800">{{ $stage->Stage_Name }}</option>
+                        @endforeach
+                    </select>
+                    @error('editStage')
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium">Step Name</label>
+                    <input
+                        type="text"
+                        wire:model="editName"
+                        maxlength="100"
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                    @error('editName')
+                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <form wire:submit="save" class="space-y-4">
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Step Name</label>
-                        <input
-                            type="text"
-                            wire:model="editName"
-                            maxlength="100"
-                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
-                        @error('editName')
-                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium">Status</label>
+                    <select
+                        wire:model="editStatus"
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                        <option value="active" class="bg-slate-800">Active</option>
+                        <option value="inactive" class="bg-slate-800">Inactive</option>
+                    </select>
+                    @error('editStatus')
+                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Status</label>
-                        <select
-                            wire:model="editStatus"
-                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                            <option value="active" class="bg-slate-800">Active</option>
-                            <option value="inactive" class="bg-slate-800">Inactive</option>
-                        </select>
-                        @error('editStatus')
-                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-2">
-                        <button type="button" wire:click="closeEdit"
-                                class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                                class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" wire:click="closeEdit"
+                        class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
+                        Save
+                    </button>
+                </div>
+            </form>
         </div>
+    </div>
     @endif
 
     <script>
