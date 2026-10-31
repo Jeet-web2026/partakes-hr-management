@@ -70,7 +70,7 @@
         </div>
 
         {{-- RESUME --}}
-        <div data-panel="resume" class="tab-panel hidden py-6">
+        <div data-panel="resume" class="tab-panel hidden pb-6 mt-5">
             <section class="card p-6">
                 <h2 class="section-title">Resume</h2>
                 @if ($bioDataUrl)
@@ -83,7 +83,7 @@
         </div>
 
         {{-- QUERY --}}
-        <div data-panel="query" class="tab-panel hidden space-y-6 py-6">
+        <div data-panel="query" class="tab-panel hidden space-y-6 pb-6 mt-5">
             <form method="POST" action="{{ route('applications.query.update', [$orguin, $a->Aply_UIN]) }}" class="space-y-6">
                 @csrf
 
