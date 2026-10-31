@@ -89,7 +89,8 @@ class JobApplicationManagementController extends Controller
     public function view(string $orguin, int $uin): View
     {
         return view('application-management.candidate-view', [
-            ...$this->applications->getForView($orguin, $uin)        
+            ...$this->applications->getForView($orguin, $uin),
+            'questions' => $this->applications->getActiveQuestionsByOrganisation($orguin),        
         ]);
     }
 

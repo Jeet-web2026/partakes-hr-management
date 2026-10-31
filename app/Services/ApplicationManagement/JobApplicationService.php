@@ -2,9 +2,11 @@
 
 namespace App\Services\ApplicationManagement;
 
+use App\Enums\InterviewStepStatus;
 use App\Models\HrMastJobAply;
 use App\Models\InterviewStep;
 use App\Models\MastHrFlag;
+use App\Models\MastIntvQstn;
 use App\Models\MastIntvStep;
 use App\Models\ShareLink;
 use App\Services\Agreement\AgreementService;
@@ -261,5 +263,14 @@ class JobApplicationService
                 'Intr_By_UIN' => $userId,
             ]);
         });
+    }
+
+    public function getActiveQuestionsByOrganisation(string $orgId)
+    {
+        return MastIntvQstn::query()
+            ->forOrganisation($orgId)
+            ->active()
+            ->orderBy('Question_Text')
+            ->get();
     }
 }

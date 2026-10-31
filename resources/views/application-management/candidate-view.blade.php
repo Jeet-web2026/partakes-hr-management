@@ -91,10 +91,23 @@
                     <h2 class="section-title">Query</h2>
 
                     <div class="space-y-4">
-                        <div class="space-y-1.5">
-                            <label for="question" class="label">Question</label>
-                            <textarea id="question" name="question" rows="3" class="input">{{ old('question') }}</textarea>
+                         <div class="space-y-1.5">
+                            <label for="question" class="label">Question <span class="text-red-500">*</span></label>
+                            <select id="question" name="question" required class="input">
+                                <option value="">Select question</option>
+                                @foreach ($questions as $q)
+                                    <option value="{{ $q->intv_qstn_UIN }}" class="bg-slate-900"
+                                        @selected(old('question') == $q->intv_qstn_UIN)>{{ $q->Question_Text }}</option>
+                                @endforeach
+                            </select>
                             @error('question') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label for="answer" class="label">Answer <span class="text-red-500">*</span></label>
+                            <textarea id="answer" name="answer" rows="4" required class="input"
+                                placeholder="Write the candidate's answer">{{ old('answer') }}</textarea>
+                            @error('answer') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
