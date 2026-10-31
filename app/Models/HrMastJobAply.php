@@ -58,4 +58,14 @@ class HrMastJobAply extends Model
     {
         return $this->hasOne(MastDsig::class, 'Dsig_UIN', 'Job_Intr');
     }
+
+    public function sharedLinkDetails(): HasOne
+    {
+        return $this->hasOne(ShareLink::class, 'Link_UIN', 'Link_UIN');
+    }
+
+    public function company(): HasOne
+    {
+        return $this->hasOne(OrganisationDetails::class, 'Orga_UIN', 'Orga_UIN');
+    }
 }

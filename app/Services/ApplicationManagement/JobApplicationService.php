@@ -7,15 +7,19 @@ use App\Models\InterviewStep;
 use App\Models\MastHrFlag;
 use App\Models\MastIntvStep;
 use App\Models\ShareLink;
+use App\Services\Agreement\AgreementService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Throwable;
 
 class JobApplicationService
 {
+    public function __construct(protected AgreementService $agreementService) {}
+
     private const UPLOAD_DIRECTORY = 'job-applications/bio-data';
 
     public function create(array $data, UploadedFile $bioData, string $token, string $orguin): HrMastJobAply
@@ -200,7 +204,7 @@ class JobApplicationService
     public function getForView(string $orguin, int $uin): array
     {
         $application = HrMastJobAply::query()
-            ->with(['country', 'interestedpositionDetails'])
+            ->with(['country', 'interestedpositionDetails', 'sharedLinkDetails', 'company'])
             ->where('Aply_UIN', $uin)
             ->firstOrFail();
 
@@ -211,6 +215,8 @@ class JobApplicationService
             'steps'       => MastIntvStep::where('Orga_UIN', $orguin)->orderBy('Intv_Step_Name')->get(),
             'flags'       => MastHrFlag::where('Orga_UIN', $orguin)->orderBy('hr_flag_name')->get(),
             'history'     => [],
+            'userData'    => $this->agreementService->fetchUserData(Session::get('partaker_access_token')),
+            'companyInformation' => $application->company
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ShareLink extends Model
@@ -56,4 +57,11 @@ class ShareLink extends Model
     {
         return $this->Link_Expy_On !== null && $this->Link_Expy_On->isPast();
     }
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'User_UIN', 'CrBy');
+    }
+
+    
 }

@@ -88,10 +88,9 @@ class JobApplicationManagementController extends Controller
 
     public function view(string $orguin, int $uin): View
     {
-        return view(
-            'application-management.candidate-view',
-            $this->applications->getForView($orguin, $uin)
-        );
+        return view('application-management.candidate-view', [
+            ...$this->applications->getForView($orguin, $uin)        
+        ]);
     }
 
     // Streams the PDF so the iframe works without exposing the storage path
