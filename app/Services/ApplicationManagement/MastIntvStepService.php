@@ -59,6 +59,7 @@ class MastIntvStepService
                     'Orga_UIN' => $orgaUin,
                     'Cr_By' => $userId,
                     'Mo_By' => $userId,
+                    'Intv_Stage' => 1
                 ]);
             }
         });

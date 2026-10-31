@@ -6,6 +6,7 @@ use App\Enums\InterviewStepStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MastIntvStep extends Model
 {
@@ -27,6 +28,7 @@ class MastIntvStep extends Model
         'Cr_By',
         'Mo_By',
         'Del_By',
+        'Intv_Stage'
     ];
 
     protected function casts(): array
@@ -55,5 +57,10 @@ class MastIntvStep extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('Intv_Step_Stau', InterviewStepStatus::Active->value);
+    }
+
+    public function stage(): BelongsTo
+    {
+        return $this->belongsTo(InterviewStep::class, 'Intv_Stage', 'id');
     }
 }

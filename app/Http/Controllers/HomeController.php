@@ -87,9 +87,9 @@ class HomeController extends Controller
 
         Session::put('selected_orga_uin', $request->input('Orga_UIN'));
 
+        SeedDefaultInterviewStepsJob::dispatch($request->input('Orga_UIN'), $userUin);
         $this->intvStepService->ensureDefaultStepsQueued($request->input('Orga_UIN'), $userUin);
         $this->hrFlagService->ensureDefaultFlagsQueued($request->input('Orga_UIN'), $userUin);
-        SeedDefaultInterviewStepsJob::dispatch($request->input('Orga_UIN'), $userUin);
 
         return redirect()->to(Dashboard::getUrl());
     }

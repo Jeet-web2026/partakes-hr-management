@@ -280,6 +280,7 @@
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <th class="px-5 py-3">Step</th>
+                        <th class="px-5 py-3">Stage Name</th>
                         <th class="px-5 py-3">Step Name</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
@@ -290,6 +291,7 @@
                     @forelse ($this->steps as $step)
                         <tr wire:key="step-{{ $step->Intv_Step_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                             <td class="px-5 py-3 whitespace-nowrap">Step {{ $step->Intv_Step_Numb }}</td>
+                            <td class="px-5 py-3 whitespace-nowrap">{{ $step->stage?->Stage_Name }}</td>
                             <td class="px-5 py-3">{{ $step->Intv_Step_Name }}</td>
                             <td class="px-5 py-3">
                                 @if ($step->Intv_Step_Stau === \App\Enums\InterviewStepStatus::Active)
