@@ -12,6 +12,7 @@ use App\Models\ShareLink;
 use App\Services\Agreement\AgreementService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,9 @@ use Throwable;
 
 class JobApplicationService
 {
+    private const MASTER_CACHE_TTL_MINUTES = 60;
+    private const MASTER_CACHE_KEYS = ['stages', 'steps', 'flags', 'questions'];
+
     public function __construct(protected AgreementService $agreementService) {}
 
     private const UPLOAD_DIRECTORY = 'job-applications/bio-data';
@@ -215,25 +219,35 @@ class JobApplicationService
         return [
             'orguin'      => $orguin,
             'application' => $application,
-            'stages'      => InterviewStep::query()
+
+            'stages' => $this->remembered('stages', $orguin, fn() => InterviewStep::query()
                 ->forOrganisation($orguin)
                 ->active()
                 ->orderBy('Stage_Name')
-                ->get(),
-            'steps'       => MastIntvStep::query()
+                ->get()),
+
+            'steps' => $this->remembered('steps', $orguin, fn() => MastIntvStep::query()
                 ->forOrganisation($orguin)
                 ->active()
                 ->orderBy('Intv_Step_Name')
-                ->get(),
-            'flags'       => MastHrFlag::query()
+                ->get()),
+
+            'flags' => $this->remembered('flags', $orguin, fn() => MastHrFlag::query()
                 ->forOrganisation($orguin)
                 ->active()
                 ->orderBy('hr_flag_name')
-                ->get(),
-            'history'     => [],
-            'userData'    => $this->agreementService->fetchUserData(Session::get('partaker_access_token')),
+                ->get()),
+
+            'questions' => $this->remembered(
+                'questions',
+                $orguin,
+                fn() => $this->getActiveQuestionsByOrganisation($orguin)
+            ),
+
+            'history'            => [],
+            'userData'           => $this->agreementService->fetchUserData(Session::get('partaker_access_token')),
             'companyInformation' => $application->company,
-            'bioDataUrl' => $application->Bio_Data_Path
+            'bioDataUrl'         => $application->Bio_Data_Path
                 ? URL::temporarySignedRoute(
                     'job-applications.bio-data',
                     now()->addMinutes(15),
@@ -241,6 +255,22 @@ class JobApplicationService
                 )
                 : null,
         ];
+    }
+
+    private function remembered(string $name, string $orguin, \Closure $query): mixed
+    {
+        return Cache::remember(
+            "hr:master:{$name}:{$orguin}",
+            now()->addMinutes(self::MASTER_CACHE_TTL_MINUTES),
+            $query
+        );
+    }
+
+    public function forgetMasterCache(string $orguin, ?array $names = null): void
+    {
+        foreach ($names ?? self::MASTER_CACHE_KEYS as $name) {
+            Cache::forget("hr:master:{$name}:{$orguin}");
+        }
     }
 
     public function updateQuery(string $orguin, int $uin, array $data, int $userId): void
