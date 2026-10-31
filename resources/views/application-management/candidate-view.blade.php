@@ -73,9 +73,9 @@
         <div data-panel="resume" class="tab-panel hidden py-6">
             <section class="card p-6">
                 <h2 class="section-title">Resume</h2>
-                @if ($a->Resume_Path)
-                    <iframe src="{{ route('applications.resume', [$orguin, $a->Aply_UIN]) }}"
-                        class="h-[80vh] w-full rounded-lg border border-white/10 bg-slate-950" title="Resume"></iframe>
+                @if ($bioDataUrl)
+                    <iframe src="{{ $bioDataUrl }}"
+                        class="h-[100vh] w-full rounded-lg border border-white/10 bg-slate-950" title="Resume"></iframe>
                 @else
                     <p class="py-8 text-center text-sm text-slate-400">No resume attached.</p>
                 @endif
@@ -102,8 +102,8 @@
                                 <label for="stage" class="label">Stage <span class="text-red-500">*</span></label>
                                 <select id="stage" name="stage" required class="input">
                                     @foreach ($stages as $s)
-                                        <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
-                                            @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>{{ $s->Name }}</option>
+                                        <option value="{{ $s->id }}" class="bg-slate-900"
+                                            @selected(old('stage', $a->id) == $s->id)>{{ $s->Stage_Name }}</option>
                                     @endforeach
                                 </select>
                                 @error('stage') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -113,26 +113,29 @@
                                 <label for="step" class="label">Steps <span class="text-red-500">*</span></label>
                                 <select id="step" name="step" required class="input">
                                     @foreach ($steps as $s)
-                                        <option value="{{ $s->Step_UIN }}" class="bg-slate-900"
-                                            @selected(old('step', $a->Step_UIN) == $s->Step_UIN)>{{ $s->Name }}</option>
+                                        <option value="{{ $s->Intv_Step_UIN }}" class="bg-slate-900"
+                                            @selected(old('step', $a->Intv_Step_UIN) == $s->Intv_Step_UIN)>{{ $s->Intv_Step_Name }}</option>
                                     @endforeach
                                 </select>
                                 @error('step') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
-                        <div class="space-y-1.5">
-                            <label class="label">Flags</label>
-                            <div class="mt-2 flex flex-wrap gap-x-6 gap-y-3">
-                                @foreach ($flags as $f)
-                                    <label class="inline-flex items-center gap-2 text-sm text-slate-200">
-                                        <input type="checkbox" name="flags[]" value="{{ $f->Flag_UIN }}" class="checkbox"
-                                            @checked(in_array($f->Flag_UIN, old('flags', $selectedFlags ?? [])))>
-                                        {{ $f->Name }}
-                                    </label>
-                                @endforeach
-                            </div>
+                       <div class="space-y-1.5">
+                        <label class="label">Flags</label>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            @foreach ($flags as $f)
+                                <label class="inline-flex cursor-pointer items-center gap-2 rounded border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-slate-300 transition
+                                            hover:bg-white/10
+                                            has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white
+                                            has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500/50">
+                                    <input type="checkbox" name="flags[]" value="{{ $f->hr_flag_UIN }}" class="checkbox"
+                                        @checked(in_array($f->hr_flag_UIN, old('flags', $selectedFlags ?? [])))>
+                                    <span>{{ $f->hr_flag_name }}</span>
+                                </label>
+                            @endforeach
                         </div>
+                    </div>
                     </div>
                 </section>
 
@@ -233,6 +236,11 @@
         .checkbox { width: 1rem; height: 1rem; accent-color: #3b82f6; }
 
         .tab-btn:not(.bg-blue-600):hover { background: rgba(255,255,255,.05); color: #e2e8f0; }
+        label:has(input.checkbox:checked) {
+            background: #2563eb;
+            border-color: #3b82f6;
+            color: #fff;
+        }
     </style>
     @endsection
 </x-base-component>

@@ -211,12 +211,31 @@ class JobApplicationService
         return [
             'orguin'      => $orguin,
             'application' => $application,
-            'stages'      => InterviewStep::where('Orga_UIN', $orguin)->orderBy('Stage_Name')->get(),
-            'steps'       => MastIntvStep::where('Orga_UIN', $orguin)->orderBy('Intv_Step_Name')->get(),
-            'flags'       => MastHrFlag::where('Orga_UIN', $orguin)->orderBy('hr_flag_name')->get(),
+            'stages'      => InterviewStep::query()
+                ->forOrganisation($orguin)
+                ->active()
+                ->orderBy('Stage_Name')
+                ->get(),
+            'steps'       => MastIntvStep::query()
+                ->forOrganisation($orguin)
+                ->active()
+                ->orderBy('Intv_Step_Name')
+                ->get(),
+            'flags'       => MastHrFlag::query()
+                ->forOrganisation($orguin)
+                ->active()
+                ->orderBy('hr_flag_name')
+                ->get(),
             'history'     => [],
             'userData'    => $this->agreementService->fetchUserData(Session::get('partaker_access_token')),
-            'companyInformation' => $application->company
+            'companyInformation' => $application->company,
+            'bioDataUrl' => $application->Bio_Data_Path
+                ? URL::temporarySignedRoute(
+                    'job-applications.bio-data',
+                    now()->addMinutes(15),
+                    ['application' => $application->Aply_UIN]
+                )
+                : null,
         ];
     }
 
