@@ -174,111 +174,160 @@
             </table>
         </div>
 
-        {{-- Footer --}}
-        <div class="mt-4 text-xs text-muted-foreground">
-            @php($total = $this->flags->count())
-            <span id="entriesLabel">Showing {{ $total ? 1 : 0 }} to {{ $total }} of {{ $total }} entries</span>
-        </div>
+        {{-- Footer: count + page links --}}
+        @if ($this->flags->total() > 0)
+        @php
+        $current = $this->flags->currentPage();
+        $last = $this->flags->lastPage();
+        $pages = collect(range(1, $last))
+        ->filter(fn ($p) => $p === 1 || $p === $last || abs($p - $current) <= 2)
+            ->values();
+            @endphp
 
-        {{-- Add / Edit modal: sits inside <main>, same width as the table --}}
-        @if ($showForm)
-        <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="closeForm"></div>
+            <div class="mt-4 flex flex-col items-center justify-between gap-3 text-xs sm:flex-row">
+                <span id="entriesLabel" class="text-muted-foreground">
+                    Showing {{ $this->flags->firstItem() }} to {{ $this->flags->lastItem() }} of {{ $this->flags->total() }} entries
+                </span>
 
-        <div
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-            wire:keydown.escape.window="closeForm"
-            @click.self="$wire.closeForm()">
-
-            <div class="w-full max-w-md rounded-xl border border-white/10 bg-card p-5 shadow-xl">
-
-                <div class="mb-4 flex items-center justify-between">
-                    <h3 class="text-base font-semibold">{{ $editingUin ? 'Edit flag' : 'Add flag' }}</h3>
-                    <button type="button" wire:click="closeForm"
-                        class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
-                        <i class="bi bi-x-lg"></i>
+                @if ($this->flags->hasPages())
+                <nav class="flex flex-wrap items-center gap-1" aria-label="Pagination">
+                    <button
+                        type="button"
+                        wire:click="previousPage"
+                        @disabled($this->flags->onFirstPage())
+                        class="inline-flex h-8 items-center gap-1 rounded-md border border-white/10 px-3 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
+                        <i class="bi bi-chevron-left"></i> Prev
                     </button>
-                </div>
 
-                <form wire:submit="save" class="space-y-4">
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Stage Name</label>
-                        <select
-                            wire:model="formStage"
-                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                            @foreach (\App\Enums\HrFlagStage::cases() as $stage)
-                            <option value="{{ $stage->value }}" class="bg-slate-800">{{ $stage->label() }}</option>
-                            @endforeach
-                        </select>
-                        @error('formStage')
-                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    @foreach ($pages as $i => $page)
+                    {{-- ellipsis when pages are skipped --}}
+                    @if ($i > 0 && $page - $pages[$i - 1] > 1)
+                    <span class="px-1 text-muted-foreground">…</span>
+                    @endif
 
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Flag Name</label>
-                        <input
-                            type="text"
-                            wire:model="formName"
-                            maxlength="100"
-                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
-                        @error('formName')
-                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <button
+                        type="button"
+                        wire:key="page-link-{{ $page }}"
+                        wire:click="gotoPage({{ $page }})"
+                        @class([ 'inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2 transition' , 'border-[#3c83f6] bg-[#3c83f6] text-white'=> $page === $current,
+                        'border-white/10 hover:bg-white/5' => $page !== $current,
+                        ])
+                        @if ($page === $current) aria-current="page" @endif>
+                        {{ $page }}
+                    </button>
+                    @endforeach
 
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Status</label>
-                        <select
-                            wire:model="formStatus"
-                            class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                            <option value="active" class="bg-slate-800">Active</option>
-                            <option value="inactive" class="bg-slate-800">Inactive</option>
-                        </select>
-                        @error('formStatus')
-                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-2">
-                        <button type="button" wire:click="closeForm"
-                            class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
-                            Save
-                        </button>
-                    </div>
-                </form>
+                    <button
+                        type="button"
+                        wire:click="nextPage"
+                        @disabled(! $this->flags->hasMorePages())
+                        class="inline-flex h-8 items-center gap-1 rounded-md border border-white/10 px-3 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </button>
+                </nav>
+                @endif
             </div>
             @endif
 
-            {{-- Delete confirmation --}}
-            @if ($deletingUin)
-            <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="cancelDelete"></div>
+            {{-- Add / Edit modal: sits inside <main>, same width as the table --}}
+            @if ($showForm)
+            <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="closeForm"></div>
 
             <div
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-                wire:keydown.escape.window="cancelDelete"
-                wire:click.self="cancelDelete">
+                wire:keydown.escape.window="closeForm"
+                @click.self="$wire.closeForm()">
 
-                <div class="w-full max-w-sm rounded-xl border border-white/10 bg-card p-5 shadow-xl">
-                    <h3 class="text-base font-semibold">Delete flag?</h3>
-                    <p class="mt-2 text-sm text-muted-foreground">This flag will be removed from your list.</p>
+                <div class="w-full max-w-md rounded-xl border border-white/10 bg-card p-5 shadow-xl">
 
-                    <div class="mt-5 flex justify-end gap-2">
-                        <button type="button" wire:click="cancelDelete"
-                            class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
-                            Cancel
-                        </button>
-                        <button type="button" wire:click="delete"
-                            class="px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700">
-                            Delete
+                    <div class="mb-4 flex items-center justify-between">
+                        <h3 class="text-base font-semibold">{{ $editingUin ? 'Edit flag' : 'Add flag' }}</h3>
+                        <button type="button" wire:click="closeForm"
+                            class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+                            <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
+
+                    <form wire:submit="save" class="space-y-4">
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Stage Name</label>
+                            <select
+                                wire:model="formStage"
+                                class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                                @foreach (\App\Enums\HrFlagStage::cases() as $stage)
+                                <option value="{{ $stage->value }}" class="bg-slate-800">{{ $stage->label() }}</option>
+                                @endforeach
+                            </select>
+                            @error('formStage')
+                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Flag Name</label>
+                            <input
+                                type="text"
+                                wire:model="formName"
+                                maxlength="100"
+                                class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                            @error('formName')
+                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Status</label>
+                            <select
+                                wire:model="formStatus"
+                                class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                                <option value="active" class="bg-slate-800">Active</option>
+                                <option value="inactive" class="bg-slate-800">Inactive</option>
+                            </select>
+                            @error('formStatus')
+                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2">
+                            <button type="button" wire:click="closeForm"
+                                class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
+                                Save
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            @endif
+                @endif
+
+                {{-- Delete confirmation --}}
+                @if ($deletingUin)
+                <div style="position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.6);" wire:click="cancelDelete"></div>
+
+                <div
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                    wire:keydown.escape.window="cancelDelete"
+                    wire:click.self="cancelDelete">
+
+                    <div class="w-full max-w-sm rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+                        <h3 class="text-base font-semibold">Delete flag?</h3>
+                        <p class="mt-2 text-sm text-muted-foreground">This flag will be removed from your list.</p>
+
+                        <div class="mt-5 flex justify-end gap-2">
+                            <button type="button" wire:click="cancelDelete"
+                                class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
+                                Cancel
+                            </button>
+                            <button type="button" wire:click="delete"
+                                class="px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endif
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
