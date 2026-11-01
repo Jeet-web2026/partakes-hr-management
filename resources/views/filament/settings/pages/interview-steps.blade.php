@@ -402,7 +402,13 @@
                         wire:model="editStage"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
                         @foreach ($this->stages as $stage)
-                        <option value="{{ $stage->id }}" class="bg-slate-800">{{ $stage->Stage_Name }}</option>
+                        <option
+                            value="{{ $stage->Stage_UIN }}"
+
+                            @selected((string) $stage->Stage_UIN === (string) $editStage)
+                            class="bg-slate-800">
+                            {{ $stage->Stage_Name }}
+                        </option>
                         @endforeach
                     </select>
                     @error('editStage')

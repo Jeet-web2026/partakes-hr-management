@@ -84,7 +84,6 @@ class InterviewSteps extends Page
     public function openEdit(string $uin): void
     {
         $step = $this->findStep($uin);
-
         $this->editingUin       = $step->getKey();
         $this->editPlaceholders = array_values((array) $step->placeholder_list);
 
@@ -98,7 +97,6 @@ class InterviewSteps extends Page
 
         $this->editStatus = $step->Intv_Step_Stau->value;
         $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
-
         $this->resetErrorBag();
     }
 
@@ -166,7 +164,6 @@ class InterviewSteps extends Page
     #[Computed]
     public function stages(): Collection
     {
-        // NOTE: if you have a dedicated stage model (e.g. InterviewStage), use it here.
         return InterviewStep::query()
             ->forOrganisation($this->orgaUin)
             ->orderBy('Stage_Name')
