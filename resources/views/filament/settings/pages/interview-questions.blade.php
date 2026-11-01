@@ -16,7 +16,7 @@
 
             <div class="flex w-full items-center gap-3 sm:w-auto">
 
-            {{-- Rows per page --}}
+                {{-- Rows per page --}}
                 <div class="flex shrink-0 items-center gap-2">
                     <label for="perPage" class="hidden text-xs text-muted-foreground sm:block">Rows</label>
                     <select
@@ -29,7 +29,7 @@
                     </select>
                 </div>
 
-                
+
                 {{-- Search --}}
                 <div class="relative w-full sm:w-auto">
                     <svg
@@ -173,36 +173,58 @@
 
         {{-- Footer: count + pagination --}}
         @if ($questions->total() > 0)
-        <div class="mt-4 flex flex-col items-center justify-between gap-3 text-xs sm:flex-row">
-            <span id="entriesLabel" class="text-muted-foreground">
-                Showing {{ $questions->firstItem() }} to {{ $questions->lastItem() }} of {{ $questions->total() }} entries
-            </span>
+        @php
+        $current = $questions->currentPage();
+        $last = $questions->lastPage();
+        $pages = collect(range(1, $last))
+        ->filter(fn ($p) => $p === 1 || $p === $last || abs($p - $current) <= 2)
+            ->values();
+            @endphp
 
-            @if ($questions->hasPages())
-            <div class="flex items-center gap-2">
-                <button
-                    type="button"
-                    wire:click="previousPage"
-                    @disabled($questions->onFirstPage())
-                    class="inline-flex h-8 items-center gap-1 rounded-md border border-white/10 px-3 text-xs transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
-                    <i class="bi bi-chevron-left"></i> Prev
-                </button>
-
-                <span class="text-muted-foreground">
-                    Page {{ $questions->currentPage() }} of {{ $questions->lastPage() }}
+            <div class="mt-4 flex flex-col items-center justify-between gap-3 text-xs sm:flex-row">
+                <span id="entriesLabel" class="text-muted-foreground">
+                    Showing {{ $questions->firstItem() }} to {{ $questions->lastItem() }} of {{ $questions->total() }} entries
                 </span>
 
-                <button
-                    type="button"
-                    wire:click="nextPage"
-                    @disabled(! $questions->hasMorePages())
-                    class="inline-flex h-8 items-center gap-1 rounded-md border border-white/10 px-3 text-xs transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
-                    Next <i class="bi bi-chevron-right"></i>
-                </button>
+                @if ($questions->hasPages())
+                <nav class="flex flex-wrap items-center gap-1" aria-label="Pagination">
+                    <button
+                        type="button"
+                        wire:click="previousPage"
+                        @disabled($questions->onFirstPage())
+                        class="inline-flex h-8 items-center gap-1 rounded-md border border-white/10 px-3 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
+                        <i class="bi bi-chevron-left"></i> Prev
+                    </button>
+
+                    @foreach ($pages as $i => $page)
+                    {{-- ellipsis when pages are skipped --}}
+                    @if ($i > 0 && $page - $pages[$i - 1] > 1)
+                    <span class="px-1 text-muted-foreground">…</span>
+                    @endif
+
+                    <button
+                        type="button"
+                        wire:key="page-link-{{ $page }}"
+                        wire:click="gotoPage({{ $page }})"
+                        @class([ 'inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2 transition' , 'border-[#3c83f6] bg-[#3c83f6] text-white'=> $page === $current,
+                        'border-white/10 hover:bg-white/5' => $page !== $current,
+                        ])
+                        @if ($page === $current) aria-current="page" @endif>
+                        {{ $page }}
+                    </button>
+                    @endforeach
+
+                    <button
+                        type="button"
+                        wire:click="nextPage"
+                        @disabled(! $questions->hasMorePages())
+                        class="inline-flex h-8 items-center gap-1 rounded-md border border-white/10 px-3 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </button>
+                </nav>
+                @endif
             </div>
             @endif
-        </div>
-        @endif
     </main>
 
     {{-- Add / Edit modal --}}
