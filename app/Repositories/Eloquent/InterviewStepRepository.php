@@ -14,9 +14,9 @@ class InterviewStepRepository implements InterviewStepRepositoryInterface
         return InterviewStep::query()->orderBy('id')->get();
     }
 
-    public function getActive(): Collection
+    public function getActive(string $orgId): Collection
     {
-        return InterviewStep::query()->active()->orderBy('Stage_UIN')->get();
+        return InterviewStep::query()->forOrganisation($orgId)->active()->orderBy('Stage_UIN')->get();
     }
 
     public function find(int $id): ?InterviewStep

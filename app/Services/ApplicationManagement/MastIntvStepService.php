@@ -46,7 +46,7 @@ class MastIntvStepService
 
     public function createDefaultSteps(string $orgaUin, string $userId): void
     {
-        $allStages =  $this->stageInterface->getActive();
+        $allStages =  $this->stageInterface->getActive($orgaUin);
 
         DB::transaction(function () use ($orgaUin, $userId, $allStages) {
             foreach ($allStages as $index => $stage) {

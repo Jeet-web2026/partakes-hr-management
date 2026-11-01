@@ -9,7 +9,7 @@ interface InterviewStepRepositoryInterface
 {
     public function all(): Collection;
 
-    public function getActive(): Collection;
+    public function getActive(string $organisationUin): Collection;
 
     public function find(int $id): ?InterviewStep;
 
