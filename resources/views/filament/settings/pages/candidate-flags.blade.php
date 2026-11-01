@@ -62,7 +62,7 @@
                 wire:click="openCreate"
                 aria-label="Add Flag"
                 title="Add Flag"
-                class="hidden h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition">
+                class="h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-1.5 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition flex flex-row">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -74,7 +74,7 @@
                     <path d="M5 12h14" />
                     <path d="M12 5v14" />
                 </svg>
-                <span class="hidden sm:inline">Add</span>
+                <span class="sm:inline">Add</span>
             </button>
         </div>
 
@@ -109,20 +109,59 @@
                             <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
                             @endif
                         </td>
-                        <td class="px-5 py-3">
-                            <div class="flex items-center justify-end gap-2">
+                        <td class="px-5 py-3 text-right">
+                            <div x-data="{ open: false }" class="relative inline-block text-left">
                                 <button
                                     type="button"
-                                    wire:click="openEdit('{{ $flag->hr_flag_UIN }}')"
-                                    class="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 px-3 text-xs hover:bg-white/5 transition">
-                                    <i class="bi bi-pencil"></i> Edit
+                                    @click="open = !open"
+                                    @keydown.escape.window="open = false"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition"
+                                    aria-haspopup="true"
+                                    :aria-expanded="open">
+                                    <i class="bi bi-three-dots-vertical"></i>
                                 </button>
-                                <button
-                                    type="button"
-                                    wire:click="confirmDelete('{{ $flag->hr_flag_UIN }}')"
-                                    class="hidden h-8 items-center gap-1.5 rounded-md border border-red-500/30 px-3 text-xs text-red-400 hover:bg-red-500/10 transition">
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
+
+                                <div
+                                    x-show="open"
+                                    x-cloak
+                                    @click.outside="open = false"
+                                    x-transition.origin.top.right
+                                    class="absolute right-0 z-40 mt-1 w-36 rounded-md border border-white/10 bg-card py-1 shadow-xl">
+                                    <button
+                                        type="button"
+                                        wire:click="openEdit('{{ $flag->hr_flag_UIN }}')"
+                                        @click="open = false"
+                                        class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-white/5">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        @click="
+                                            open = false;
+                                            Swal.fire({
+                                                title: 'Delete this flag?',
+                                                text: 'This flag will be removed from your list.',
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Yes, delete',
+                                                cancelButtonText: 'Cancel',
+                                                confirmButtonColor: '#ef4444',
+                                                cancelButtonColor: '#475569',
+                                                background: '#0f172a',
+                                                color: '#e2e8f0',
+                                                reverseButtons: true,
+                                                focusCancel: true,
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    $wire.delete('{{ $flag->hr_flag_UIN }}');
+                                                }
+                                            });
+                                        "
+                                        class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-400 hover:bg-red-500/10">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -246,4 +285,8 @@
     <script src="{{ asset('assets/common.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    @assets
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @endassets
 </x-filament-panels::page>

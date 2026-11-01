@@ -17,6 +17,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\WithPagination;
+use Throwable;
 
 class CandidateFlags extends Page
 {
@@ -180,14 +181,29 @@ class CandidateFlags extends Page
         $this->deletingUin = null;
     }
 
-    public function delete(): void
+    public function delete(string $uin): void
     {
-        $flag = $this->findFlag((string) $this->deletingUin);
+        $flag = $this->findFlag($uin);
 
-        app(MastHrFlagService::class)->delete($flag, $this->userUin);
+        try {
+            app(MastHrFlagService::class)->delete($flag, $this->userUin);
+        } catch (ValidationException $e) {
+            session()->now('error', $e->validator->errors()->first());
+
+            return;
+        } catch (Throwable $e) {
+            report($e);
+            session()->now('error', 'Could not delete the flag. Please try again.');
+
+            return;
+        }
 
         unset($this->flags);
-        $this->deletingUin = null;
+
+        if ($this->flags->isEmpty() && $this->getPage() > 1) {
+            $this->previousPage();
+            unset($this->flags);
+        }
 
         session()->now('success', 'Flag deleted successfully.');
     }
