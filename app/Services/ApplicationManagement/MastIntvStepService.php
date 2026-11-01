@@ -5,6 +5,7 @@ namespace App\Services\ApplicationManagement;
 use App\Enums\InterviewStepStatus;
 use App\Jobs\CreateDefaultInterviewStepsJob;
 use App\Models\MastIntvStep;
+use App\Repositories\Contracts\InterviewStepRepositoryInterface;
 use App\Repositories\Contracts\MastIntvStepRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,16 +15,16 @@ use Illuminate\Validation\ValidationException;
 class MastIntvStepService
 {
     public const DEFAULT_STEPS = [
-        1 => 'Introduction',
-        2 => 'Written / Skill Test 1',
-        3 => 'Intimate',
-        4 => 'Verbal Interview Round 1',
-        5 => 'Verbal Interview Round 2',
-        6 => 'Verbal Interview Final Round',
-        7 => 'Salary Expectation/Negotiation',
+        'Introduction',
+        'Written / Skill Test 1',
+        'Intimate',
+        'Verbal Interview Round 1',
+        'Verbal Interview Round 2',
+        'Verbal Interview Final Round',
+        'Salary Expectation/Negotiation',
     ];
 
-    public function __construct(protected MastIntvStepRepositoryInterface $steps) {}
+    public function __construct(protected MastIntvStepRepositoryInterface $steps, protected InterviewStepRepositoryInterface $stageInterface) {}
 
     public function queryForOrganisation(string $orgaUin): Builder
     {
@@ -46,20 +47,25 @@ class MastIntvStepService
 
     public function createDefaultSteps(string $orgaUin, string $userId): void
     {
-        DB::transaction(function () use ($orgaUin, $userId) {
-            foreach (self::DEFAULT_STEPS as $number => $name) {
+        $allStages =  $this->stageInterface->getActive();
+
+        DB::transaction(function () use ($orgaUin, $userId, $allStages) {
+            foreach ($allStages as $index => $stage) {
+                $number = $index + 1;
+
                 if ($this->steps->findByOrganisationAndNumber($orgaUin, $number)) {
                     continue;
                 }
 
                 $this->steps->create([
-                    'Intv_Step_Numb' => $number,
-                    'Intv_Step_Name' => $name,
-                    'Intv_Step_Stau' => InterviewStepStatus::Active,
-                    'Orga_UIN' => $orgaUin,
-                    'Cr_By' => $userId,
-                    'Mo_By' => $userId,
-                    'Intv_Stage' => 1
+                    'Intv_Step_Numb'             => $number,
+                    'Intv_Step_Name'             => null,
+                    'Intv_Step_Placeholder_Type' => self::DEFAULT_STEPS,
+                    'Intv_Step_Stau'             => InterviewStepStatus::Active,
+                    'Orga_UIN'                   => $orgaUin,
+                    'Cr_By'                      => $userId,
+                    'Mo_By'                      => $userId,
+                    'Intv_Stage'                 => $stage->getKey(),
                 ]);
             }
         });
@@ -71,18 +77,23 @@ class MastIntvStepService
             array_flip(['Intv_Step_Name', 'Intv_Step_Stau', 'Intv_Stage'])
         );
 
-        if (isset($changes['Intv_Step_Name'])) {
-            $changes['Intv_Step_Name'] = trim($changes['Intv_Step_Name']);
+        if (array_key_exists('Intv_Step_Name', $changes)) {
+            $names = $changes['Intv_Step_Name'];
 
-            if ($this->steps->nameExists($step->Orga_UIN, $changes['Intv_Step_Name'], $step->getKey())) {
-                throw ValidationException::withMessages([
-                    'Intv_Step_Name' => 'Another step in this organisation already uses this name.',
-                ]);
+            if (is_array($names)) {
+                $names = array_map(fn($n) => trim((string) $n), array_values($names));
+
+                if (collect($names)->every(fn($n) => $n === '')) {
+                    $names = null;
+                }
+            } else {
+                $names = null;
             }
+
+            $changes['Intv_Step_Name'] = $names;
         }
 
         $changes['Mo_By'] = $userId;
-        
 
         return $this->steps->update($step, $changes);
     }

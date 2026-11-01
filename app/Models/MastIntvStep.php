@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\InterviewStepStatus;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,7 +29,9 @@ class MastIntvStep extends Model
         'Cr_By',
         'Mo_By',
         'Del_By',
-        'Intv_Stage'
+        'Intv_Stage',
+        'Intv_Step_Name',
+        'Intv_Step_Placeholder_Type',
     ];
 
     protected function casts(): array
@@ -38,6 +41,8 @@ class MastIntvStep extends Model
             'Intv_Step_Stau' => InterviewStepStatus::class,
             'Cr_On' => 'datetime',
             'Mo_On' => 'datetime',
+            'Intv_Step_Name'             => 'array',
+            'Intv_Step_Placeholder_Type' => 'array',
         ];
     }
 
@@ -62,5 +67,30 @@ class MastIntvStep extends Model
     public function stage(): BelongsTo
     {
         return $this->belongsTo(InterviewStep::class, 'Intv_Stage', 'id');
+    }
+
+    protected function placeholderList(): Attribute
+    {
+        return Attribute::get(fn() => $this->toList($this->Intv_Step_Placeholder_Type));
+    }
+
+    protected function nameList(): Attribute
+    {
+        return Attribute::get(fn() => $this->toList($this->Intv_Step_Name));
+    }
+
+    private function toList(mixed $value): array
+    {
+        while (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if ($decoded === null || $decoded === $value) {
+                return [];
+            }
+
+            $value = $decoded;
+        }
+
+        return is_array($value) ? array_values($value) : [];
     }
 }

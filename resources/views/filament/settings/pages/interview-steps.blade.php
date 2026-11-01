@@ -10,7 +10,7 @@
 
     <main class="mt-8">
         <!-- Toolbar -->
-        <div class="mb-6">
+        <div>
             <div class="flex flex-col gap-3">
 
                 {{-- Top row --}}
@@ -280,8 +280,8 @@
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <th class="px-5 py-3">Step</th>
-                        <th class="px-5 py-3">Stage Name</th>
                         <th class="px-5 py-3">Step Name</th>
+                        <th class="px-5 py-3">Stage Name</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
                     </tr>
@@ -289,29 +289,83 @@
 
                 <tbody id="tbody">
                     @forelse ($this->steps as $step)
+                    @php
+                    $placeholders = $step->placeholder_list;
+                    $names = $step->name_list;
+                    @endphp
                     <tr wire:key="step-{{ $step->Intv_Step_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
-                        <td class="px-5 py-3 whitespace-nowrap">Step {{ $step->Intv_Step_Numb }}</td>
-                        <td class="px-5 py-3 whitespace-nowrap">{{ $step->stage?->Stage_Name }}</td>
-                        <td class="px-5 py-3">{{ $step->Intv_Step_Name }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap align-top">Step {{ $step->Intv_Step_Numb }}</td>
+
                         <td class="px-5 py-3">
+                            <div class="flex flex-wrap gap-1.5">
+                                @foreach ($placeholders as $i => $placeholder)
+                                @php $custom = filled($names[$i] ?? null); @endphp
+                                <span
+                                    wire:key="step-{{ $step->Intv_Step_UIN }}-{{ $i }}"
+                                    class="inline-flex items-center rounded border px-2.5 py-0.5 text-xs font-medium
+                                        {{ $custom
+                                            ? 'border-[#3c83f6]/30 bg-[#3c83f6]/15 text-[#3c83f6]'
+                                            : 'border-white/10 bg-white/5 text-muted-foreground' }}">
+                                    {{ $custom ? $names[$i] : "e.g. " . $placeholder }}
+                                </span>
+                                @endforeach
+                            </div>
+                        </td>
+
+                        <td class="px-5 py-3 whitespace-nowrap align-top">{{ $step->stage?->Stage_Name }}</td>
+
+                        <td class="px-5 py-3 align-top">
                             @if ($step->Intv_Step_Stau === \App\Enums\InterviewStepStatus::Active)
                             <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
                             @else
                             <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-right">
-                            <button
-                                type="button"
-                                wire:click="openEdit('{{ $step->Intv_Step_UIN }}')"
-                                class="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 px-3 text-xs hover:bg-white/5 transition">
-                                <i class="bi bi-pencil"></i> Edit
-                            </button>
+
+                        <td class="px-5 py-3 text-right align-top">
+                            @php $stageActive = (bool) $step->stage?->Stage_Status; @endphp
+
+                            <div x-data="{ open: false }" class="relative inline-block text-left">
+                                <button
+                                    type="button"
+                                    @click="open = !open"
+                                    @keydown.escape.window="open = false"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition"
+                                    aria-haspopup="true"
+                                    :aria-expanded="open">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+
+                                <div
+                                    x-show="open"
+                                    x-cloak
+                                    @click.outside="open = false"
+                                    x-transition.origin.top.right
+                                    class="absolute right-0 z-40 mt-1 w-44 rounded-md border border-white/10 bg-card py-1 shadow-xl">
+                                    @if ($stageActive)
+                                    <button
+                                        type="button"
+                                        wire:click="openEdit('{{ $step->Intv_Step_UIN }}')"
+                                        @click="open = false"
+                                        class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-white/5">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </button>
+                                    @else
+                                    <button
+                                        type="button"
+                                        disabled
+                                        title="This stage is inactive, so its steps can't be edited"
+                                        class="flex w-full cursor-not-allowed items-center gap-2 px-3 py-2 text-left text-sm opacity-40">
+                                        <i class="bi bi-pencil-square"></i> Edit (stage inactive)
+                                    </button>
+                                    @endif
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-5 py-10 text-center text-muted-foreground">No interview steps found.</td>
+                        <td colspan="5" class="px-5 py-10 text-center text-muted-foreground">No interview steps found.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -334,9 +388,9 @@
     <div
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="closeEdit">
-        <div class="w-full max-w-md rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+        <div class="w-full max-w-4xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
             <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-base font-semibold">Edit interview step</h3>
+                <h3 class="text-base font-semibold">Edit interview steps</h3>
                 <button type="button" wire:click="closeEdit"
                     class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
                     <i class="bi bi-x-lg"></i>
@@ -350,21 +404,33 @@
                         wire:model="editStage"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
                         @foreach ($this->stages as $stage)
-                            <option value="{{ $stage->id }}" class="bg-slate-800">{{ $stage->Stage_Name }}</option>
+                        <option value="{{ $stage->id }}" class="bg-slate-800">{{ $stage->Stage_Name }}</option>
                         @endforeach
                     </select>
                     @error('editStage')
-                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
+
                 <div>
-                    <label class="mb-1 block text-sm font-medium">Step Name</label>
-                    <input
-                        type="text"
-                        wire:model="editName"
-                        maxlength="100"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
-                    @error('editName')
+                    <p class="mb-2 text-sm font-medium">Steps</p>
+                    <div class="grid max-h-[30vh] grid-cols-1 gap-3 overflow-y-auto pr-1 sm:grid-cols-2">
+                        @foreach ($editPlaceholders as $i => $placeholder)
+                        <div wire:key="step-input-{{ $i }}">
+                            <textarea
+                                wire:model="editNames.{{ $i }}"
+                                rows="2"
+                                maxlength="100"
+                                placeholder="e.g. {{ $placeholder }}"
+                                class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                            @error('editNames.' . $i)
+                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        @endforeach
+                    </div>
+                    <p class="mt-2 text-xs text-muted-foreground">Leave a box empty to keep its default name.</p>
+                    @error('editNames')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </div>

@@ -39,8 +39,15 @@ class InterviewSteps extends Page
     #[Locked]
     public ?string $editingUin = null;
 
+    // default step names, display-only; locked so the client can't change them
+    #[Locked]
+    public array $editPlaceholders = [];
+
     public string $search = '';
-    public string $editName = '';
+
+    /** user-defined names, same positions as $editPlaceholders */
+    public array $editNames = [];
+
     public string $editStatus = 'active';
 
     public function mount(): void
@@ -57,14 +64,21 @@ class InterviewSteps extends Page
     public function steps(): Collection
     {
         $steps = app(MastIntvStepService::class)->listForOrganisation($this->orgaUin);
-        $term = mb_strtolower(trim($this->search));
+        $term  = mb_strtolower(trim($this->search));
 
         if ($term === '') {
             return $steps;
         }
 
+        // search across the names shown in the table (user name if set, else placeholder)
         return $steps
-            ->filter(fn($step) => str_contains(mb_strtolower($step->Intv_Step_Name), $term))
+            ->filter(function ($step) use ($term) {
+                $names = $step->name_list;
+
+                return collect($step->placeholder_list)
+                    ->map(fn($placeholder, $i) => filled($names[$i] ?? null) ? $names[$i] : $placeholder)
+                    ->contains(fn($name) => str_contains(mb_strtolower((string) $name), $term));
+            })
             ->values();
     }
 
@@ -72,16 +86,24 @@ class InterviewSteps extends Page
     {
         $step = $this->findStep($uin);
 
-        $this->editingUin = $step->getKey();
-        $this->editName   = $step->Intv_Step_Name;
+        $this->editingUin       = $step->getKey();
+        $this->editPlaceholders = $step->placeholder_list;
+
+        $names = $step->name_list;
+        $this->editNames = collect($this->editPlaceholders)
+            ->keys()
+            ->map(fn($i) => (string) ($names[$i] ?? ''))   // blank box -> placeholder is shown
+            ->all();
+
         $this->editStatus = $step->Intv_Step_Stau->value;
         $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
+
         $this->resetErrorBag();
     }
 
     public function closeEdit(): void
     {
-        $this->reset(['editingUin', 'editName', 'editStage']);
+        $this->reset(['editingUin', 'editNames', 'editPlaceholders', 'editStage']);
         $this->editStatus = 'active';
         $this->resetErrorBag();
     }
@@ -89,24 +111,33 @@ class InterviewSteps extends Page
     public function save(): void
     {
         $this->validate([
-            'editName'   => ['required', 'string', 'max:100'],
-            'editStatus' => ['required', Rule::enum(InterviewStepStatus::class)],
-            'editStage'  => [
+            'editNames'   => ['array', 'size:' . count($this->editPlaceholders)],
+            'editNames.*' => ['nullable', 'string', 'max:100'],
+            'editStatus'  => ['required', Rule::enum(InterviewStepStatus::class)],
+            'editStage'   => [
                 'required',
                 Rule::exists('tbl_mast_intv_stage', 'id')->where('Orga_UIN', $this->orgaUin),
             ],
         ]);
 
+        $names  = array_map(fn($n) => trim((string) $n), array_values($this->editNames));
+        $filled = array_filter($names, fn($n) => $n !== '');
+
+        if (count($filled) !== count(array_unique(array_map('mb_strtolower', $filled)))) {
+            $this->addError('editNames', 'Step names must be unique.');
+            return;
+        }
+
         $step = $this->findStep((string) $this->editingUin);
 
         try {
             app(MastIntvStepService::class)->updateStep($step, [
-                'Intv_Step_Name' => $this->editName,
+                'Intv_Step_Name' => $filled ? $names : null,   // null = all defaults
                 'Intv_Step_Stau' => $this->editStatus,
                 'Intv_Stage'     => $this->editStage,
             ], $this->userUin);
         } catch (ValidationException $e) {
-            $this->addError('editName', $e->validator->errors()->first());
+            $this->addError('editNames', $e->validator->errors()->first());
             return;
         } catch (Throwable $e) {
             report($e);
