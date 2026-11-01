@@ -2,9 +2,12 @@
 
 namespace App\Services\ApplicationManagement;
 
+use App\Models\HrMastJobAply;
 use App\Models\MastDsig;
 use App\Repositories\Contracts\MastDsigRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class MastDsigService
 {
@@ -70,11 +73,31 @@ class MastDsigService
 
     public function delete(MastDsig $designation): bool
     {
+        $usedBy = HrMastJobAply::query()
+            ->where('Job_Intr', $designation->getKey())
+            ->count();
+
+        if ($usedBy > 0) {
+            throw ValidationException::withMessages([
+                'designation' => sprintf(
+                    'Cannot delete "%s": %d candidate application%s use this designation.',
+                    $designation->Dsig_Name,
+                    $usedBy,
+                    $usedBy === 1 ? '' : 's'
+                ),
+            ]);
+        }
+
         return $this->designations->delete($designation->getKey());
     }
 
     public function getActiveByOrganisation(string $orgUin, string $search = ''): Collection
     {
         return $this->designations->getActiveByOrganisation((int) $orgUin, $search ?: null);
+    }
+
+    public function paginateForOrganisation(string $orgaUin, string $search = '', int $perPage = 50): LengthAwarePaginator
+    {
+        return $this->designations->paginateByOrganisation($orgaUin, $search, $perPage);
     }
 }

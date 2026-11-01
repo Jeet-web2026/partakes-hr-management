@@ -7,21 +7,28 @@ use App\Services\ApplicationManagement\MastDsigService;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
+use Throwable;
 
 class Designations extends Page
 {
-    use HasCompanyHeader;
+    use HasCompanyHeader, WithPagination;
 
     protected static ?string $navigationLabel = 'Designations';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
     protected static ?int $navigationSort = 11;
     protected static ?string $slug = 'designations';
+
+    public const PER_PAGE_OPTIONS = [50, 100, 250];
+
+    public int $perPage = 100;
 
     protected string $view = 'filament.settings.pages.designations';
 
@@ -33,9 +40,6 @@ class Designations extends Page
 
     #[Locked]
     public ?string $editingUin = null;
-
-    #[Locked]
-    public ?string $deletingUin = null;
 
     public bool $showForm = false;
     public string $search = '';
@@ -59,13 +63,30 @@ class Designations extends Page
     public function refreshOrganisation(): void
     {
         $this->orgaUin = (string) Session::get('selected_orga_uin');
+        $this->resetPage();
         unset($this->designations);
     }
 
     #[Computed]
-    public function designations(): Collection
+    public function designations(): LengthAwarePaginator
     {
-        return app(MastDsigService::class)->listForOrganisation($this->orgaUin, $this->search);
+        return app(MastDsigService::class)->paginateForOrganisation(
+            $this->orgaUin,
+            $this->search,
+            $this->perPage,
+        );
+    }
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage($value): void
+    {
+        // never trust the browser: any other value falls back to 50
+        $this->perPage = in_array((int) $value, self::PER_PAGE_OPTIONS, true) ? (int) $value : 50;
+        $this->resetPage();
     }
 
     #[Computed]
@@ -115,48 +136,63 @@ class Designations extends Page
             return;
         }
 
-        if ($this->editingUin) {
-            $service->update($this->findDesignation($this->editingUin), [
-                'Dsig_Name' => $this->formName,
-                'Dsig_Desp' => $this->formDesc ?: null,
-                'Dsig_Stau' => (int) $this->formStatus,
-            ], $this->userUin);
+        try {
+            if ($this->editingUin) {
+                $service->update($this->findDesignation($this->editingUin), [
+                    'Dsig_Name' => $this->formName,
+                    'Dsig_Desp' => $this->formDesc ?: null,
+                    'Dsig_Stau' => (int) $this->formStatus,
+                ], $this->userUin);
 
-            session()->now('success', 'Designation updated successfully.');
-        } else {
-            $service->create(
-                $this->orgaUin,
-                $this->formName,
-                $this->formDesc ?: null,
-                (int) $this->formStatus,
-                $this->userUin,
-            );
+                session()->now('success', 'Designation updated successfully.');
+            } else {
+                $service->create(
+                    $this->orgaUin,
+                    $this->formName,
+                    $this->formDesc ?: null,
+                    (int) $this->formStatus,
+                    $this->userUin,
+                );
 
-            session()->now('success', 'Designation added successfully.');
+                session()->now('success', 'Designation added successfully.');
+            }
+        } catch (ValidationException $e) {
+            // service-level duplicate check
+            $this->addError('formName', $e->validator->errors()->first());
+
+            return;
         }
 
         unset($this->designations);
         $this->resetForm();
     }
 
-    public function confirmDelete(string $uin): void
+    public function delete(string $uin): void
     {
-        $this->deletingUin = (string) $this->findDesignation($uin)->getKey();
-    }
+        $designation = $this->findDesignation($uin);
 
-    public function cancelDelete(): void
-    {
-        $this->deletingUin = null;
-    }
+        try {
+            app(MastDsigService::class)->delete($designation);
+        } catch (ValidationException $e) {
+            // e.g. 'Cannot delete "Manager": 3 candidate applications use this designation.'
+            session()->now('error', $e->validator->errors()->first());
 
-    public function delete(): void
-    {
-        $designation = $this->findDesignation((string) $this->deletingUin);
+            return;
+        } catch (Throwable $e) {
+            report($e);
+            session()->now('error', 'Could not delete the designation. Please try again.');
 
-        app(MastDsigService::class)->delete($designation);
+            return;
+        }
 
         unset($this->designations);
-        $this->deletingUin = null;
+
+        // deleted the last row on this page -> go back one page
+        if ($this->designations->isEmpty() && $this->getPage() > 1) {
+            $this->previousPage();
+            unset($this->designations);
+        }
+
         session()->now('success', 'Designation deleted successfully.');
     }
 
