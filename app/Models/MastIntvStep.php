@@ -5,21 +5,16 @@ namespace App\Models;
 use App\Enums\InterviewStepStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MastIntvStep extends Model
 {
-    use HasUuids;
-
     public const CREATED_AT = 'Cr_On';
     public const UPDATED_AT = 'Mo_On';
 
     protected $table = 'tbl_mast_intv_step';
     protected $primaryKey = 'Intv_Step_UIN';
-    public $incrementing = false;
-    protected $keyType = 'string';
 
     protected $fillable = [
         'Intv_Step_Numb',
@@ -69,26 +64,11 @@ class MastIntvStep extends Model
 
     protected function placeholderList(): Attribute
     {
-        return Attribute::get(fn() => json_decode($this->Intv_Step_Placeholder_Type));
+        return Attribute::get(fn() => $this->Intv_Step_Placeholder_Type);
     }
 
     protected function nameList(): Attribute
     {
         return Attribute::get(fn() => json_decode($this->Intv_Step_Name));
-    }
-
-    private function toList(mixed $value): array
-    {
-        while (is_string($value)) {
-            $decoded = json_decode($value, true);
-
-            if ($decoded === null || $decoded === $value) {
-                return [];
-            }
-
-            $value = $decoded;
-        }
-
-        return is_array($value) ? array_values($value) : [];
     }
 }

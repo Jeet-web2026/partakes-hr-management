@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tbl_mast_intv_step', function (Blueprint $table) {
-            $table->uuid('Intv_Step_UIN')->primary();
+            $table->id('Intv_Step_UIN');
             $table->unsignedTinyInteger('Intv_Step_Numb');
             $table->string('Intv_Step_Name', 100);
             $table->enum('Intv_Step_Stau', ['active', 'inactive'])->default('active');
@@ -25,6 +26,8 @@ return new class extends Migration
 
             $table->index('Orga_UIN');
         });
+
+        DB::statement('ALTER TABLE tbl_mast_intv_step AUTO_INCREMENT = 101');
     }
 
     /**
