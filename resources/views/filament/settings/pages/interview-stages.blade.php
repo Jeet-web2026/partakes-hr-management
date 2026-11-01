@@ -4,7 +4,7 @@
         <x-globalresponse />
 
         <!-- Toolbar -->
-        <div class="mb-6">
+        <div class="mb-6 hidden">
             <div class="flex items-center justify-between gap-3">
                 <div class="relative w-full">
                     <svg
@@ -34,7 +34,7 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        <th class="px-5 py-3 hidden">Stage</th>
+                        <th class="px-5 py-3">Stage</th>
                         <th class="px-5 py-3">Stage Name</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
@@ -44,7 +44,7 @@
                 <tbody>
                     @forelse ($this->stages as $stage)
                     <tr wire:key="stage-{{ $stage->getKey() }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
-                        <td class="px-5 py-3 whitespace-nowrap hidden">Stage {{ $loop->iteration }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap">Stage {{ $loop->iteration }}</td>
                         <td class="px-5 py-3">{{ $stage->Stage_Name }}</td>
                         <td class="px-5 py-3">
                             @if ($stage->Stage_Status)
@@ -54,12 +54,32 @@
                             @endif
                         </td>
                         <td class="px-5 py-3 text-right">
-                            <button
-                                type="button"
-                                wire:click="openEdit('{{ $stage->getKey() }}')"
-                                class="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 px-3 text-xs hover:bg-white/5 transition">
-                                <i class="bi bi-pencil"></i> Edit
-                            </button>
+                            <div x-data="{ open: false }" class="relative inline-block text-left">
+                                <button
+                                    type="button"
+                                    @click="open = !open"
+                                    @keydown.escape.window="open = false"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition"
+                                    aria-haspopup="true"
+                                    :aria-expanded="open">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+
+                                <div
+                                    x-show="open"
+                                    x-cloak
+                                    @click.outside="open = false"
+                                    x-transition.origin.top.right
+                                    class="absolute right-0 z-40 mt-1 w-36 rounded-md border border-white/10 bg-card py-1 shadow-xl">
+                                    <button
+                                        type="button"
+                                        wire:click="openEdit('{{ $stage->getKey() }}', {{ $loop->iteration }})"
+                                        @click="open = false"
+                                        class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-white/5">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @empty
