@@ -11,6 +11,7 @@ class InterviewStep extends Model
     public const UPDATED_AT = 'Mo_On';
 
     protected $table = 'tbl_mast_intv_stage';
+    protected $primaryKey = 'Stage_UIN';
 
     protected $fillable = [
         'Stage_Name',

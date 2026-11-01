@@ -55,7 +55,7 @@ class InterviewStepService
     {
         return InterviewStep::query()
             ->forOrganisation($orgaUin)
-            ->orderBy('id')
+            ->orderBy('Stage_UIN')
             ->get();
     }
 

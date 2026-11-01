@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('Intv_Stage')
                 ->nullable()
                 ->after('Intv_Step_UIN')
-                ->constrained('tbl_mast_intv_stage', 'id')
+                ->constrained('tbl_mast_intv_stage', 'Stage_UIN')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
         });

@@ -66,7 +66,7 @@ class MastIntvStep extends Model
 
     public function stage(): BelongsTo
     {
-        return $this->belongsTo(InterviewStep::class, 'Intv_Stage', 'id');
+        return $this->belongsTo(InterviewStep::class, 'Intv_Stage', 'Stage_UIN');
     }
 
     protected function placeholderList(): Attribute
