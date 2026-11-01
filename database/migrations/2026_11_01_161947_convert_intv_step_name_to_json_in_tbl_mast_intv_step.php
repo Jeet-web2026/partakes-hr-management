@@ -18,8 +18,8 @@ return new class extends Migration
         }
 
         Schema::table($this->table, function (Blueprint $table) {
-            $table->json('Intv_Step_Name')->nullable()->after('Intv_Step_UIN');
-            $table->json('Intv_Step_Placeholder_Type')->nullable()->after('Intv_Step_Name');
+            $table->text('Intv_Step_Name')->nullable()->after('Intv_Step_UIN');
+            $table->text('Intv_Step_Placeholder_Type')->nullable()->after('Intv_Step_Name');
         });
     }
 

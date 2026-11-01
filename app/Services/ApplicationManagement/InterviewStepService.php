@@ -10,12 +10,12 @@ use Illuminate\Validation\ValidationException;
 class InterviewStepService
 {
     public const DEFAULT_STEPS = [
-        'New Candidate',
-        'Candidate Short Listed',
-        'Schedule Interview',
-        'Candidate Selected',
-        'Offer Letter Issued',
-        'Offer Accepted'
+        ['name' => 'New Candidate', 'status' => false],
+        ['name' => 'Candidate Short Listed', 'status' => false],
+        ['name' => 'Schedule Interview', 'status' => true],
+        ['name' => 'Candidate Selected', 'status' => false],
+        ['name' => 'Offer Letter Issued', 'status' => false],
+        ['name' => 'Offer Accepted', 'status' => false]
     ];
 
     public function __construct(
@@ -44,8 +44,8 @@ class InterviewStepService
 
     public function seedDefaults(string $orgUin, string $userUin): int
     {
-        foreach (self::DEFAULT_STEPS as $name) {
-            $this->steps->upsertByName($name,  true, $orgUin, $userUin);
+        foreach (self::DEFAULT_STEPS as $step) {
+            $this->steps->upsertByName($step['name'], $step['status'], $orgUin, $userUin);
         }
 
         return count(self::DEFAULT_STEPS);

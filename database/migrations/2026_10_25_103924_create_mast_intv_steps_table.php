@@ -23,7 +23,6 @@ return new class extends Migration
             $table->timestamp('Cr_On')->useCurrent();
             $table->timestamp('Mo_On')->useCurrent();
 
-            $table->unique(['Orga_UIN', 'Intv_Step_Numb'], 'uq_intv_step_orga_numb');
             $table->index('Orga_UIN');
         });
     }

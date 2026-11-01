@@ -10,7 +10,6 @@ use App\Repositories\Contracts\MastIntvStepRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class MastIntvStepService
 {
@@ -57,18 +56,26 @@ class MastIntvStepService
                     continue;
                 }
 
-                $this->steps->create([
-                    'Intv_Step_Numb'             => $number,
-                    'Intv_Step_Name'             => null,
-                    'Intv_Step_Placeholder_Type' => self::DEFAULT_STEPS,
-                    'Intv_Step_Stau'             => InterviewStepStatus::Active,
-                    'Orga_UIN'                   => $orgaUin,
-                    'Cr_By'                      => $userId,
-                    'Mo_By'                      => $userId,
-                    'Intv_Stage'                 => $stage->getKey(),
-                ]);
+                foreach (self::DEFAULT_STEPS as $stepIndex => $step) {
+                    $stepNumber = $stepIndex + 1;
+
+                    $this->steps->create([
+                        'Intv_Step_Numb'             => $stepNumber,
+                        'Intv_Step_Name'             => null,
+                        'Intv_Step_Placeholder_Type' => $step,
+                        'Intv_Step_Stau'             => InterviewStepStatus::Active,
+                        'Orga_UIN'                   => $orgaUin,
+                        'Cr_By'                      => $userId,
+                        'Mo_By'                      => $userId,
+                        'Intv_Stage'                 => $stage->getKey(),
+                    ]);
+                }
             }
         });
+
+        DB::table('tbl_mast_intv_stage')->update([
+            'Stage_Status' => true
+        ]);
     }
     public function updateStep(MastIntvStep $step, array $data, string $userId): MastIntvStep
     {

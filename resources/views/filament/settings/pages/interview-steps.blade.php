@@ -30,7 +30,7 @@
                                 class="h-9 w-[70px] sm:w-[90px] rounded-md border border-white/10 bg-transparent px-2 text-sm text-white focus:outline-none">
                                 <option value="50" class="bg-slate-800">50</option>
                                 <option value="100" class="bg-slate-800" selected>100</option>
-                                <option value="100" class="bg-slate-800">250</option>
+                                <option value="250" class="bg-slate-800">250</option>
                             </select>
                         </div>
 
@@ -120,7 +120,7 @@
                         </div>
 
 
-                        {{-- Search --}}
+                        {{-- Search (HIDDEN) --}}
                         <div class="relative hidden" data-menu>
 
                             <button
@@ -128,7 +128,8 @@
                                 type="button"
                                 data-menu-toggle="searchMenu"
                                 aria-label="Search"
-                                title="h-9 w-9 items-center justify-center rounded-md border border-white/10 hover:bg-white/5 transition">
+                                title="Search"
+                                class="h-9 w-9 items-center justify-center rounded-md border border-white/10 hover:bg-white/5 transition">
                                 <i class="bi bi-search"></i>
                             </button>
 
@@ -169,7 +170,7 @@
                             href="{{ route('add-agreement-name', ['company' => $companyInformation->first()?->Orga_UIN]) }}"
                             aria-label="Add Agreement Name"
                             title="Add Agreement Name"
-                            class="hidden h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-[#3c83f6]-foreground hover:bg-[#3c83f6]/90 transition">
+                            class="hidden h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition">
 
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -242,7 +243,7 @@
         </div>
 
         <x-globalresponse />
-        <!-- Table -->
+
         {{-- Mobile Search Dropdown --}}
         <div
             id="searchMenu"
@@ -274,7 +275,7 @@
 
         </div>
 
-        <!-- Table (now visible on all screen sizes) -->
+        <!-- Table (visible on all screen sizes) -->
         <div class="rounded-xl border border-white/10 bg-card overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
@@ -288,25 +289,22 @@
                 </thead>
 
                 <tbody id="tbody">
-                    @forelse ($this->steps as $step)
-                    @php
-                    $placeholders = $step->placeholder_list;
-                    $names = $step->name_list;
-                    @endphp
+                    @forelse ($this->steps as $i => $step)
+                    @php $names = (array) $step->name_list; @endphp
                     <tr wire:key="step-{{ $step->Intv_Step_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                         <td class="px-5 py-3 whitespace-nowrap align-top">Step {{ $step->Intv_Step_Numb }}</td>
 
                         <td class="px-5 py-3">
                             <div class="flex flex-wrap gap-1.5">
-                                @foreach ($placeholders as $i => $placeholder)
-                                @php $custom = filled($names[$i] ?? null); @endphp
+                                @foreach ((array) $step->placeholder_list as $j => $placeholder)
+                                @php $custom = filled($names[$j] ?? null); @endphp
                                 <span
-                                    wire:key="step-{{ $step->Intv_Step_UIN }}-{{ $i }}"
+                                    wire:key="step-{{ $step->Intv_Step_UIN }}-{{ $j }}"
                                     class="inline-flex items-center rounded border px-2.5 py-0.5 text-xs font-medium
-                                        {{ $custom
-                                            ? 'border-[#3c83f6]/30 bg-[#3c83f6]/15 text-[#3c83f6]'
-                                            : 'border-white/10 bg-white/5 text-muted-foreground' }}">
-                                    {{ $custom ? $names[$i] : "e.g. " . $placeholder }}
+                                            {{ $custom
+                                                ? 'border-[#3c83f6]/30 bg-[#3c83f6]/15 text-[#3c83f6]'
+                                                : 'border-white/10 bg-white/5 text-muted-foreground' }}">
+                                    {{ $custom ? $names[$j] : "e.g. " . $placeholder }}
                                 </span>
                                 @endforeach
                             </div>
@@ -375,7 +373,7 @@
         <!-- Mobile Cards (HIDDEN: the table above is used on all sizes) -->
         <div id="mobileAgreementList" class="hidden space-y-3"></div>
 
-        <!-- Footer -->
+        <!-- Footer (HIDDEN) -->
         <div class="mt-4 flex items-center justify-between text-xs text-muted-foreground hidden">
             @php($total = $this->steps->count())
             <span id="entriesLabel">Showing {{ $total ? 1 : 0 }} to {{ $total }} of {{ $total }} entries</span>
@@ -388,7 +386,7 @@
     <div
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="closeEdit">
-        <div class="w-full max-w-4xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+        <div class="w-full max-w-2xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-base font-semibold">Edit interview steps</h3>
                 <button type="button" wire:click="closeEdit"
@@ -414,22 +412,19 @@
 
                 <div>
                     <p class="mb-2 text-sm font-medium">Steps</p>
-                    <div class="grid max-h-[30vh] grid-cols-1 gap-3 overflow-y-auto pr-1 sm:grid-cols-2">
-                        @foreach ($editPlaceholders as $i => $placeholder)
-                        <div wire:key="step-input-{{ $i }}">
-                            <textarea
-                                wire:model="editNames.{{ $i }}"
-                                rows="2"
-                                maxlength="100"
-                                placeholder="e.g. {{ $placeholder }}"
-                                class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
-                            @error('editNames.' . $i)
-                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        @endforeach
+                    @foreach ($editPlaceholders as $i => $placeholder)
+                    <div wire:key="step-input-{{ $i }}">
+                        <textarea
+                            wire:model="editNames.{{ $i }}"
+                            rows="2"
+                            maxlength="100"
+                            placeholder="e.g. {{ $placeholder }}"
+                            class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                        @error('editNames.' . $i)
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <p class="mt-2 text-xs text-muted-foreground">Leave a box empty to keep its default name.</p>
+                    @endforeach
                     @error('editNames')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror

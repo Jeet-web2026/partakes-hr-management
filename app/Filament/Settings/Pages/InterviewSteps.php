@@ -39,13 +39,13 @@ class InterviewSteps extends Page
     #[Locked]
     public ?string $editingUin = null;
 
-    // default step names, display-only; locked so the client can't change them
+    /** Default step names, display-only; locked so the client can't change them. */
     #[Locked]
     public array $editPlaceholders = [];
 
     public string $search = '';
 
-    /** user-defined names, same positions as $editPlaceholders */
+    /** User-defined names, same positions as $editPlaceholders. */
     public array $editNames = [];
 
     public string $editStatus = 'active';
@@ -70,7 +70,6 @@ class InterviewSteps extends Page
             return $steps;
         }
 
-        // search across the names shown in the table (user name if set, else placeholder)
         return $steps
             ->filter(function ($step) use ($term) {
                 $names = $step->name_list;
@@ -87,12 +86,14 @@ class InterviewSteps extends Page
         $step = $this->findStep($uin);
 
         $this->editingUin       = $step->getKey();
-        $this->editPlaceholders = $step->placeholder_list;
+        $this->editPlaceholders = array_values((array) $step->placeholder_list);
 
-        $names = $step->name_list;
+        $names = (array) $step->name_list;
+
+        // One entry per placeholder; '' means "use the default" (placeholder is shown).
         $this->editNames = collect($this->editPlaceholders)
             ->keys()
-            ->map(fn($i) => (string) ($names[$i] ?? ''))   // blank box -> placeholder is shown
+            ->map(fn($i) => (string) ($names[$i] ?? ''))
             ->all();
 
         $this->editStatus = $step->Intv_Step_Stau->value;
@@ -116,7 +117,7 @@ class InterviewSteps extends Page
             'editStatus'  => ['required', Rule::enum(InterviewStepStatus::class)],
             'editStage'   => [
                 'required',
-                Rule::exists('tbl_mast_intv_stage', 'id')->where('Orga_UIN', $this->orgaUin),
+                Rule::exists('tbl_mast_intv_stage', 'Stage_UIN')->where('Orga_UIN', $this->orgaUin),
             ],
         ]);
 
@@ -165,6 +166,7 @@ class InterviewSteps extends Page
     #[Computed]
     public function stages(): Collection
     {
+        // NOTE: if you have a dedicated stage model (e.g. InterviewStage), use it here.
         return InterviewStep::query()
             ->forOrganisation($this->orgaUin)
             ->orderBy('Stage_Name')

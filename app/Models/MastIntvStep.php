@@ -40,9 +40,7 @@ class MastIntvStep extends Model
             'Intv_Step_Numb' => 'integer',
             'Intv_Step_Stau' => InterviewStepStatus::class,
             'Cr_On' => 'datetime',
-            'Mo_On' => 'datetime',
-            'Intv_Step_Name'             => 'array',
-            'Intv_Step_Placeholder_Type' => 'array',
+            'Mo_On' => 'datetime'
         ];
     }
 
@@ -71,12 +69,12 @@ class MastIntvStep extends Model
 
     protected function placeholderList(): Attribute
     {
-        return Attribute::get(fn() => $this->toList($this->Intv_Step_Placeholder_Type));
+        return Attribute::get(fn() => json_decode($this->Intv_Step_Placeholder_Type));
     }
 
     protected function nameList(): Attribute
     {
-        return Attribute::get(fn() => $this->toList($this->Intv_Step_Name));
+        return Attribute::get(fn() => json_decode($this->Intv_Step_Name));
     }
 
     private function toList(mixed $value): array
