@@ -5,6 +5,7 @@ namespace App\Services\ApplicationManagement;
 use App\Enums\InterviewStepStatus;
 use App\Models\MastIntvQstn;
 use App\Repositories\Contracts\MastIntvQstnRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class MastIntvQstnService
@@ -48,5 +49,10 @@ class MastIntvQstnService
     public function delete(MastIntvQstn $question, string $userId): bool
     {
         return $this->questions->softDelete($question, $userId);
+    }
+
+    public function paginateForOrganisation(string $orgaUin, string $search = '', int $perPage = 50): LengthAwarePaginator
+    {
+        return $this->questions->paginateForOrganisation($orgaUin, $search, $perPage);
     }
 }

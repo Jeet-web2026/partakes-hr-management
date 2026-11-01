@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\MastIntvQstn;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 interface MastIntvQstnRepositoryInterface
@@ -16,4 +17,10 @@ interface MastIntvQstnRepositoryInterface
     public function update(MastIntvQstn $question, array $data): MastIntvQstn;
 
     public function softDelete(MastIntvQstn $question, string $deletedBy): bool;
+
+    public function paginateForOrganisation(
+        string $orgaUin,
+        string $search = '',
+        int $perPage = 50
+    ): LengthAwarePaginator;
 }

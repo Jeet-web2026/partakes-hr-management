@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\MastIntvQstn;
 use App\Repositories\Contracts\MastIntvQstnRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class MastIntvQstnRepository implements MastIntvQstnRepositoryInterface
@@ -46,5 +47,20 @@ class MastIntvQstnRepository implements MastIntvQstnRepositoryInterface
     public function softDelete(MastIntvQstn $question, string $deletedBy): bool
     {
         return $question->update(['Del_By' => $deletedBy, 'Mo_By' => $deletedBy]);
+    }
+
+    public function paginateForOrganisation(
+        string $orgaUin,
+        string $search = '',
+        int $perPage = 100
+    ): LengthAwarePaginator {
+        $term = trim($search);
+
+        return MastIntvQstn::query()
+            ->with('creator')
+            ->where('Orga_UIN', $orgaUin)
+            ->when($term !== '', fn($query) => $query->where('Question_Text', 'like', '%' . $term . '%'))
+            ->orderByDesc('Cr_On')
+            ->paginate($perPage);
     }
 }

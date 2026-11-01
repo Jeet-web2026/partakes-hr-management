@@ -8,21 +8,28 @@ use App\Services\ApplicationManagement\MastIntvQstnService;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
+use Throwable;
 
 class InterviewQuestions extends Page
 {
-    use HasCompanyHeader;
+    use HasCompanyHeader, WithPagination;
 
     protected static ?string $navigationLabel = 'Interview Questions';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
     protected static ?int $navigationSort = 11;
     protected static ?string $slug = 'interview-questions';
+
+    public const PER_PAGE_OPTIONS = [50, 100, 250];
+
+    public int $perPage = 50;
 
     protected string $view = 'filament.settings.pages.interview-questions';
 
@@ -34,9 +41,6 @@ class InterviewQuestions extends Page
 
     #[Locked]
     public ?string $editingUin = null;
-
-    #[Locked]
-    public ?string $deletingUin = null;
 
     public bool $showForm = false;
     public string $search = '';
@@ -57,13 +61,30 @@ class InterviewQuestions extends Page
     public function refreshOrganisation(): void
     {
         $this->orgaUin = (string) Session::get('selected_orga_uin');
+        $this->resetPage();
         unset($this->questions);
     }
 
     #[Computed]
-    public function questions(): Collection
+    public function questions(): LengthAwarePaginator
     {
-        return app(MastIntvQstnService::class)->listForOrganisation($this->orgaUin, $this->search);
+        return app(MastIntvQstnService::class)->paginateForOrganisation(
+            $this->orgaUin,
+            $this->search,
+            $this->perPage,
+        );
+    }
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage($value): void
+    {
+        // never trust the browser: any other value falls back to 50
+        $this->perPage = in_array((int) $value, self::PER_PAGE_OPTIONS, true) ? (int) $value : 50;
+        $this->resetPage();
     }
 
     public function openCreate(): void
@@ -90,6 +111,8 @@ class InterviewQuestions extends Page
 
     public function save(): void
     {
+        $this->formText = trim($this->formText);
+
         $this->validate([
             'formText' => ['required', 'string', 'max:2000'],
             'formStatus' => ['required', Rule::enum(InterviewStepStatus::class)],
@@ -97,41 +120,59 @@ class InterviewQuestions extends Page
 
         $service = app(MastIntvQstnService::class);
 
-        if ($this->editingUin) {
-            $service->update($this->findQuestion($this->editingUin), [
-                'Question_Text' => $this->formText,
-                'Intv_qstn_Stau' => $this->formStatus,
-            ], $this->userUin);
+        try {
+            if ($this->editingUin) {
+                $service->update($this->findQuestion($this->editingUin), [
+                    'Question_Text' => $this->formText,
+                    'Intv_qstn_Stau' => $this->formStatus,
+                ], $this->userUin);
 
-            session()->now('success', 'Question updated successfully.');
-        } else {
-            $service->create($this->orgaUin, $this->formText, $this->formStatus, $this->userUin);
+                session()->now('success', 'Question updated successfully.');
+            } else {
+                $service->create($this->orgaUin, $this->formText, $this->formStatus, $this->userUin);
 
-            session()->now('success', 'Question added successfully.');
+                session()->now('success', 'Question added successfully.');
+            }
+        } catch (ValidationException $e) {
+            $this->addError('formText', $e->validator->errors()->first());
+
+            return;
         }
 
         unset($this->questions);
         $this->resetForm();
     }
 
-    public function confirmDelete(string $uin): void
+    /**
+     * Called from the SweetAlert confirm button in the table.
+     * SweetAlert is only a UI prompt, so the record is still looked up
+     * server-side and scoped to the current organisation (404 otherwise).
+     */
+    public function delete(string $uin): void
     {
-        $this->deletingUin = $this->findQuestion($uin)->getKey();
-    }
+        $question = $this->findQuestion($uin);
 
-    public function cancelDelete(): void
-    {
-        $this->deletingUin = null;
-    }
+        try {
+            app(MastIntvQstnService::class)->delete($question, $this->userUin);
+        } catch (ValidationException $e) {
+            session()->now('error', $e->validator->errors()->first());
 
-    public function delete(): void
-    {
-        $question = $this->findQuestion((string) $this->deletingUin);
+            return;
+        } catch (Throwable $e) {
+            report($e);
+            session()->now('error', 'Could not delete the question. Please try again.');
 
-        app(MastIntvQstnService::class)->delete($question, $this->userUin);
+            return;
+        }
 
         unset($this->questions);
-        $this->deletingUin = null;
+
+        // deleted the last row on this page -> go back one page
+        if ($this->questions->isEmpty() && $this->getPage() > 1) {
+            $this->previousPage();
+            unset($this->questions);
+        }
+
         session()->now('success', 'Question deleted successfully.');
     }
 
