@@ -6,6 +6,7 @@ use App\Http\Requests\IndexJobApplicationRequest;
 use App\Http\Requests\StoreJobApplicationRequest;
 use App\Models\CountryMaster;
 use App\Models\HrMastJobAply;
+use App\Models\MastIntvStep;
 use App\Services\ApplicationManagement\JobApplicationService;
 use App\Services\ApplicationManagement\MastDsigService;
 use App\Services\Common\TinyUrlService;
@@ -90,7 +91,7 @@ class JobApplicationManagementController extends Controller
     {
         return view('application-management.candidate-view', [
             ...$this->applications->getForView($orguin, $uin),
-            'questions' => $this->applications->getActiveQuestionsByOrganisation($orguin),        
+            'questions' => $this->applications->getActiveQuestionsByOrganisation($orguin),
         ]);
     }
 
@@ -119,5 +120,18 @@ class JobApplicationManagementController extends Controller
         $this->applications->updateQuery($orguin, $uin, $data, auth()->id());
 
         return back()->with('success', 'Query updated.');
+    }
+
+
+    public function stageBysteps(int $stage, string $organisation): JsonResponse
+    {
+        $steps = MastIntvStep::query()
+            ->forOrganisation($organisation)
+            ->active()
+            ->where('Intv_Stage', $stage)
+            ->orderBy('Intv_Step_Name')
+            ->get(['Intv_Step_UIN', 'Intv_Step_Name']);
+
+        return response()->json($steps);
     }
 }

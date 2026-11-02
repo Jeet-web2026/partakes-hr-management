@@ -113,10 +113,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-1.5">
                                 <label for="stage" class="label">Stage <span class="text-red-500">*</span></label>
-                                <select id="stage" name="stage" required class="input">
+                                    <select id="stage" name="stage" required class="input" data-steps-url="{{ route('applications.stages.steps', [
+                                        'stage'        => '__STAGE__',
+                                        'organisation' => $companyInformation->Orga_UIN,
+                                    ]) }}">
                                     @foreach ($stages as $s)
-                                        <option value="{{ $s->id }}" class="bg-slate-900"
-                                            @selected(old('stage', $a->id) == $s->id)>{{ $s->Stage_Name }}</option>
+                                        <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
+                                            @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>{{ $s->Stage_Name }}</option>
                                     @endforeach
                                 </select>
                                 @error('stage') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -207,6 +210,58 @@
             buttons.forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
             show(location.hash.replace('#', '') || @json($errors->any() ? 'query' : 'detail'));
         })();
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const stageSelect = document.getElementById('stage');
+        const stepSelect  = document.getElementById('step');
+        const urlTemplate = stageSelect.dataset.stepsUrl;
+
+        stageSelect.addEventListener('change', async () => {
+            const stageId = stageSelect.value;
+            if (!stageId) return;
+
+            stepSelect.innerHTML = '';
+            stepSelect.disabled = true;
+            stepSelect.add(new Option('Loading...', ''));
+
+            try {
+                const url = urlTemplate.replace('__STAGE__', encodeURIComponent(stageId));
+                const res = await fetch(url, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status} for ${url}`);
+                }
+
+                const steps = await res.json();
+
+                stepSelect.innerHTML = '';
+                if (!Array.isArray(steps) || steps.length === 0) {
+                    stepSelect.add(new Option('No steps for this stage', ''));
+                    return;
+                }
+
+                steps.forEach(s => {
+                    if(!s.Intv_Step_Name) return;
+                    const opt = new Option(s.Intv_Step_Name, s.Intv_Step_UIN);
+                    opt.className = 'bg-slate-900';
+                    stepSelect.add(opt);
+                });
+            } catch (e) {
+                console.error(e);
+                stepSelect.innerHTML = '';
+                stepSelect.add(new Option('Failed to load steps', ''));
+            } finally {
+                stepSelect.disabled = false;
+            }
+        });
+    });
     </script>
     @endsection
 

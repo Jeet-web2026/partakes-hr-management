@@ -48,6 +48,8 @@ Route::middleware('partaker.session')->group(function () {
             Route::get('{orguin}/{uin}', 'view')->name('view');
             Route::get('{orguin}/{uin}/resume', 'resume')->name('resume');
             Route::post('{orguin}/{uin}/query', 'updateQuery')->name('query.update');
+            Route::get('/stages/{stage}/{organisation}/steps', 'stageBysteps')
+                ->name('stages.steps');
         });
 
     Route::fallback(function () {
