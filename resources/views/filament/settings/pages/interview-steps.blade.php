@@ -304,7 +304,7 @@
                                             {{ $custom
                                                 ? 'border-[#3c83f6]/30 bg-[#3c83f6]/15 text-[#3c83f6]'
                                                 : 'border-white/10 bg-white/5 text-muted-foreground' }}">
-                                    {{ $custom ? $names[$j] : "e.g. " . $placeholder }}
+                                    {{ $custom ? $names[$i] : "e.g. " . $placeholder }}
                                 </span>
                                 @endforeach
                             </div>
@@ -418,19 +418,21 @@
 
                 <div>
                     <p class="mb-2 text-sm font-medium">Steps</p>
-                    @foreach ($editPlaceholders as $i => $placeholder)
-                    <div wire:key="step-input-{{ $i }}">
-                        <textarea
-                            wire:model="editNames.{{ $i }}"
-                            rows="2"
-                            maxlength="100"
-                            placeholder="e.g. {{ $placeholder }}"
-                            class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
-                        @error('editNames.' . $i)
-                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                        @enderror
+                    <div class="grid grid-cols-2 gap-2">
+                        @foreach ($editPlaceholders as $i => $placeholder)
+                        <div wire:key="step-input-{{ $i }}">
+                            <textarea
+                                wire:model="editNames.{{ $i }}"
+                                rows="2"
+                                maxlength="100"
+                                placeholder="e.g. {{ $placeholder }}"
+                                class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                            @error('editNames.' . $i)
+                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        @endforeach
                     </div>
-                    @endforeach
                     @error('editNames')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror

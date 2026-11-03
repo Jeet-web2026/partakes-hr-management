@@ -5,6 +5,7 @@ namespace App\Filament\Settings\Pages;
 use App\Enums\InterviewStepStatus;
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use App\Models\InterviewStep;
+use App\Models\MastIntvStep;
 use App\Services\ApplicationManagement\MastIntvStepService;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -85,11 +86,14 @@ class InterviewSteps extends Page
     {
         $step = $this->findStep($uin);
         $this->editingUin       = $step->getKey();
-        $this->editPlaceholders = array_values((array) $step->placeholder_list);
+        $this->editPlaceholders = MastIntvStep::query()
+            ->where('Intv_Stage', $step->Intv_Stage)
+            ->pluck('Intv_Step_Placeholder_Type')
+            ->values()
+            ->all();
 
         $names = (array) $step->name_list;
 
-        // One entry per placeholder; '' means "use the default" (placeholder is shown).
         $this->editNames = collect($this->editPlaceholders)
             ->keys()
             ->map(fn($i) => (string) ($names[$i] ?? ''))
@@ -110,7 +114,7 @@ class InterviewSteps extends Page
     public function save(): void
     {
         $this->validate([
-            'editNames'   => ['array', 'size:' . count($this->editPlaceholders)],
+            'editNames'   => ['required', 'array', 'size:' . count($this->editPlaceholders)],
             'editNames.*' => ['nullable', 'string', 'max:100'],
             'editStatus'  => ['required', Rule::enum(InterviewStepStatus::class)],
             'editStage'   => [
@@ -119,22 +123,29 @@ class InterviewSteps extends Page
             ],
         ]);
 
-        $names  = array_map(fn($n) => trim((string) $n), array_values($this->editNames));
-        $filled = array_filter($names, fn($n) => $n !== '');
+        $names = collect($this->editPlaceholders)
+            ->map(function ($placeholder, $i) {
+                $name = trim((string) ($this->editNames[$i] ?? ''));
 
-        if (count($filled) !== count(array_unique(array_map('mb_strtolower', $filled)))) {
+                return $name !== '' ? $name : trim((string) $placeholder);
+            })
+            ->all();
+
+        if (count($names) !== count(array_unique(array_map('mb_strtolower', $names)))) {
             $this->addError('editNames', 'Step names must be unique.');
             return;
         }
 
-        $step = $this->findStep((string) $this->editingUin);
+        $steps = $this->findrelatedSteps((string) $this->editStage);
 
         try {
-            app(MastIntvStepService::class)->updateStep($step, [
-                'Intv_Step_Name' => $filled ? $names : null,   // null = all defaults
-                'Intv_Step_Stau' => $this->editStatus,
-                'Intv_Stage'     => $this->editStage,
-            ], $this->userUin);
+            foreach ($steps as $step) {
+                app(MastIntvStepService::class)->updateStep($step, [
+                    'Intv_Step_Name' => $names,
+                    'Intv_Step_Stau' => $this->editStatus,
+                    'Intv_Stage'     => $this->editStage,
+                ], $this->userUin);
+            }
         } catch (ValidationException $e) {
             $this->addError('editNames', $e->validator->errors()->first());
             return;
@@ -159,6 +170,17 @@ class InterviewSteps extends Page
         abort_unless($step, 404);
 
         return $step;
+    }
+
+    protected function findrelatedSteps(string $intStageUIN)
+    {
+        $steps = app(MastIntvStepService::class)
+            ->listForOrganisation($this->orgaUin)
+            ->where('Intv_Stage', $intStageUIN);
+
+        abort_unless($steps, 404);
+
+        return $steps;
     }
 
     #[Computed]
