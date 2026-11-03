@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hr_mast_job_aply', function (Blueprint $table) {
-            if (! Schema::hasColumn('hr_mast_job_aply', 'Distr')) {
+        Schema::table('HR_Mast_Job_Aply', function (Blueprint $table) {
+            if (! Schema::hasColumn('HR_Mast_Job_Aply', 'Distr')) {
                 $table->string('Distr', 100)->nullable()->after('PinCod_UIN');
             }
-            if (! Schema::hasColumn('hr_mast_job_aply', 'State')) {
+            if (! Schema::hasColumn('HR_Mast_Job_Aply', 'State')) {
                 $table->string('State', 100)->nullable()->after('PinCod_UIN');
             }
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hr_mast_job_aply', function (Blueprint $table) {
+        Schema::table('HR_Mast_Job_Aply', function (Blueprint $table) {
             $table->dropColumn(['Distr', 'State']);
         });
     }
