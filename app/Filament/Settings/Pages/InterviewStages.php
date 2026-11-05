@@ -93,7 +93,7 @@ class InterviewStages extends Page
 
         $this->validate([
             'editName' => ['required', 'string', 'max:100'],
-            'editStatus' => ['required', Rule::in(['active', 'inactive'])],
+            'editStatus' => ['required', Rule::in(['100201', '100202'])],
         ]);
 
         $stage = $this->findStage((string) $this->editingId);
@@ -101,7 +101,7 @@ class InterviewStages extends Page
         try {
             app(InterviewStepService::class)->updateStep($stage, [
                 self::NAME_COLUMN => $this->editName,
-                self::ACTIVE_COLUMN => $this->editStatus === 'active',
+                self::ACTIVE_COLUMN => $this->editStatus,
             ], $this->userUin);
         } catch (ValidationException $e) {
             $this->addError('editName', $e->validator->errors()->first());

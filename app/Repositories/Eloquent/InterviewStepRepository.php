@@ -41,11 +41,11 @@ class InterviewStepRepository implements InterviewStepRepositoryInterface
         return (bool) $step->delete();
     }
 
-    public function upsertByName(string $name, bool $status, string $orgUin, string $userUin): InterviewStep
+    public function upsertByName(string $name, int $sorting, int $status, string $orgUin, string $userUin): InterviewStep
     {
         $name = $name;
 
-        return DB::transaction(function () use ($name, $status, $orgUin, $userUin) {
+        return DB::transaction(function () use ($name, $sorting, $status, $orgUin, $userUin) {
             $existing = $this->findByOrganisationAndName($orgUin, $name, $userUin);
 
             if ($existing) {
@@ -58,6 +58,7 @@ class InterviewStepRepository implements InterviewStepRepositoryInterface
                 'Orga_UIN'     => $orgUin,
                 'Cr_By'        => $userUin,
                 'Mo_By'        => $userUin,
+                'Stage_Sort'   => $sorting,
             ]);
         });
     }
@@ -66,7 +67,7 @@ class InterviewStepRepository implements InterviewStepRepositoryInterface
     {
         return InterviewStep::query()
             ->forOrganisation($orgaUin)
-             ->where('Cr_By', $crBy)
+            ->where('Cr_By', $crBy)
             ->where('Stage_Name', $name)
             ->first();
     }

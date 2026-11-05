@@ -10,21 +10,21 @@ use Illuminate\Validation\ValidationException;
 class InterviewStepService
 {
     public const DEFAULT_STEPS = [
-        ['name' => 'New Candidate', 'status' => false],
-        ['name' => 'Candidate Short Listed', 'status' => false],
-        ['name' => 'Schedule Interview', 'status' => true],
-        ['name' => 'Candidate Selected', 'status' => false],
-        ['name' => 'Offer Letter Issued', 'status' => false],
-        ['name' => 'Offer Accepted', 'status' => false]
+        ['name' => 'New Candidate', 'sort' => 1, 'status' => 100201],
+        ['name' => 'Candidate Short Listed', 'sort' => 2, 'status' => 100202],
+        ['name' => 'Schedule Interview', 'sort' => 3, 'status' => 100202],
+        ['name' => 'Candidate Selected', 'sort' => 4, 'status' => 100202],
+        ['name' => 'Offer Letter Issued', 'sort' => 5, 'status' => 100202],
+        ['name' => 'Offer Accepted', 'sort' => 6, 'status' => 100202]
     ];
 
     public function __construct(
         private readonly InterviewStepRepositoryInterface $steps,
     ) {}
 
-    public function list(bool $onlyActive = false): Collection
+    public function list(bool $onlyActive = false, string $orgUin): Collection
     {
-        return $onlyActive ? $this->steps->getActive() : $this->steps->all();
+        return $onlyActive ? $this->steps->getActive($orgUin) : $this->steps->all();
     }
 
     public function create(array $data): InterviewStep
@@ -45,7 +45,7 @@ class InterviewStepService
     public function seedDefaults(string $orgUin, string $userUin): int
     {
         foreach (self::DEFAULT_STEPS as $step) {
-            $this->steps->upsertByName($step['name'], $step['status'], $orgUin, $userUin);
+            $this->steps->upsertByName($step['name'], $step['sort'], $step['status'], $orgUin, $userUin);
         }
 
         return count(self::DEFAULT_STEPS);
@@ -54,8 +54,9 @@ class InterviewStepService
     public function listForOrganisation(string $orgaUin): Collection
     {
         return InterviewStep::query()
+            ->with('status')
             ->forOrganisation($orgaUin)
-            ->orderBy('Stage_UIN')
+            ->orderBy('Stage_Sort')
             ->get();
     }
 

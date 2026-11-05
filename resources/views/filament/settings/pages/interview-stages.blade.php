@@ -47,7 +47,7 @@
                         <td class="px-5 py-3 whitespace-nowrap">Stage {{ $loop->iteration }}</td>
                         <td class="px-5 py-3">{{ $stage->Stage_Name }}</td>
                         <td class="px-5 py-3">
-                            @if ($stage->Stage_Status)
+                            @if ($stage->status->Stau_Name === 'Active')
                             <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
                             @else
                             <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
@@ -124,8 +124,8 @@
                     <select
                         wire:model="editStatus"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                        <option value="active" class="bg-slate-800">Active</option>
-                        <option value="inactive" class="bg-slate-800">Inactive</option>
+                        <option value="100201" class="bg-slate-800">Active</option>
+                        <option value="100202" class="bg-slate-800">Inactive</option>
                     </select>
                     @error('editStatus')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>

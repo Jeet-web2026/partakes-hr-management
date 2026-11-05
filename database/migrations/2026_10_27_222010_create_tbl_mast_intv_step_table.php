@@ -15,7 +15,12 @@ return new class extends Migration
         Schema::create('tbl_mast_intv_stage', function (Blueprint $table) {
             $table->id('Stage_UIN');
             $table->string('Stage_Name', 100);
-            $table->boolean('Stage_Status')->default(true)->index();
+            $table->integer('Stage_Sort')->unsigned()->default(0);
+            $table->foreignId('Stage_Status')
+                ->nullable()
+                ->constrained('tbl_mast_stau', 'Stau_UIN')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
             $table->uuid('Orga_UIN');
             $table->uuid('Cr_By');
             $table->uuid('Mo_By');

@@ -74,7 +74,7 @@ class MastIntvStepService
         });
 
         DB::table('tbl_mast_intv_stage')->update([
-            'Stage_Status' => true
+            'Stage_Status' => 100201
         ]);
     }
     public function updateStep(MastIntvStep $step, array $data, string $userId): MastIntvStep

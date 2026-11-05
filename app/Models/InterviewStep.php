@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InterviewStep extends Model
 {
@@ -18,25 +19,31 @@ class InterviewStep extends Model
         'Stage_Status',
         'Orga_UIN',
         'Cr_By',
-        'Mo_By'
+        'Mo_By',
+        'Stage_Sort'
     ];
 
     protected function casts(): array
     {
         return [
-            'Stage_Status' => 'boolean',
             'Cr_On' => 'datetime',
             'Mo_On' => 'datetime',
+            'Stage_Status' => 'integer',
         ];
     }
 
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('Stage_Status', true);
+        return $query->where('Stage_Status', 100201);
     }
 
     public function scopeForOrganisation(Builder $query, string $orgaUin): Builder
     {
         return $query->where('Orga_UIN', $orgaUin);
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(MastStau::class, 'Stage_Status', 'Stau_UIN');
     }
 }

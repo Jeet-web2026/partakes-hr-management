@@ -19,5 +19,5 @@ interface InterviewStepRepositoryInterface
 
     public function delete(InterviewStep $step): bool;
 
-    public function upsertByName(string $name, bool $status, string $orgUin, string $userUin): InterviewStep;
+    public function upsertByName(string $name, int $sort, int $status, string $orgUin, string $userUin): InterviewStep;
 }
