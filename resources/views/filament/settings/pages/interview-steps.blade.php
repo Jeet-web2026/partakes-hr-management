@@ -386,7 +386,7 @@
     <div
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="closeEdit">
-        <div class="w-full max-w-2xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+        <div class="w-full max-w-3xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-base font-semibold">Edit interview steps</h3>
                 <button type="button" wire:click="closeEdit"
@@ -416,37 +416,41 @@
                     @enderror
                 </div>
 
-                <div>
+                <div class="h-[300px] overflow-y-auto">
                     <p class="mb-2 text-sm font-medium">Steps</p>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 gap-2">
                         @foreach ($editPlaceholders as $i => $placeholder)
-                        <div wire:key="step-input-{{ $i }}">
-                            <textarea
-                                wire:model="editNames.{{ $i }}"
-                                rows="2"
-                                maxlength="100"
-                                placeholder="e.g. {{ $placeholder }}"
-                                class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
-                            @error('editNames.' . $i)
-                            <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                            @enderror
+                        <div wire:key="step-row-{{ $i }}" class="flex items-start gap-3">
+                            {{-- Left: step name --}}
+                            <div class="min-w-0 flex-1">
+                                <textarea
+                                    wire:model="editNames.{{ $i }}"
+                                    rows="2"
+                                    maxlength="100"
+                                    placeholder="e.g. {{ $placeholder }}"
+                                    class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                                @error('editNames.' . $i)
+                                <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Right: active / inactive --}}
+                            <div class="w-32 shrink-0">
+                                <select
+                                    wire:model="editStatuses.{{ $i }}"
+                                    class="w-full rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary [&>option]:bg-gray-900">
+                                    @foreach ($statusOptions as $uin => $name)
+                                    <option value="{{ $uin }}">{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('editStatuses.' . $i)
+                                <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                         @endforeach
                     </div>
                     @error('editNames')
-                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="mb-1 block text-sm font-medium">Status</label>
-                    <select
-                        wire:model="editStatus"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                        <option value="active" class="bg-slate-800">Active</option>
-                        <option value="inactive" class="bg-slate-800">Inactive</option>
-                    </select>
-                    @error('editStatus')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </div>

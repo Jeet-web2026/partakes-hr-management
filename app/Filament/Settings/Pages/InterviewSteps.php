@@ -6,6 +6,7 @@ use App\Enums\InterviewStepStatus;
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use App\Models\InterviewStep;
 use App\Models\MastIntvStep;
+use App\Models\MastStau;
 use App\Services\ApplicationManagement\MastIntvStepService;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -49,7 +50,8 @@ class InterviewSteps extends Page
     /** User-defined names, same positions as $editPlaceholders. */
     public array $editNames = [];
 
-    public string $editStatus = 'active';
+    public ?int $editStatus = null;
+    public array $statusOptions = [];
 
     public function mount(): void
     {
@@ -99,15 +101,21 @@ class InterviewSteps extends Page
             ->map(fn($i) => (string) ($names[$i] ?? ''))
             ->all();
 
-        $this->editStatus = $step->Intv_Step_Stau->value;
+        $this->editStatus = $step->Intv_Step_Stau;   // plain Stau_UIN, no ->value
         $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
+
+        $this->statusOptions = MastStau::query()
+            ->whereIn('Stau_Name', ['Active', 'Inactive'])
+            ->pluck('Stau_Name', 'Stau_UIN')
+            ->all();
+
         $this->resetErrorBag();
     }
 
     public function closeEdit(): void
     {
         $this->reset(['editingUin', 'editNames', 'editPlaceholders', 'editStage']);
-        $this->editStatus = 'active';
+        $this->editStatus = null;
         $this->resetErrorBag();
     }
 

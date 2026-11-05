@@ -33,7 +33,7 @@ class MastIntvStep extends Model
     {
         return [
             'Intv_Step_Numb' => 'integer',
-            'Intv_Step_Stau' => InterviewStepStatus::class,
+            'Intv_Step_Stau' => 'integer',
             'Cr_On' => 'datetime',
             'Mo_On' => 'datetime'
         ];
@@ -54,7 +54,7 @@ class MastIntvStep extends Model
 
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('Intv_Step_Stau', InterviewStepStatus::Active->value);
+        return $query->where('Intv_Step_Stau', 100201);
     }
 
     public function stage(): BelongsTo
@@ -70,5 +70,10 @@ class MastIntvStep extends Model
     protected function nameList(): Attribute
     {
         return Attribute::get(fn() => json_decode($this->Intv_Step_Name));
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(MastStau::class, 'Intv_Step_Stau', 'Stau_UIN');
     }
 }

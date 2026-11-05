@@ -16,7 +16,11 @@ return new class extends Migration
             $table->id('Intv_Step_UIN');
             $table->unsignedTinyInteger('Intv_Step_Numb');
             $table->string('Intv_Step_Name', 100);
-            $table->enum('Intv_Step_Stau', ['active', 'inactive'])->default('active');
+            $table->foreignId('Intv_Step_Stau')
+                ->nullable()
+                ->constrained('tbl_mast_stau', 'Stau_UIN')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
             $table->uuid('Orga_UIN');
             $table->uuid('Cr_By');
             $table->uuid('Mo_By');
