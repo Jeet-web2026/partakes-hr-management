@@ -321,7 +321,8 @@
                         </td>
 
                         <td class="px-5 py-3 text-right align-top">
-                            @php $stageActive = (bool) $step->stage?->Stage_Status; @endphp
+                            @php $stageActive = $step->stage?->Stage_Status === 100201;
+                            @endphp
 
                             <div x-data="{ open: false }" class="relative inline-block text-left">
                                 <button
@@ -340,7 +341,10 @@
                                     @click.outside="open = false"
                                     x-transition.origin.top.right
                                     class="absolute right-0 z-40 mt-1 w-44 rounded-md border border-white/10 bg-card py-1 shadow-xl">
-                                    @if ($stageActive)
+                                    
+                                    @if (
+                                        $stageActive
+                                    )
                                     <button
                                         type="button"
                                         wire:click="openEdit('{{ $step->Intv_Step_UIN }}')"

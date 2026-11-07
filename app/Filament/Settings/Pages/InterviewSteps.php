@@ -2,7 +2,6 @@
 
 namespace App\Filament\Settings\Pages;
 
-use App\Enums\InterviewStepStatus;
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use App\Models\InterviewStep;
 use App\Models\MastIntvStep;
@@ -12,6 +11,7 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -45,13 +45,17 @@ class InterviewSteps extends Page
     #[Locked]
     public array $editPlaceholders = [];
 
+    /** Status dropdown options (Stau_UIN => Stau_Name); locked so validation can trust them. */
+    #[Locked]
+    public array $statusOptions = [];
+
     public string $search = '';
 
     /** User-defined names, same positions as $editPlaceholders. */
     public array $editNames = [];
 
-    public ?int $editStatus = null;
-    public array $statusOptions = [];
+    /** Status (Stau_UIN) per step row, same positions as $editPlaceholders. */
+    public array $editStatuses = [];
 
     public function mount(): void
     {
@@ -87,7 +91,10 @@ class InterviewSteps extends Page
     public function openEdit(string $uin): void
     {
         $step = $this->findStep($uin);
-        $this->editingUin       = $step->getKey();
+
+        $this->editingUin = $step->getKey();
+        $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
+
         $this->editPlaceholders = MastIntvStep::query()
             ->where('Intv_Stage', $step->Intv_Stage)
             ->pluck('Intv_Step_Placeholder_Type')
@@ -101,8 +108,13 @@ class InterviewSteps extends Page
             ->map(fn($i) => (string) ($names[$i] ?? ''))
             ->all();
 
-        $this->editStatus = $step->Intv_Step_Stau;   // plain Stau_UIN, no ->value
-        $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
+        // One status per row; falls back to the opened step's status if a row has no record.
+        $related = $this->findrelatedSteps((string) $step->Intv_Stage)->values();
+
+        $this->editStatuses = collect($this->editPlaceholders)
+            ->keys()
+            ->map(fn($i) => (string) ($related[$i]->Intv_Step_Stau ?? $step->Intv_Step_Stau))
+            ->all();
 
         $this->statusOptions = MastStau::query()
             ->whereIn('Stau_Name', ['Active', 'Inactive'])
@@ -114,21 +126,34 @@ class InterviewSteps extends Page
 
     public function closeEdit(): void
     {
-        $this->reset(['editingUin', 'editNames', 'editPlaceholders', 'editStage']);
-        $this->editStatus = null;
+        $this->reset([
+            'editingUin',
+            'editNames',
+            'editStatuses',
+            'editPlaceholders',
+            'statusOptions',
+            'editStage',
+        ]);
+
         $this->resetErrorBag();
     }
 
     public function save(): void
     {
+        $count = count($this->editPlaceholders);
+
         $this->validate([
-            'editNames'   => ['required', 'array', 'size:' . count($this->editPlaceholders)],
-            'editNames.*' => ['nullable', 'string', 'max:100'],
-            'editStatus'  => ['required', Rule::enum(InterviewStepStatus::class)],
-            'editStage'   => [
+            'editNames'      => ['required', 'array', 'size:' . $count],
+            'editNames.*'    => ['nullable', 'string', 'max:100'],
+            'editStatuses'   => ['required', 'array', 'size:' . $count],
+            'editStatuses.*' => ['required', Rule::in(array_keys($this->statusOptions))],
+            'editStage'      => [
                 'required',
                 Rule::exists('tbl_mast_intv_stage', 'Stage_UIN')->where('Orga_UIN', $this->orgaUin),
             ],
+        ], [
+            'editStatuses.*.required' => 'Please select a status.',
+            'editStatuses.*.in'       => 'Invalid status selected.',
         ]);
 
         $names = collect($this->editPlaceholders)
@@ -137,6 +162,7 @@ class InterviewSteps extends Page
 
                 return $name !== '' ? $name : trim((string) $placeholder);
             })
+            ->values()
             ->all();
 
         if (count($names) !== count(array_unique(array_map('mb_strtolower', $names)))) {
@@ -144,16 +170,25 @@ class InterviewSteps extends Page
             return;
         }
 
-        $steps = $this->findrelatedSteps((string) $this->editStage);
+        $steps = $this->findrelatedSteps((string) $this->editStage)->values();
+
+        if ($steps->count() !== $count) {
+            $this->addError('editNames', 'Steps changed while editing. Please close and reopen.');
+            return;
+        }
 
         try {
-            foreach ($steps as $step) {
-                app(MastIntvStepService::class)->updateStep($step, [
-                    'Intv_Step_Name' => $names,
-                    'Intv_Step_Stau' => $this->editStatus,
-                    'Intv_Stage'     => $this->editStage,
-                ], $this->userUin);
-            }
+            DB::transaction(function () use ($steps, $names) {
+                $service = app(MastIntvStepService::class);
+
+                foreach ($steps as $i => $step) {
+                    $service->updateStep($step, [
+                        'Intv_Step_Name' => $names[$i],               // this row's name
+                        'Intv_Step_Stau' => $this->editStatuses[$i],  // this row's status
+                        'Intv_Stage'     => $this->editStage,
+                    ], $this->userUin);
+                }
+            });
         } catch (ValidationException $e) {
             $this->addError('editNames', $e->validator->errors()->first());
             return;
@@ -180,13 +215,13 @@ class InterviewSteps extends Page
         return $step;
     }
 
-    protected function findrelatedSteps(string $intStageUIN)
+    protected function findrelatedSteps(string $intStageUIN): Collection
     {
         $steps = app(MastIntvStepService::class)
             ->listForOrganisation($this->orgaUin)
             ->where('Intv_Stage', $intStageUIN);
 
-        abort_unless($steps, 404);
+        abort_unless($steps->isNotEmpty(), 404);
 
         return $steps;
     }

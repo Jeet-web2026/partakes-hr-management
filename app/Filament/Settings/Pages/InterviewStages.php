@@ -76,7 +76,7 @@ class InterviewStages extends Page
 
         $this->editingId = (string) $stage->getKey();
         $this->editName = (string) $stage->{self::NAME_COLUMN};
-        $this->editStatus = $stage->{self::ACTIVE_COLUMN} ? 'active' : 'inactive';
+        $this->editStatus = $stage->Stage_Status;
         $this->resetErrorBag();
     }
 
