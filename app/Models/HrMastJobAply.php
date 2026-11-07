@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HrMastJobAply extends Model
@@ -40,7 +42,9 @@ class HrMastJobAply extends Model
         'Orga_UIN',
         'App_Stus',
         'Distr',
-        'State'
+        'State',
+        'Stage_UIN',
+        'Intv_Step_UIN',
     ];
 
     protected $casts = [
@@ -69,5 +73,20 @@ class HrMastJobAply extends Model
     public function company(): HasOne
     {
         return $this->hasOne(OrganisationDetails::class, 'Orga_UIN', 'Orga_UIN');
+    }
+
+    public function flags(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            MastHrFlag::class, 
+            'HR_Aply_Flag',
+            'Aply_UIN', 
+            'hr_flag_UIN' 
+        );
+    }
+
+    public function queryHistory(): HasMany
+    {
+        return $this->hasMany(IntvQueryAndStatus::class, 'Appl_UIN', 'Aply_UIN');
     }
 }

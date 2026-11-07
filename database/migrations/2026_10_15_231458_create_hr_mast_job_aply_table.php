@@ -47,6 +47,9 @@ return new class extends Migration
             $table->string('Job_Type', 50)->nullable();
             $table->string('Bio_Data_Path', 500)->nullable();
 
+            $table->unsignedBigInteger('Stage_UIN')->nullable();
+            $table->unsignedBigInteger('Intv_Step_UIN')->nullable();
+
             // Timestamps (custom column names)
             $table->timestamp('CrBy')->nullable();
             $table->timestamp('UpBy')->nullable();

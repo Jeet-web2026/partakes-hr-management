@@ -208,8 +208,8 @@ class JobApplicationService
     public function findForOrganisation(string $orguin, int $uin): HrMastJobAply
     {
         return HrMastJobAply::query()
-            ->where('Org_UIN', $orguin)
-            ->where('Job_Appl_UIN', $uin)
+            ->where('Orga_UIN', $orguin)
+            ->where('Aply_UIN', $uin)
             ->firstOrFail();
     }
 
@@ -220,35 +220,51 @@ class JobApplicationService
             ->where('Aply_UIN', $uin)
             ->firstOrFail();
 
+        $stages = $this->remembered('stages', $orguin, fn() => InterviewStep::query()
+            ->forOrganisation($orguin)
+            ->active()
+            ->orderBy('Stage_Sort')
+            ->get());
+
+        $steps = $this->remembered('steps', $orguin, fn() => MastIntvStep::query()
+            ->forOrganisation($orguin)
+            ->active()
+            ->orderBy('Intv_Step_Name')
+            ->get());
+
+        $flags = $this->remembered('flags', $orguin, fn() => MastHrFlag::query()
+            ->forOrganisation($orguin)
+            ->active()
+            ->orderBy('hr_flag_name')
+            ->get());
+
+        $questions = $this->remembered(
+            'questions',
+            $orguin,
+            fn() => $this->getActiveQuestionsByOrganisation($orguin)
+        );
+
+        $stageNames    = $stages->pluck('Stage_Name', 'Stage_UIN');
+        $stepNames     = $steps->pluck('Intv_Step_Name', 'Intv_Step_UIN');
+        $questionTexts = collect($questions)->pluck('Question_Text', 'intv_qstn_UIN');
+
+        $history = $application->queryHistory()
+            ->latest('CrOn')
+            ->get()
+            ->each(function ($h) use ($stageNames, $stepNames, $questionTexts) {
+                $h->setAttribute('stage_name', $stageNames[$h->Stage_UIN] ?? '—');
+                $h->setAttribute('step_name', $stepNames[$h->Intv_Step_UIN] ?? '—');
+                $h->setAttribute('question_text', $questionTexts[$h->Ques_UIN] ?? '—');
+            });
+
         return [
-            'orguin'      => $orguin,
-            'application' => $application,
-
-            'stages' => $this->remembered('stages', $orguin, fn() => InterviewStep::query()
-                ->forOrganisation($orguin)
-                ->active()
-                ->orderBy('Stage_Sort')
-                ->get()),
-
-            'steps' => $this->remembered('steps', $orguin, fn() => MastIntvStep::query()
-                ->forOrganisation($orguin)
-                ->active()
-                ->orderBy('Intv_Step_Name')
-                ->get()),
-
-            'flags' => $this->remembered('flags', $orguin, fn() => MastHrFlag::query()
-                ->forOrganisation($orguin)
-                ->active()
-                ->orderBy('hr_flag_name')
-                ->get()),
-
-            'questions' => $this->remembered(
-                'questions',
-                $orguin,
-                fn() => $this->getActiveQuestionsByOrganisation($orguin)
-            ),
-
-            'history'            => [],
+            'orguin'             => $orguin,
+            'application'        => $application,
+            'stages'             => $stages,
+            'steps'              => $steps,
+            'flags'              => $flags,
+            'questions'          => $questions,
+            'history'            => $history,
             'userData'           => $this->agreementService->fetchUserData(Session::get('partaker_access_token')),
             'companyInformation' => $application->company,
             'bioDataUrl'         => $application->Bio_Data_Path
@@ -277,24 +293,26 @@ class JobApplicationService
         }
     }
 
-    public function updateQuery(string $orguin, int $uin, array $data, int $userId): void
+    public function updateQuery(string $orguin, int $uin, array $data, string $userId): void
     {
         DB::transaction(function () use ($orguin, $uin, $data, $userId) {
             $application = $this->findForOrganisation($orguin, $uin);
 
             $application->update([
-                'Stage_UIN' => $data['stage'],
-                'Step_UIN'  => $data['step'],
+                'Stage_UIN'     => $data['stage'],
+                'Intv_Step_UIN' => $data['step'],
             ]);
 
             $application->flags()->sync($data['flags'] ?? []);
 
             $application->queryHistory()->create([
-                'Question'    => $data['question'] ?? null,
-                'Stage_UIN'   => $data['stage'],
-                'Step_UIN'    => $data['step'],
-                'Intr_Date'   => now(),
-                'Intr_By_UIN' => $userId,
+                'Org_UIN'       => $application->Orga_UIN,
+                'Stage_UIN'     => $data['stage'],
+                'Intv_Step_UIN' => $data['step'],
+                'Ques_UIN'      => $data['question'],
+                'Qury_Answer'   => $data['answer'],
+                'Qury_Marks'    => $data['marks'],
+                'CrBy'          => $userId,
             ]);
         });
     }

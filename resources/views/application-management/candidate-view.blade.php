@@ -88,7 +88,7 @@ $assets = [
                 @csrf
 
                 <section class="card p-6">
-                    <h2 class="section-title">Query</h2>
+                    <h2 class="section-title">Query & Status update</h2>
 
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -99,12 +99,12 @@ $assets = [
                                         'organisation' => $companyInformation->Orga_UIN,
                                     ]) }}">
                                     @foreach ($stages as $s)
-                                        @continue($s->Stage_Name === 'Candidate Selected')
+                                    @continue($s->Stage_Name === 'Candidate Selected')
 
-                                        <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
-                                            @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>
-                                            Step {{ $s->Stage_Sort }} | {{ $s->Stage_Name }}
-                                        </option>
+                                    <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
+                                        @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>
+                                        Step {{ $s->Stage_Sort }} | {{ $s->Stage_Name }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 @error('stage') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -136,7 +136,7 @@ $assets = [
                                 @endforeach
                             </div>
                         </div>
-                        
+
                         <hr class="border-white/10">
 
                         <div class="space-y-1.5">
@@ -164,7 +164,7 @@ $assets = [
                                 placeholder="Enter the marks"
                                 value="{{ old('marks') }}">
                             @error('marks') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
-                        </div>                        
+                        </div>
                     </div>
                 </section>
 
@@ -175,23 +175,75 @@ $assets = [
 
             {{-- Query History --}}
             <section class="card p-6">
-                <h2 class="section-title">Query History</h2>
-                <ul class="divide-y divide-white/10">
-                    @forelse ($history as $h)
-                    <li class="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between">
-                        <span class="text-sm text-slate-100">
-                            <span class="label">Date :</span>
-                            {{ \Carbon\Carbon::parse($h->Intr_Date)->format('H.i d-M-Y l') }}
-                        </span>
-                        <span class="text-sm text-slate-100">
-                            <span class="label">Interview By :</span>
-                            {{ $h->interviewer->Name ?? '—' }}
-                        </span>
+                <div class="mb-5 flex items-center justify-between">
+                    <h2 class="section-title !mb-0">Query History</h2>
+                    @if ($history->count())
+                    <span class="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                        {{ $history->count() }} {{ \Illuminate\Support\Str::plural('entry', $history->count()) }}
+                    </span>
+                    @endif
+                </div>
+
+                @forelse ($history as $h)
+                @if ($loop->first)
+                <ol class="relative ml-3 space-y-6 border-l border-white/10">
+                    @endif
+
+                    <li class="relative pl-6">
+                        {{-- timeline dot --}}
+                        <span class="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-blue-500"></span>
+
+                        <div class="rounded-lg border border-white/10 bg-white/5 p-4">
+                            {{-- header: date + marks --}}
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <i class="bi bi-clock"></i>
+                                    <span class="font-medium text-slate-200">{{ $h->CrOn?->format('d M Y') ?? '—' }}</span>
+                                    <span>{{ $h->CrOn?->format('h:i A') }}</span>
+                                    @if ($h->CrOn)
+                                    <span class="hidden text-slate-500 sm:inline">· {{ $h->CrOn->diffForHumans() }}</span>
+                                    @endif
+                                </div>
+
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-300 ring-1 ring-inset ring-blue-500/30">
+                                    <i class="bi bi-star-fill text-[10px]"></i>
+                                    {{ $h->Qury_Marks }} marks
+                                </span>
+                            </div>
+
+                            {{-- stage / step badges --}}
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">
+                                    <i class="bi bi-diagram-3 text-slate-400"></i> {{ $h->stage_name }}
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">
+                                    <i class="bi bi-list-check text-slate-400"></i> {{ $h->step_name }}
+                                </span>
+                            </div>
+
+                            {{-- question --}}
+                            <div class="mt-4">
+                                <p class="label">Question</p>
+                                <p class="mt-1 text-sm font-medium text-slate-100">{{ $h->question_text }}</p>
+                            </div>
+
+                            {{-- answer --}}
+                            <div class="mt-3 rounded-md border border-white/5 bg-slate-950/40 p-3">
+                                <p class="label">Answer</p>
+                                <p class="mt-1 whitespace-pre-line break-words text-sm text-slate-300">{{ $h->Qury_Answer }}</p>
+                            </div>
+                        </div>
                     </li>
-                    @empty
-                    <li class="py-3 text-sm text-slate-400">No history yet.</li>
-                    @endforelse
-                </ul>
+
+                    @if ($loop->last)
+                </ol>
+                @endif
+                @empty
+                <div class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 py-10 text-center">
+                    <i class="bi bi-clock-history text-2xl text-slate-500"></i>
+                    <p class="text-sm text-slate-400">No history yet.</p>
+                </div>
+                @endforelse
             </section>
         </div>
     </main>
@@ -228,7 +280,7 @@ $assets = [
         })();
     </script>
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const stageSelect = document.getElementById('stage');
             const stepSelect = document.getElementById('step');
             const urlTemplate = stageSelect.dataset.stepsUrl;

@@ -14,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -115,15 +116,19 @@ class JobApplicationManagementController extends Controller
     public function updateQuery(Request $request, string $orguin, int $uin): RedirectResponse
     {
         $data = $request->validate([
-            'question' => ['nullable', 'string', 'max:1000'],
             'stage'    => ['required', 'integer'],
             'step'     => ['required', 'integer'],
             'flags'    => ['nullable', 'array'],
-            'flags.*'  => ['integer'],
-            'marks'    => ['nullable', 'integer', 'min:0', 'max:100'],
+            'flags.*'  => ['uuid'],
+            'question' => ['required', 'uuid'],
+            'answer'   => ['required', 'string', 'max:5000'],
+            'marks'    => ['required', 'integer', 'min:0', 'max:100'],
         ]);
 
-        $this->applications->updateQuery($orguin, $uin, $data, auth()->id());
+        $userUin = Session::get('partaker_user_uin');
+        abort_if(blank($userUin), 403);
+
+        $this->applications->updateQuery($orguin, $uin, $data, (string) $userUin);
 
         return back()->with('success', 'Query updated.');
     }
