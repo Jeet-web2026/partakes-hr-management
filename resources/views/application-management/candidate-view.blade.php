@@ -1,31 +1,31 @@
 @php
-    $yn = fn ($v) => $v ? 'Yes' : 'No';
-    $a  = $application;
+$yn = fn ($v) => $v ? 'Yes' : 'No';
+$a = $application;
 
-    $personal = [
-        'Name'          => trim("{$a->FaNm} {$a->MiNm} {$a->SuNm}"),
-        'Gender'        => $a->Gend,
-        'Mother Tongue' => $a->MoTu,
-        'Date of Birth' => optional($a->DOB)->format('d-M-Y'),
-        'Email'         => $a->Emai,
-        'Mobile Number' => $a->Mo_No,
-        'Country'       => $a->country->Name ?? null,
-        'Pincode'       => $a->PinCod_UIN,
-        'State'         => $a->State,
-        'District'      => $a->Distr,
-    ];
+$personal = [
+'Name' => trim("{$a->FaNm} {$a->MiNm} {$a->SuNm}"),
+'Gender' => $a->Gend,
+'Mother Tongue' => $a->MoTu,
+'Date of Birth' => optional($a->DOB)->format('d-M-Y'),
+'Email' => $a->Emai,
+'Mobile Number' => $a->Mo_No,
+'Country' => $a->country->Name ?? null,
+'Pincode' => $a->PinCod_UIN,
+'State' => $a->State,
+'District' => $a->Distr,
+];
 
-    $job = [
-        'Interested in Job' => $a->interestedpositionDetails?->Dsig_Name,
-        'Job Type'          => $a->Job_Type,
-        'Relocate'          => $yn($a->Rlca) . ($a->Rlca ? ' | ' . $a->Rlca_Area : ''),
-    ];
+$job = [
+'Interested in Job' => $a->interestedpositionDetails?->Dsig_Name,
+'Job Type' => $a->Job_Type,
+'Relocate' => $yn($a->Rlca) . ($a->Rlca ? ' | ' . $a->Rlca_Area : ''),
+];
 
-    $assets = [
-        'Mobile'                => $yn($a->Own_Mo) . ($a->Own_Mo ? ' | ' . $a->Mo_Type : ''),
-        'Laptop'                => $yn($a->Own_Lptp) . ($a->Own_Lptp ? ' | ' . $a->Lptp_OS : ''),
-        'Valid Driving Licence' => $yn($a->Drvi_Lisc) . ($a->Drvi_Lisc ? ' | ' . $a->Vcle_Type_Lisc : ''),
-    ];
+$assets = [
+'Mobile' => $yn($a->Own_Mo) . ($a->Own_Mo ? ' | ' . $a->Mo_Type : ''),
+'Laptop' => $yn($a->Own_Lptp) . ($a->Own_Lptp ? ' | ' . $a->Lptp_OS : ''),
+'Valid Driving Licence' => $yn($a->Drvi_Lisc) . ($a->Drvi_Lisc ? ' | ' . $a->Vcle_Type_Lisc : ''),
+];
 @endphp
 
 <x-base-component tailwind="true" jQuery="true" subheading="View Candidate" metadata="Candidate — {{ $personal['Name'] }}" metadescription="Candidate detail" bIcons="true">
@@ -44,10 +44,10 @@
         {{-- Tabs --}}
         <div class="grid grid-cols-3 gap-1 rounded-lg border border-white/10 bg-white/5 p-1" role="tablist">
             @foreach (['detail' => 'Detail', 'resume' => 'Resume', 'query' => 'Query'] as $key => $title)
-                <button type="button" role="tab" data-tab="{{ $key }}"
-                    class="tab-btn w-full rounded-md px-4 py-2.5 text-center text-sm font-medium text-slate-400 transition">
-                    {{ $title }}
-                </button>
+            <button type="button" role="tab" data-tab="{{ $key }}"
+                class="tab-btn w-full rounded-md px-4 py-2.5 text-center text-sm font-medium text-slate-400 transition">
+                {{ $title }}
+            </button>
             @endforeach
         </div>
 
@@ -55,17 +55,17 @@
         {{-- DETAIL --}}
         <div data-panel="detail" class="tab-panel space-y-6 pb-6 mt-5">
             @foreach (['Personal Details' => $personal, 'Job Preference' => $job, 'Assets & Licence' => $assets] as $title => $rows)
-                <section class="card p-6">
-                    <h2 class="section-title">{{ $title }}</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach ($rows as $k => $v)
-                            <div class="space-y-1.5">
-                                <label class="label">{{ $k }}</label>
-                                <div class="input value">{{ $v ?: '—' }}</div>
-                            </div>
-                        @endforeach
+            <section class="card p-6">
+                <h2 class="section-title">{{ $title }}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach ($rows as $k => $v)
+                    <div class="space-y-1.5">
+                        <label class="label">{{ $k }}</label>
+                        <div class="input value">{{ $v ?: '—' }}</div>
                     </div>
-                </section>
+                    @endforeach
+                </div>
+            </section>
             @endforeach
         </div>
 
@@ -74,10 +74,10 @@
             <section class="card p-6">
                 <h2 class="section-title">Resume</h2>
                 @if ($bioDataUrl)
-                    <iframe src="{{ $bioDataUrl }}"
-                        class="h-[100vh] w-full rounded-lg border border-white/10 bg-slate-950" title="Resume"></iframe>
+                <iframe src="{{ $bioDataUrl }}"
+                    class="h-[100vh] w-full rounded-lg border border-white/10 bg-slate-950" title="Resume"></iframe>
                 @else
-                    <p class="py-8 text-center text-sm text-slate-400">No resume attached.</p>
+                <p class="py-8 text-center text-sm text-slate-400">No resume attached.</p>
                 @endif
             </section>
         </div>
@@ -91,13 +91,61 @@
                     <h2 class="section-title">Query</h2>
 
                     <div class="space-y-4">
-                         <div class="space-y-1.5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label for="stage" class="label">Stage <span class="text-red-500">*</span></label>
+                                <select id="stage" name="stage" required class="input" data-steps-url="{{ route('applications.stages.steps', [
+                                        'stage'        => '__STAGE__',
+                                        'organisation' => $companyInformation->Orga_UIN,
+                                    ]) }}">
+                                    @foreach ($stages as $s)
+                                        @continue($s->Stage_Name === 'Candidate Selected')
+
+                                        <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
+                                            @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>
+                                            {{ $s->Stage_Name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('stage') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label for="step" class="label">Steps <span class="text-red-500">*</span></label>
+                                <select id="step" name="step" required class="input">
+                                    @foreach ($steps as $s)
+                                    <option value="{{ $s->Intv_Step_UIN }}" class="bg-slate-900"
+                                        @selected(old('step', $a->Intv_Step_UIN) == $s->Intv_Step_UIN)>{{ $s->Intv_Step_Name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('step') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="label">Flags</label>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                @foreach ($flags as $f)
+                                <label class="inline-flex cursor-pointer items-center gap-2 rounded border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-slate-300 transition
+                                            hover:bg-white/10
+                                            has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white
+                                            has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500/50">
+                                    <input type="checkbox" name="flags[]" value="{{ $f->hr_flag_UIN }}" class="checkbox"
+                                        @checked(in_array($f->hr_flag_UIN, old('flags', $selectedFlags ?? [])))>
+                                    <span>{{ $f->hr_flag_name }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <hr class="border-white/10">
+
+                        <div class="space-y-1.5">
                             <label for="question" class="label">Question <span class="text-red-500">*</span></label>
                             <select id="question" name="question" required class="input">
                                 <option value="">Select question</option>
                                 @foreach ($questions as $q)
-                                    <option value="{{ $q->intv_qstn_UIN }}" class="bg-slate-900"
-                                        @selected(old('question') == $q->intv_qstn_UIN)>{{ $q->Question_Text }}</option>
+                                <option value="{{ $q->intv_qstn_UIN }}" class="bg-slate-900"
+                                    @selected(old('question')==$q->intv_qstn_UIN)>{{ $q->Question_Text }}</option>
                                 @endforeach
                             </select>
                             @error('question') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -110,48 +158,13 @@
                             @error('answer') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-1.5">
-                                <label for="stage" class="label">Stage <span class="text-red-500">*</span></label>
-                                    <select id="stage" name="stage" required class="input" data-steps-url="{{ route('applications.stages.steps', [
-                                        'stage'        => '__STAGE__',
-                                        'organisation' => $companyInformation->Orga_UIN,
-                                    ]) }}">
-                                    @foreach ($stages as $s)
-                                        <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
-                                            @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>{{ $s->Stage_Name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('stage') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <label for="step" class="label">Steps <span class="text-red-500">*</span></label>
-                                <select id="step" name="step" required class="input">
-                                    @foreach ($steps as $s)
-                                        <option value="{{ $s->Intv_Step_UIN }}" class="bg-slate-900"
-                                            @selected(old('step', $a->Intv_Step_UIN) == $s->Intv_Step_UIN)>{{ $s->Intv_Step_Name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('step') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-
-                       <div class="space-y-1.5">
-                        <label class="label">Flags</label>
-                        <div class="mt-2 flex flex-wrap gap-2">
-                            @foreach ($flags as $f)
-                                <label class="inline-flex cursor-pointer items-center gap-2 rounded border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-slate-300 transition
-                                            hover:bg-white/10
-                                            has-[:checked]:border-blue-500 has-[:checked]:bg-blue-600 has-[:checked]:text-white
-                                            has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500/50">
-                                    <input type="checkbox" name="flags[]" value="{{ $f->hr_flag_UIN }}" class="checkbox"
-                                        @checked(in_array($f->hr_flag_UIN, old('flags', $selectedFlags ?? [])))>
-                                    <span>{{ $f->hr_flag_name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
+                        <div class="space-y-1.5">
+                            <label for="marks" class="label">Marks <span class="text-red-500">*</span></label>
+                            <input type="number" id="marks" name="marks" required class="input"
+                                placeholder="Enter the marks"
+                                value="{{ old('marks') }}">
+                            @error('marks') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>                        
                     </div>
                 </section>
 
@@ -165,18 +178,18 @@
                 <h2 class="section-title">Query History</h2>
                 <ul class="divide-y divide-white/10">
                     @forelse ($history as $h)
-                        <li class="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between">
-                            <span class="text-sm text-slate-100">
-                                <span class="label">Date :</span>
-                                {{ \Carbon\Carbon::parse($h->Intr_Date)->format('H.i d-M-Y l') }}
-                            </span>
-                            <span class="text-sm text-slate-100">
-                                <span class="label">Interview By :</span>
-                                {{ $h->interviewer->Name ?? '—' }}
-                            </span>
-                        </li>
+                    <li class="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between">
+                        <span class="text-sm text-slate-100">
+                            <span class="label">Date :</span>
+                            {{ \Carbon\Carbon::parse($h->Intr_Date)->format('H.i d-M-Y l') }}
+                        </span>
+                        <span class="text-sm text-slate-100">
+                            <span class="label">Interview By :</span>
+                            {{ $h->interviewer->Name ?? '—' }}
+                        </span>
+                    </li>
                     @empty
-                        <li class="py-3 text-sm text-slate-400">No history yet.</li>
+                    <li class="py-3 text-sm text-slate-400">No history yet.</li>
                     @endforelse
                 </ul>
             </section>
@@ -189,12 +202,12 @@
 
     @section('extrajs')
     <script>
-        (function () {
+        (function() {
             const root = document.getElementById('candidate-view');
             const buttons = root.querySelectorAll('.tab-btn');
             const panels = root.querySelectorAll('.tab-panel');
             const active = ['bg-blue-600', 'text-white'];
-            const idle   = ['text-slate-400', 'hover:bg-white/5', 'hover:text-slate-200'];
+            const idle = ['text-slate-400', 'hover:bg-white/5', 'hover:text-slate-200'];
 
             function show(name) {
                 if (!root.querySelector('[data-panel="' + name + '"]')) name = 'detail';
@@ -212,56 +225,51 @@
         })();
     </script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const stageSelect = document.getElementById('stage');
-        const stepSelect  = document.getElementById('step');
-        const urlTemplate = stageSelect.dataset.stepsUrl;
+       document.addEventListener('DOMContentLoaded', () => {
+            const stageSelect = document.getElementById('stage');
+            const stepSelect = document.getElementById('step');
+            const urlTemplate = stageSelect.dataset.stepsUrl;
 
-        stageSelect.addEventListener('change', async () => {
-            const stageId = stageSelect.value;
-            if (!stageId) return;
-
-            stepSelect.innerHTML = '';
-            stepSelect.disabled = true;
-            stepSelect.add(new Option('Loading...', ''));
-
-            try {
-                const url = urlTemplate.replace('__STAGE__', encodeURIComponent(stageId));
-                const res = await fetch(url, {
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                });
-
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status} for ${url}`);
-                }
-
-                const steps = await res.json();
+            stageSelect.addEventListener('change', async () => {
+                const stageId = stageSelect.value;
 
                 stepSelect.innerHTML = '';
-                if (!Array.isArray(steps) || steps.length === 0) {
-                    stepSelect.add(new Option('No steps for this stage', ''));
-                    return;
-                }
+                stepSelect.disabled = true;
 
-                steps.forEach(s => {
-                    if(!s.Intv_Step_Name) return;
-                    const opt = new Option(s.Intv_Step_Name, s.Intv_Step_UIN);
-                    opt.className = 'bg-slate-900';
-                    stepSelect.add(opt);
-                });
-            } catch (e) {
-                console.error(e);
-                stepSelect.innerHTML = '';
-                stepSelect.add(new Option('Failed to load steps', ''));
-            } finally {
-                stepSelect.disabled = false;
-            }
+                if (!stageId) return;
+
+                try {
+                    const url = urlTemplate.replace('__STAGE__', encodeURIComponent(stageId));
+                    const res = await fetch(url, {
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+
+                    if (!res.ok) {
+                        throw new Error(`HTTP ${res.status} for ${url}`);
+                    }
+
+                    const steps = await res.json();
+
+                    if (Array.isArray(steps)) {
+                        steps.forEach(s => {
+                            if (!s.Intv_Step_Name) return;
+                            const opt = new Option(s.Intv_Step_Name, s.Intv_Step_UIN);
+                            opt.className = 'bg-slate-900';
+                            stepSelect.add(opt);
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    // enabled only if at least one option was added
+                    stepSelect.disabled = stepSelect.options.length === 0;
+                }
+            });
         });
-    });
     </script>
     @endsection
 
@@ -272,38 +280,95 @@
 
     @section('extracss')
     <style>
-        body { background: #0b1220; color: #e2e8f0; }
-
-        .card { background: #111a2e; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; }
-
-        .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .875rem;
-               border-radius: .5rem; font-size: .875rem; font-weight: 500; transition: .15s; }
-        .btn-primary { background: #3b82f6; color: #fff; }
-        .btn-primary:hover { background: #2563eb; }
-
-        .input, select.input, textarea.input {
-            width: 100%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
-            border-radius: .5rem; padding: .5rem .75rem; color: #e2e8f0; font-size: .875rem;
+        body {
+            background: #0b1220;
+            color: #e2e8f0;
         }
-        .input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+
+        .card {
+            background: #111a2e;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem .875rem;
+            border-radius: .5rem;
+            font-size: .875rem;
+            font-weight: 500;
+            transition: .15s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .input,
+        select.input,
+        textarea.input {
+            width: 100%;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: .5rem;
+            padding: .5rem .75rem;
+            color: #e2e8f0;
+            font-size: .875rem;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+        }
 
         /* read-only value box (same look as .input, not focusable) */
-        .input.value { display: flex; align-items: center; min-height: 2.5rem; }
+        .input.value {
+            display: flex;
+            align-items: center;
+            min-height: 2.5rem;
+        }
 
-        .label { font-size: .75rem; color: #94a3b8; }
+        .label {
+            font-size: .75rem;
+            color: #94a3b8;
+        }
 
-        .section-title { font-size: .75rem; font-weight: 600; text-transform: uppercase;
-                         letter-spacing: .08em; color: #94a3b8; margin-bottom: 1rem; }
+        .section-title {
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
 
         select.input {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right .75rem center; padding-right: 2rem;
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            padding-right: 2rem;
         }
 
-        .checkbox { width: 1rem; height: 1rem; accent-color: #3b82f6; }
+        .checkbox {
+            width: 1rem;
+            height: 1rem;
+            accent-color: #3b82f6;
+        }
 
-        .tab-btn:not(.bg-blue-600):hover { background: rgba(255,255,255,.05); color: #e2e8f0; }
+        .tab-btn:not(.bg-blue-600):hover {
+            background: rgba(255, 255, 255, .05);
+            color: #e2e8f0;
+        }
+
         label:has(input.checkbox:checked) {
             background: #2563eb;
             border-color: #3b82f6;

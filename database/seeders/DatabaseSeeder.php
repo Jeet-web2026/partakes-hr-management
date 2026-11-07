@@ -24,7 +24,9 @@ class DatabaseSeeder extends Seeder
             MasterVerticalPageNameSeeder::class,
             MastUserLogiSeeder::class,
             MastStauSeeder::class,
-            MastPageSeeder::class
+            MastPageSeeder::class,
+            MastStatSeeder::class,
+            MastDistSeeder::class,
         ]);
     }
 }

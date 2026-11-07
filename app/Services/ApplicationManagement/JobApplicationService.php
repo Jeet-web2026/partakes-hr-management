@@ -5,9 +5,12 @@ namespace App\Services\ApplicationManagement;
 use App\Enums\InterviewStepStatus;
 use App\Models\HrMastJobAply;
 use App\Models\InterviewStep;
+use App\Models\MastDist;
 use App\Models\MastHrFlag;
 use App\Models\MastIntvQstn;
 use App\Models\MastIntvStep;
+use App\Models\MastStat;
+use App\Models\PinCode;
 use App\Models\ShareLink;
 use App\Services\Agreement\AgreementService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -17,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class JobApplicationService
@@ -101,8 +105,8 @@ class JobApplicationService
             'Rlca_Area'      => $data['Rlca_Area'],
             'Job_Intr'       => $data['Job_Intr'],
             'Job_Type'       => $data['Job_Type'],
-            'Distr' => "demo district",
-            'State' => "demo state"
+            'Distr' => $this->getDistrict($data['PinCod_UIN']),
+            'State' => $this->getState($data['PinCod_UIN'])
         ];
     }
 
@@ -302,5 +306,27 @@ class JobApplicationService
             ->active()
             ->orderBy('Question_Text')
             ->get();
+    }
+
+    private function getDistrict(string $pincode)
+    {
+        $disTrictUin = PinCode::query()->where('pin_code_No', $pincode)->value('Dist_UIN');
+
+        if (! $disTrictUin) {
+            throw new NotFoundHttpException('Pincode not valid.');
+        }
+
+        return MastDist::query()->where('Dist_UIN', $disTrictUin)->value('Dist_Comp_Name');
+    }
+
+    private function getState(string $pincode)
+    {
+        $stateUin = PinCode::query()->where('pin_code_No', $pincode)->value('Stat_UIN');
+
+        if (! $stateUin) {
+            throw new NotFoundHttpException('Pincode not valid.');
+        }
+
+        return MastStat::query()->where('Stat_UIN', $stateUin)->value('Stat_Comp_Name');
     }
 }
