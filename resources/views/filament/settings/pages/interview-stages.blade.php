@@ -29,6 +29,9 @@
             </div>
         </div>
 
+        <div class="flex justify-end items-end mb-3">
+            <x-feedback-button page="PAGE_UIN_VALUE" />
+        </div>
         <!-- Table -->
         <div class="rounded-xl border border-white/10 bg-card overflow-x-auto">
             <table class="w-full text-sm">
@@ -146,8 +149,6 @@
         </div>
     </div>
     @endif
-
-    <x-feedback-button page="PAGE_UIN_VALUE" />
 
     <script>
         var AGREEMENTS_URL = "{{ route('agreements-name.data') }}";
