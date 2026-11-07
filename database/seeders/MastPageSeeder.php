@@ -25,24 +25,37 @@ class MastPageSeeder extends Seeder
 
     public function run(): void
     {
-        // [uin, name, description, hit, wallet points, rate points, permission values (same order as PERM_COLUMNS)]
+        // permission values, same order as PERM_COLUMNS
         $pageA = [100211, 100211, 100211, 100211, 100213, 100213, 100211, 100213, 100213, 100211, 100213];
         $pageB = [100211, 100213, 100213, 100213, 100213, 100213, 100211, 100211, 100211, 100211, 100211];
         $pageC = [100213, 100213, 100213, 100213, 100211, 100211, 100213, 100213, 100213, 100213, 100213];
         $pageD = [100211, 100213, 100213, 100213, 100213, 100213, 100213, 100213, 100213, 100213, 100213];
 
+        // permissions for the six new settings/management pages (placeholder: same as $pageA)
+        $pageNew = $pageA;
+
+        // [uin, name, description, hit, wallet points, rate points, permission values]
+        // names are kept exactly as in the SQL dump (note the trailing space on two of them)
         $pages = [
-            [10000001, 'Login',          'Login Screen',                       55,   1, 0, $pageA],
-            [10000002, 'Myprofile',      'Can Select various options',         222,  1, 0, $pageA],
-            [10000003, 'SelfAccounting', 'Accounting Dashboard',               432,  1, 0, $pageA],
-            [10000004, 'GroupAcounting', 'Project Master',                     22,   1, 0, $pageA],
-            [10000005, 'SelfAlbum',      'Department Master',                  18,   1, 0, $pageA],
-            [10000006, 'GroupAlbum',     'Location Master',                    16,   2, 0, $pageB],
-            [10000007, 'Project',        'Show the ledger transactional daata', 2341, 1, 0, $pageC],
-            [10000008, 'Department',     'Ledger Group data',                  564,  0, 0, $pageD],
-            [10000009, 'Location',       'Location data',                      564,  0, 0, $pageD],
-            [10000010, 'Ledger',         'Ledger data',                        564,  0, 0, $pageD],
-            [10000011, 'Ledger Group',   'Ledger Group data',                  564,  0, 0, $pageD],
+            [10000001, 'Login',           'Login Screen',                        55,   1, 0, $pageA],
+            [10000002, 'Myprofile',       'Can Select various options',          222,  1, 0, $pageA],
+            [10000003, 'SelfAccounting ', 'Accounting Dashboard',                432,  1, 0, $pageA],
+            [10000004, 'GroupAcounting',  'Project Master',                      22,   1, 0, $pageA],
+            [10000005, 'SelfAlbum ',      'Department Master',                   18,   1, 0, $pageA],
+            [10000006, 'GroupAlbum',      'Location Master',                     16,   2, 0, $pageB],
+            [10000007, 'Project',         'Show the ledger transactional daata', 2341, 1, 0, $pageC],
+            [10000008, 'Department',      'Ledger Group data',                   564,  0, 0, $pageD],
+            [10000009, 'Location',        'Location data',                       564,  0, 0, $pageD],
+            [10000010, 'Ledger',          'Ledger data',                         564,  0, 0, $pageD],
+            [10000011, 'Ledger Group',    'Ledger Group data',                   564,  0, 0, $pageD],
+
+            // new pages
+            [10000012, 'Candidate Management', 'Manage candidate applications',    0, 0, 0, $pageNew],
+            [10000013, 'Interview Stages',     'Manage interview stages',          0, 0, 0, $pageNew],
+            [10000014, 'Interview Steps',      'Manage interview steps',           0, 0, 0, $pageNew],
+            [10000015, 'Designations',         'Manage designations',              0, 0, 0, $pageNew],
+            [10000016, 'Interview Questions',  'Manage interview questions',       0, 0, 0, $pageNew],
+            [10000017, 'Candidate Flags',      'Manage candidate flags',           0, 0, 0, $pageNew],
         ];
 
         $rows = array_map(function (array $p) {
@@ -73,7 +86,7 @@ class MastPageSeeder extends Seeder
         DB::table('tbl_mast_page')->upsert(
             $rows,
             ['Page_UIN'],
-            array_keys($rows[0] + []) // update every column on conflict
+            array_diff(array_keys($rows[0]), ['Page_UIN'])   // update every other column on conflict
         );
     }
 }

@@ -276,7 +276,7 @@
         </div>
 
         <div class="flex justify-end items-end mb-3">
-            <x-feedback-button page="PAGE_UIN_VALUE" />
+            <x-feedback-button page="10000014" />
         </div>
         <!-- Table (visible on all screen sizes) -->
         <div class="rounded-xl border border-white/10 bg-card overflow-x-auto">
