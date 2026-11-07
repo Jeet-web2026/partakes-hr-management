@@ -227,7 +227,7 @@ class JobApplicationService
             'stages' => $this->remembered('stages', $orguin, fn() => InterviewStep::query()
                 ->forOrganisation($orguin)
                 ->active()
-                ->orderBy('Stage_Name')
+                ->orderBy('Stage_Sort')
                 ->get()),
 
             'steps' => $this->remembered('steps', $orguin, fn() => MastIntvStep::query()

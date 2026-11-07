@@ -103,7 +103,7 @@ $assets = [
 
                                         <option value="{{ $s->Stage_UIN }}" class="bg-slate-900"
                                             @selected(old('stage', $a->Stage_UIN) == $s->Stage_UIN)>
-                                            {{ $s->Stage_Name }}
+                                            Step {{ $s->Stage_Sort }} | {{ $s->Stage_Name }}
                                         </option>
                                     @endforeach
                                 </select>
