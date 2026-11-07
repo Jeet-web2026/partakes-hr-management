@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class MastIntvStep extends Model
 {
@@ -45,6 +46,14 @@ class MastIntvStep extends Model
         static::addGlobalScope('notDeleted', function (Builder $query) {
             $query->whereNull($query->getModel()->getTable() . '.Del_By');
         });
+
+        static::saved(function (self $question) {
+            $question->forgetQuestionCache();
+        });
+
+        static::deleted(function (self $question) {
+            $question->forgetQuestionCache();
+        });
     }
 
     public function scopeForOrganisation(Builder $query, string $orgaUin): Builder
@@ -75,5 +84,10 @@ class MastIntvStep extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(MastStau::class, 'Intv_Step_Stau', 'Stau_UIN');
+    }
+
+    public function forgetQuestionCache(): void
+    {
+        Cache::clear();
     }
 }

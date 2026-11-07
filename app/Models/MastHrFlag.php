@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class MastHrFlag extends Model
 {
@@ -42,11 +43,18 @@ class MastHrFlag extends Model
         ];
     }
 
-    // Soft delete is marked by Del_By (the schema has no deleted_at).
     protected static function booted(): void
     {
         static::addGlobalScope('notDeleted', function (Builder $query) {
             $query->whereNull($query->getModel()->getTable() . '.Del_By');
+        });
+
+        static::saved(function (self $question) {
+            $question->forgetQuestionCache();
+        });
+
+        static::deleted(function (self $question) {
+            $question->forgetQuestionCache();
         });
     }
 
@@ -72,5 +80,10 @@ class MastHrFlag extends Model
                 ? $attributes['hr_flag_name']
                 : ("e.g. " . $attributes['hr_flag_placeholder'] ?? null),
         );
+    }
+
+    public function forgetQuestionCache(): void
+    {
+        Cache::clear();
     }
 }

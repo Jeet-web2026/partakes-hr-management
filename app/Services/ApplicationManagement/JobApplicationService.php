@@ -101,8 +101,8 @@ class JobApplicationService
             'Rlca_Area'      => $data['Rlca_Area'],
             'Job_Intr'       => $data['Job_Intr'],
             'Job_Type'       => $data['Job_Type'],
-            'Distr' => $data['Distr'],
-            'State' => $data['State']
+            'Distr' => "demo district",
+            'State' => "demo state"
         ];
     }
 

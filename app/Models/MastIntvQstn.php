@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class MastIntvQstn extends Model
 {
@@ -44,6 +45,14 @@ class MastIntvQstn extends Model
         static::addGlobalScope('notDeleted', function (Builder $query) {
             $query->whereNull($query->getModel()->getTable() . '.Del_By');
         });
+
+        static::saved(function (self $question) {
+            $question->forgetQuestionCache();
+        });
+
+        static::deleted(function (self $question) {
+            $question->forgetQuestionCache();
+        });
     }
 
     public function scopeForOrganisation(Builder $query, string $orgaUin): Builder
@@ -59,5 +68,10 @@ class MastIntvQstn extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'Cr_By', 'User_UIN');
+    }
+
+    public function forgetQuestionCache(): void
+    {
+        Cache::clear();
     }
 }
