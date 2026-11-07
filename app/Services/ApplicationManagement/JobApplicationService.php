@@ -2,7 +2,6 @@
 
 namespace App\Services\ApplicationManagement;
 
-use App\Enums\InterviewStepStatus;
 use App\Models\HrMastJobAply;
 use App\Models\InterviewStep;
 use App\Models\MastDist;
@@ -20,7 +19,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class JobApplicationService
@@ -331,20 +329,12 @@ class JobApplicationService
     {
         $disTrictUin = PinCode::query()->where('pin_code_No', $pincode)->value('Dist_UIN');
 
-        if (! $disTrictUin) {
-            throw new NotFoundHttpException('Pincode not valid.');
-        }
-
         return MastDist::query()->where('Dist_UIN', $disTrictUin)->value('Dist_Comp_Name');
     }
 
     private function getState(string $pincode)
     {
         $stateUin = PinCode::query()->where('pin_code_No', $pincode)->value('Stat_UIN');
-
-        if (! $stateUin) {
-            throw new NotFoundHttpException('Pincode not valid.');
-        }
 
         return MastStat::query()->where('Stat_UIN', $stateUin)->value('Stat_Comp_Name');
     }

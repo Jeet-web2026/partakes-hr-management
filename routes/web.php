@@ -51,10 +51,6 @@ Route::middleware('partaker.session')->group(function () {
             Route::get('/stages/{stage}/{organisation}/steps', 'stageBysteps')
                 ->name('stages.steps');
         });
-
-    Route::fallback(function () {
-        return redirect()->route('home');
-    });
 });
 
 Route::controller(JobApplicationManagementController::class)->group(function () {
@@ -78,4 +74,8 @@ Route::controller(JobApplicationManagementController::class)->group(function () 
 
     Route::get('/apply/{submitTime}/success', 'success')
         ->name('job-application.success');
+});
+
+Route::fallback(function () {
+    return redirect()->route('home');
 });

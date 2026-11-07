@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\CountryMaster;
+use App\Models\PinCode;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -34,7 +35,7 @@ class StoreJobApplicationRequest extends FormRequest
             'MoTu'  => ['required', Rule::in(self::MOTHER_TONGUES)],
 
             'Cutr_UIN'   => ['required', Rule::exists((new CountryMaster)->getTable(), 'Admn_Cutr_Mast_UIN')],
-            'PinCod_UIN' => ['required', 'string', 'max:10'],
+            'PinCod_UIN' => ['required', 'string', 'max:10', Rule::exists(PinCode::class, 'pin_code_No')],
             'Mo_No'      => ['required', 'string', 'max:15', 'regex:/^[0-9+\-\s()]{7,15}$/'],
             'Emai'       => ['required', 'email', 'max:255'],
 

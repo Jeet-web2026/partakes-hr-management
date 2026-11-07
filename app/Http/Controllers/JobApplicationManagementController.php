@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class JobApplicationManagementController extends Controller
 {
@@ -35,17 +34,18 @@ class JobApplicationManagementController extends Controller
 
     public function store(string $token, string $orguin, StoreJobApplicationRequest $request): RedirectResponse
     {
-        try {
-            $validated = $request->safe()->except('Bio_Data_Path');
+        $validated = $request->safe()->except('Bio_Data_Path');
 
-            $application = $this->applications->create($validated, $request->file('Bio_Data_Path'), $token, $orguin);
+        $application = $this->applications->create(
+            $validated,
+            $request->file('Bio_Data_Path'),
+            $token,
+            $orguin,
+        );
 
-            return redirect()
-                ->route('job-application.success', [$application->CrBy->format('M j, Y \a\t g:i A')])
-                ->with('sucesss', "Application sumitted successfully!");
-        } catch (NotFoundHttpException $th) {
-            throw $th;
-        }
+        return redirect()
+            ->route('job-application.success', [$application->CrBy->format('M j, Y \a\t g:i A')])
+            ->with('success', 'Application submitted successfully!');
     }
 
     public function redirect(string $token): RedirectResponse
