@@ -10,8 +10,8 @@ use Illuminate\Validation\ValidationException;
 class InterviewStepService
 {
     public const DEFAULT_STEPS = [
-        ['name' => 'New Candidate', 'sort' => 1, 'status' => 100201],
-        ['name' => 'Candidate Short Listed', 'sort' => 2, 'status' => 100202],
+        ['name' => 'New Candidate', 'sort' => 1, 'status' => 100202],
+        ['name' => 'Candidate Short Listed', 'sort' => 2, 'status' => 100201],
         ['name' => 'Schedule Interview', 'sort' => 3, 'status' => 100202],
         ['name' => 'Candidate Selected', 'sort' => 4, 'status' => 100202],
         ['name' => 'Offer Letter Issued', 'sort' => 5, 'status' => 100202],
