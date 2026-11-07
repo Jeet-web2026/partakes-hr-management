@@ -139,6 +139,8 @@
                 </p>
             </x-filament::section>
         </div>
+
+        <x-feedback-button page="PAGE_UIN_VALUE" />
     </main>
 
     <script>

@@ -147,6 +147,8 @@
     </div>
     @endif
 
+    <x-feedback-button page="PAGE_UIN_VALUE" />
+
     <script>
         var AGREEMENTS_URL = "{{ route('agreements-name.data') }}";
     </script>

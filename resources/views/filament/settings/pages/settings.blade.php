@@ -325,6 +325,8 @@
             <span id="entriesLabel"></span>
             <div id="pagination" class="flex items-center gap-1"></div>
         </div>
+
+        <x-feedback-button page="PAGE_UIN_VALUE" />
     </main>
 
     <script>

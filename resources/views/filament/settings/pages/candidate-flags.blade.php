@@ -328,6 +328,8 @@
                     </div>
                 </div>
                 @endif
+
+                <x-feedback-button page="PAGE_UIN_VALUE" />
     </main>
 
     <script>

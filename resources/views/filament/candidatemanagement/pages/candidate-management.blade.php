@@ -375,7 +375,7 @@
                             </svg>
 
                             <span class="hidden sm:inline">
-                                Generate
+                                Link
                             </span>
 
                         </a>
