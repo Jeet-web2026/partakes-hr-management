@@ -84,6 +84,7 @@
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <th class="px-5 py-3">Question</th>
+                        <th class="px-5 py-3">Question Marks</th>
                         <th class="px-5 py-3">Created By</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
@@ -97,10 +98,13 @@
                             <div class="line-clamp-2 max-w-2xl">{{ $question->Question_Text }}</div>
                         </td>
                         <td class="px-5 py-3 whitespace-nowrap">
-                            {{ $question->creator?->User_Name ?? '—' }}
+                            {{ $question->Qstn_Mark }}
+                        </td>
+                        <td class="px-5 py-3 whitespace-nowrap">
+                            {{ $question->creator?->User_Name }}
                         </td>
                         <td class="px-5 py-3">
-                            @if ($question->Intv_qstn_Stau === \App\Enums\InterviewStepStatus::Active)
+                            @if ($question->Intv_qstn_Stau === 100201)
                             <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
                             @else
                             <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
@@ -255,12 +259,26 @@
                 </div>
 
                 <div>
+                    <label class="mb-1 block text-sm font-medium">Marks</label>
+                    <input
+                        type="number"
+                        wire:model="formMarks"
+                        min="0"
+                        step="any"
+                        inputmode="decimal"
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                    @error('formMarks')
+                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label class="mb-1 block text-sm font-medium">Status</label>
                     <select
                         wire:model="formStatus"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                        <option value="active" class="bg-slate-800">Active</option>
-                        <option value="inactive" class="bg-slate-800">Inactive</option>
+                        <option value="100201" class="bg-slate-800">Active</option>
+                        <option value="100202" class="bg-slate-800">Inactive</option>
                     </select>
                     @error('formStatus')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>

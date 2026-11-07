@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('tbl_mast_intv_qstn', function (Blueprint $table) {
             $table->uuid('intv_qstn_UIN')->primary();
             $table->text('Question_Text');
-            $table->enum('Intv_qstn_Stau', ['active', 'inactive'])->default('active');
+            $table->foreignId('Intv_qstn_Stau')
+                ->nullable()
+                ->constrained('tbl_mast_stau', 'Stau_UIN')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
+            $table->text('Qstn_Mark')->default(0);
             $table->uuid('Orga_UIN');
             $table->uuid('Cr_By');
             $table->uuid('Mo_By');

@@ -22,20 +22,21 @@ class MastIntvQstnService
         return $this->questions->findInOrganisation($orgaUin, $uin);
     }
 
-    public function create(string $orgaUin, string $text, InterviewStepStatus|string $status, string $userId): MastIntvQstn
+    public function create(string $orgaUin, string $text, string|int $status, string $userUin, int $marks = 0): MastIntvQstn
     {
-        return $this->questions->create([
-            'Question_Text' => trim($text),
+        return MastIntvQstn::create([
+            'Question_Text'  => $text,
+            'Qstn_Mark' => $marks,
             'Intv_qstn_Stau' => $status,
-            'Orga_UIN' => $orgaUin,
-            'Cr_By' => $userId,
-            'Mo_By' => $userId,
+            'Orga_UIN'       => $orgaUin,
+            'Cr_By'          => $userUin,
+            'Mo_By'          => $userUin,
         ]);
     }
 
     public function update(MastIntvQstn $question, array $data, string $userId): MastIntvQstn
     {
-        $changes = array_intersect_key($data, array_flip(['Question_Text', 'Intv_qstn_Stau']));
+        $changes = array_intersect_key($data, array_flip(['Question_Text', 'Intv_qstn_Stau', 'Qstn_Mark']));
 
         if (isset($changes['Question_Text'])) {
             $changes['Question_Text'] = trim($changes['Question_Text']);

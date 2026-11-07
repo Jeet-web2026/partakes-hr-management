@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\InterviewStepStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -27,14 +26,16 @@ class MastIntvQstn extends Model
         'Cr_By',
         'Mo_By',
         'Del_By',
+        'Qstn_Mark'
     ];
 
     protected function casts(): array
     {
         return [
-            'Intv_qstn_Stau' => InterviewStepStatus::class,
+            'Intv_qstn_Stau' => 'integer',
             'Cr_On' => 'datetime',
             'Mo_On' => 'datetime',
+            'Qstn_Mark' => 'integer'
         ];
     }
 
@@ -52,7 +53,7 @@ class MastIntvQstn extends Model
 
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('Intv_qstn_Stau', InterviewStepStatus::Active->value);
+        return $query->where('Intv_qstn_Stau', 100201);
     }
 
     public function creator(): BelongsTo
