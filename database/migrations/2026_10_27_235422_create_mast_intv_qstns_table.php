@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained('tbl_mast_stau', 'Stau_UIN')
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
-            $table->text('Qstn_Mark')->default(0);
+            $table->bigInteger('Qstn_Mark')->default(0);
             $table->uuid('Orga_UIN');
             $table->uuid('Cr_By');
             $table->uuid('Mo_By');
