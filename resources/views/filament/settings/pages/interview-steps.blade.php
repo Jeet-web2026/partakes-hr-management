@@ -313,16 +313,15 @@
                         <td class="px-5 py-3 whitespace-nowrap align-top">{{ $step->stage?->Stage_Name }}</td>
 
                         <td class="px-5 py-3 align-top">
-                            @if ($step->Intv_Step_Stau === \App\Enums\InterviewStepStatus::Active)
-                            <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
+                            @if ($step->Intv_Step_Stau === 100201)
+                                <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
                             @else
-                            <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
+                                <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
                             @endif
                         </td>
 
                         <td class="px-5 py-3 text-right align-top">
-                            @php $stageActive = $step->stage?->Stage_Status === 100201;
-                            @endphp
+                            @php $stageActive = $step->stage?->Stage_Status === 100201; @endphp
 
                             <div x-data="{ open: false }" class="relative inline-block text-left">
                                 <button
@@ -342,9 +341,7 @@
                                     x-transition.origin.top.right
                                     class="absolute right-0 z-40 mt-1 w-44 rounded-md border border-white/10 bg-card py-1 shadow-xl">
                                     
-                                    @if (
-                                        $stageActive
-                                    )
+                                    @if ($stageActive)
                                     <button
                                         type="button"
                                         wire:click="openEdit('{{ $step->Intv_Step_UIN }}')"
