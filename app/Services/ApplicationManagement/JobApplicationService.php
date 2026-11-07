@@ -221,6 +221,7 @@ class JobApplicationService
             ->firstOrFail();
 
         $stages = $this->remembered('stages', $orguin, fn() => InterviewStep::query()
+            ->whereDoesntHave('hasStep')
             ->forOrganisation($orguin)
             ->active()
             ->orderBy('Stage_Sort')

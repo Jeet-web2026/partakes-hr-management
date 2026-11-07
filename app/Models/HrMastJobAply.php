@@ -78,10 +78,10 @@ class HrMastJobAply extends Model
     public function flags(): BelongsToMany
     {
         return $this->belongsToMany(
-            MastHrFlag::class, 
+            MastHrFlag::class,
             'HR_Aply_Flag',
-            'Aply_UIN', 
-            'hr_flag_UIN' 
+            'Aply_UIN',
+            'hr_flag_UIN'
         );
     }
 

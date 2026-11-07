@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class InterviewStep extends Model
 {
@@ -45,5 +46,10 @@ class InterviewStep extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(MastStau::class, 'Stage_Status', 'Stau_UIN');
+    }
+
+    public function hasStep(): HasOne
+    {
+        return $this->hasOne(HrMastJobAply::class, 'Stage_UIN', 'Stage_UIN');
     }
 }
