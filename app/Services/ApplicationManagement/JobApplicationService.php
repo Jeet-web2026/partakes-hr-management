@@ -218,12 +218,10 @@ class JobApplicationService
             ->where('Aply_UIN', $uin)
             ->firstOrFail();
 
-        $stages = $this->remembered('stages', $orguin, fn() => InterviewStep::query()
-            ->whereDoesntHave('hasStep')
+        $stages = InterviewStep::query()
             ->forOrganisation($orguin)
             ->active()
-            ->orderBy('Stage_Sort')
-            ->get());
+            ->orderBy('Stage_Sort');
 
         $steps = $this->remembered('steps', $orguin, fn() => MastIntvStep::query()
             ->forOrganisation($orguin)
@@ -259,7 +257,8 @@ class JobApplicationService
         return [
             'orguin'             => $orguin,
             'application'        => $application,
-            'stages'             => $stages,
+            'stages'             => (clone $stages)->whereDoesntHave('hasStep')
+                ->get(),
             'steps'              => $steps,
             'flags'              => $flags,
             'questions'          => $questions,

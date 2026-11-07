@@ -213,10 +213,10 @@ $assets = [
 
                             {{-- stage / step badges --}}
                             <div class="mt-3 flex flex-wrap gap-2">
-                                <span class="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">
+                                <span class="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200 capitalize">
                                     <i class="bi bi-diagram-3 text-slate-400"></i> {{ $h->stage_name }}
                                 </span>
-                                <span class="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">
+                                <span class="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200 capitalize">
                                     <i class="bi bi-list-check text-slate-400"></i> {{ $h->step_name }}
                                 </span>
                             </div>
