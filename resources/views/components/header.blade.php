@@ -13,6 +13,8 @@ $companyInformation = is_iterable($companyInformation) ? $companyInformation : [
 $userData = $userData ?? session('user_data', session('partaker_user_data', []));
 $userData = is_array($userData) ? $userData : [];
 @endphp
+
+
 <header class="w-full">
     <div class="mx-auto flex gap-3 items-center justify-between py-4 relative">
         <div class="flex flex-row relative items-center">

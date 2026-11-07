@@ -16,6 +16,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Throwable;
+use App\Enums\DesignationType;
 
 class Designations extends Page
 {
@@ -46,6 +47,7 @@ class Designations extends Page
     public string $formName = '';
     public string $formDesc = '';
     public string $formStatus = '';
+    public string $formType = '';
 
     public function mount(): void
     {
@@ -65,6 +67,14 @@ class Designations extends Page
         $this->orgaUin = (string) Session::get('selected_orga_uin');
         $this->resetPage();
         unset($this->designations);
+    }
+
+    #[Computed]
+    public function typeOptions(): array
+    {
+        return collect(DesignationType::cases())
+            ->mapWithKeys(fn($t) => [$t->value => $t->label()])
+            ->all();
     }
 
     #[Computed]
@@ -110,6 +120,7 @@ class Designations extends Page
         $this->formName = $designation->Dsig_Name;
         $this->formDesc = (string) $designation->Dsig_Desp;
         $this->formStatus = (string) $designation->Dsig_Stau;
+        $this->formType = $designation->Dsig_Type?->value ?? '';
         $this->showForm = true;
     }
 
@@ -126,6 +137,7 @@ class Designations extends Page
             'formName' => ['required', 'string', 'max:150'],
             'formDesc' => ['nullable', 'string', 'max:255'],
             'formStatus' => ['required', Rule::in(array_keys($this->statusOptions))],
+            'formType'   => ['required', Rule::enum(DesignationType::class)],
         ]);
 
         $service = app(MastDsigService::class);
@@ -142,6 +154,7 @@ class Designations extends Page
                     'Dsig_Name' => $this->formName,
                     'Dsig_Desp' => $this->formDesc ?: null,
                     'Dsig_Stau' => (int) $this->formStatus,
+                    'Dsig_Type' => $this->formType,
                 ], $this->userUin);
 
                 session()->now('success', 'Designation updated successfully.');
@@ -152,6 +165,7 @@ class Designations extends Page
                     $this->formDesc ?: null,
                     (int) $this->formStatus,
                     $this->userUin,
+                    $this->formType,
                 );
 
                 session()->now('success', 'Designation added successfully.');
@@ -198,7 +212,7 @@ class Designations extends Page
 
     protected function resetForm(): void
     {
-        $this->reset(['showForm', 'editingUin', 'formName', 'formDesc']);
+        $this->reset(['showForm', 'editingUin', 'formName', 'formDesc', 'formType']);
         $this->formStatus = (string) MastDsigService::STATUS_ACTIVE;
         $this->resetErrorBag();
     }

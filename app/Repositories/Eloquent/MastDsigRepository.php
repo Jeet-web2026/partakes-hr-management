@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\DesignationType;
 use App\Models\MastDsig;
 use App\Repositories\Contracts\MastDsigRepositoryInterface;
 use App\Services\ApplicationManagement\MastDsigService;
@@ -72,6 +73,7 @@ class MastDsigRepository implements MastDsigRepositoryInterface
     {
         return $this->baseQuery($orgUin, $search)
             ->where('Dsig_Stau', MastDsigService::STATUS_ACTIVE)
+            ->where('Dsig_Type', DesignationType::Recruitment)
             ->get();
     }
 }

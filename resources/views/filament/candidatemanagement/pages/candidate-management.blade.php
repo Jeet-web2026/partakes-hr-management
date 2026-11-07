@@ -565,6 +565,8 @@
                             </div>
 
                         </div>
+                        
+                        <x-feedback-button page="PAGE_UIN_VALUE" />
 
                     </div>
 

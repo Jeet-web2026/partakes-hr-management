@@ -32,17 +32,29 @@
                 </h1>
                 <div class="mb-6">
                     <label class="block text-white mb-2">Which page are you reviewing?</label>
-                    <select
-                        name="page_uin"
-                        class="w-full rounded-md input px-3 py-2 text-white">
-                        <option value="" class="bg-slate-900" disabled {{ old('page_uin') ? '' : 'selected' }}>Select a page name</option>
-                        @forelse($pages as $page)                        
-                            <option value="{{ $page->Page_UIN }}" class="bg-slate-900 text-white" @selected(old('page_uin')===$page->Page_UIN )>{{ $page->Page_name }}</option>
+                    @php
+                    $isLocked = filled($lockedPageUin);
+                    $selectedPage = $isLocked ? $lockedPageUin : old('page_uin');
+                    @endphp
+
+                    <select id="page_uin"
+                        @unless ($isLocked) name="page_uin" @endunless
+                        @disabled($isLocked)
+                        required
+                        class="input disabled:cursor-not-allowed disabled:opacity-60">
+                        @forelse ($pages as $page)
+                        <option value="{{ $page->Page_UIN }}" class="bg-slate-900 text-white"
+                            @selected((string) $selectedPage===(string) $page->Page_UIN)>
+                            {{ $page->Page_name }}
+                        </option>
                         @empty
-                            <option value="" class="bg-slate-900" disabled>No pages available</option>
+                        <option value="" class="bg-slate-900" disabled>No pages available</option>
                         @endforelse
                     </select>
-                    @error('page_uin') <p class="text-sm text-red-700 mt-1">{{ $message }}</p> @enderror
+
+                    @if ($isLocked)
+                    <input type="hidden" name="page_uin" value="{{ $lockedPageUin }}">
+                    @endif
                 </div>
 
                 <p class="text-white mb-3 text-white">How satisfied were you using this page?</p>
@@ -156,7 +168,7 @@
                                     class="w-full flex items-center justify-between gap-2 rounded-md input px-3 py-2 text-white bg-slate-900 border border-white/10 border-r-0 rounded-r-none">
 
                                     <span class="flex items-center gap-2" x-show="selectedCountry">
-                                        <img :src="`https://flagsapi.com/${selectedCountry?.Code?.trim()}/flat/24.png`" class="w-full h-full object-cover"  loading="lazy">
+                                        <img :src="`https://flagsapi.com/${selectedCountry?.Code?.trim()}/flat/24.png`" class="w-full h-full object-cover" loading="lazy">
                                         <span x-text="selectedCountry?.Name"></span>
                                     </span>
 
@@ -179,21 +191,21 @@
                                             class="flex items-center gap-2 px-3 py-2 text-white cursor-pointer"
                                             :class="selected == country.Admn_Cutr_Mast_UIN && 'bg-slate-800'">
                                             <span class="fi w-5 h-4 inline-block flex-shrink-0 rounded-sm overflow-hidden bg-cover bg-center bg-no-repeat">
-                                                <img :src="`https://flagsapi.com/${country.Code.trim()}/flat/64.png`" class="w-full h-full object-cover"  loading="lazy">
+                                                <img :src="`https://flagsapi.com/${country.Code.trim()}/flat/64.png`" class="w-full h-full object-cover" loading="lazy">
                                             </span>
                                             <span x-text="country.Name"></span>
                                         </li>
                                     </template>
                                 </ul>
                             </div>
-                        <div class="flex-1">
-                            <label class="block text-white mb-2">Present Location Pincode</label>
-                            <input
-                                type="text"
-                                name="pincode"
-                                value="{{ old('pincode') }}"
-                                placeholder="Enter your pin code"
-                                class="w-full rounded-md input pe-3 py-3 text-white placeholder-slate-400 border border-white/10" />
+                            <div class="flex-1">
+                                <label class="block text-white mb-2">Present Location Pincode</label>
+                                <input
+                                    type="text"
+                                    name="pincode"
+                                    value="{{ old('pincode') }}"
+                                    placeholder="Enter your pin code"
+                                    class="w-full rounded-md input pe-3 py-3 text-white placeholder-slate-400 border border-white/10" />
                             </div>
                         </div>
                         @error('pincode') <p class="text-sm text-red-700 mt-1">{{ $message }}</p> @enderror

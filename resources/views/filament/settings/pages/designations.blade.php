@@ -16,7 +16,7 @@
 
             <div class="flex w-full items-center gap-3 sm:w-auto">
 
-            {{-- Rows per page --}}
+                {{-- Rows per page --}}
                 <div class="flex shrink-0 items-center gap-2">
                     <label for="perPage" class="hidden text-xs text-muted-foreground sm:block">Rows</label>
                     <select
@@ -29,7 +29,7 @@
                     </select>
                 </div>
 
-                
+
                 {{-- Search --}}
                 <div class="relative w-full sm:w-auto">
                     <svg
@@ -85,6 +85,7 @@
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <th class="px-5 py-3">Designation</th>
+                        <th class="px-5 py-3">Designation Type</th>
                         <th class="px-5 py-3">Description</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
@@ -95,6 +96,7 @@
                     @forelse ($designations as $designation)
                     <tr wire:key="dsig-{{ $designation->getKey() }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                         <td class="px-5 py-3 whitespace-nowrap font-medium">{{ $designation->Dsig_Name }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap font-medium capitalize">{{ $designation->Dsig_Type }}</td>
                         <td class="px-5 py-3">
                             <div class="line-clamp-2 max-w-2xl text-muted-foreground">{{ $designation->Dsig_Desp ?: '—' }}</div>
                         </td>
@@ -219,8 +221,31 @@
             </div>
 
             <form wire:submit="save" class="space-y-4">
+                <fieldset>
+                    <legend class="mb-1 block text-sm font-medium">
+                        Designation will be created as per <span class="text-red-400">*</span>
+                    </legend>
+
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        @foreach ($this->typeOptions as $value => $label)
+                        <label wire:key="dsig-type-{{ $value }}"
+                            class="flex cursor-pointer items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-sm transition
+                                hover:bg-white/5
+                                has-[:checked]:border-[#3c83f6] has-[:checked]:bg-[#3c83f6]/10
+                                has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-primary">
+                            <input type="radio" wire:model="formType" value="{{ $value }}"
+                                class="h-4 w-4 accent-[#3c83f6]">
+                            <span>{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+
+                    @error('formType')
+                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
+                </fieldset>
                 <div>
-                    <label class="mb-1 block text-sm font-medium">Name <span class="text-red-400">*</span></label>
+                    <label class="mb-1 block text-sm font-medium">Designation <span class="text-red-400">*</span></label>
                     <input
                         type="text"
                         wire:model="formName"
@@ -232,7 +257,7 @@
                 </div>
 
                 <div>
-                    <label class="mb-1 block text-sm font-medium">Description</label>
+                    <label class="mb-1 block text-sm font-medium">Designation Description</label>
                     <textarea
                         wire:model="formDesc"
                         rows="3"

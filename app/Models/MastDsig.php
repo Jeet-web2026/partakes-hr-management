@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DesignationType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,7 @@ class MastDsig extends Model
         'Org_UIN',
         'CrBy',
         'MoBy',
+        'Dsig_Type',
     ];
 
     protected function casts(): array
@@ -33,6 +35,7 @@ class MastDsig extends Model
             'Org_UIN' => 'integer',
             'CrOn' => 'datetime',
             'MoOn' => 'datetime',
+            'Dsig_Type' =>DesignationType::class,
         ];
     }
 

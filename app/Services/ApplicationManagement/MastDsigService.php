@@ -51,7 +51,7 @@ class MastDsigService
         );
     }
 
-    public function create(string $orgUin, string $name, ?string $description, int $status, string $userUin): MastDsig
+    public function create(string $orgUin, string $name, ?string $description, int $status, string $userUin, string $designationType): MastDsig
     {
         return $this->designations->create([
             'Dsig_Name' => $name,
@@ -60,6 +60,7 @@ class MastDsigService
             'Org_UIN' => (int) $orgUin,
             'CrBy' => (int) $userUin,
             'MoBy' => (int) $userUin,
+            'Dsig_Type' => $designationType
         ]);
     }
 
