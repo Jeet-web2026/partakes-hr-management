@@ -63,7 +63,7 @@ class MastIntvStepService
                         'Intv_Step_Numb'             => $stepNumber,
                         'Intv_Step_Name'             => null,
                         'Intv_Step_Placeholder_Type' => $step,
-                        'Intv_Step_Stau'             => 100201,
+                        'Intv_Step_Stau'             => 100202,
                         'Orga_UIN'                   => $orgaUin,
                         'Cr_By'                      => $userId,
                         'Mo_By'                      => $userId,
