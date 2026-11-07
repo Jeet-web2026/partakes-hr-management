@@ -55,25 +55,28 @@
             </div>
 
             {{-- Add --}}
-            <button
-                type="button"
-                wire:click="openCreate"
-                aria-label="Add Question"
-                title="Add Question"
-                class="inline-flex h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2">
-                    <path d="M5 12h14" />
-                    <path d="M12 5v14" />
-                </svg>
-                <span class="hidden sm:inline">Add</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <button
+                    type="button"
+                    wire:click="openCreate"
+                    aria-label="Add Question"
+                    title="Add Question"
+                    class="inline-flex h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white hover:bg-[#3c83f6]/90 transition">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
+                    <span class="hidden sm:inline">Add</span>
+                </button>
+                <x-feedback-button page="PAGE_UIN_VALUE" />
+            </div>
         </div>
 
         <x-globalresponse />
@@ -300,8 +303,6 @@
         </div>
     </div>
     @endif
-
-    <x-feedback-button page="PAGE_UIN_VALUE" />
 
     <script>
         var AGREEMENTS_URL = "{{ route('agreements-name.data') }}";
