@@ -230,7 +230,7 @@ $assets = [
             const stepSelect = document.getElementById('step');
             const urlTemplate = stageSelect.dataset.stepsUrl;
 
-            stageSelect.addEventListener('change', async () => {
+            async function loadSteps(selectedStep = '') {
                 const stageId = stageSelect.value;
 
                 stepSelect.innerHTML = '';
@@ -257,7 +257,12 @@ $assets = [
                     if (Array.isArray(steps)) {
                         steps.forEach(s => {
                             if (!s.Intv_Step_Name) return;
-                            const opt = new Option(s.Intv_Step_Name, s.Intv_Step_UIN);
+                            const opt = new Option(
+                                s.Intv_Step_Name,
+                                s.Intv_Step_UIN,
+                                false,
+                                String(s.Intv_Step_UIN) === String(selectedStep)
+                            );
                             opt.className = 'bg-slate-900';
                             stepSelect.add(opt);
                         });
@@ -265,10 +270,15 @@ $assets = [
                 } catch (e) {
                     console.error(e);
                 } finally {
-                    // enabled only if at least one option was added
                     stepSelect.disabled = stepSelect.options.length === 0;
                 }
-            });
+            }
+
+            // on stage change: no preselected step
+            stageSelect.addEventListener('change', () => loadSteps());
+
+            // on page load: keep the saved step
+            loadSteps(stepSelect.dataset.selected || '');
         });
     </script>
     @endsection
