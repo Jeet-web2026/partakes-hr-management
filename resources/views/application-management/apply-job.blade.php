@@ -70,7 +70,8 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
         <form method="POST"
             action="{{ route('application-management.store', ['token' => $token, 'orguin' => $orguin]) }}"
             enctype="multipart/form-data"
-            class="space-y-6">
+            class="space-y-6"
+            id="application-form">
             @csrf
 
             {{-- Personal details --}}
@@ -367,6 +368,48 @@ $yesNo = ['1' => 'Yes', '0' => 'No'];
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('application-form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            let confirmed = false;
+
+            form.addEventListener('submit', (e) => {
+                if (confirmed) return;
+
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Submit application?',
+                    text: 'Please check your details. You cannot edit the application after it is submitted.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, submit',
+                    cancelButtonText: 'Review again',
+                    reverseButtons: true,
+                    focusCancel: true,
+                    background: '#111a2b',
+                    color: '#f1f5f9',
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#475569',
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        // "Review again" or dialog dismissed: make sure the button is usable
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                        return;
+                    }
+
+                    confirmed = true;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Submitting...';
+                    form.submit();
+                });
+            });
+        });
+    </script>
     <script>
         (function() {
             var form = document.querySelector('form');
