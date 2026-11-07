@@ -197,7 +197,10 @@ $assets = [
     </main>
 
     @section('extracsscdns')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css">
+    <script src="{{ asset('assets/header-functionality.js') }}"></script>
+    <script src="{{ asset('assets/common.js') }}"></script>
     @endsection
 
     @section('extrajs')
