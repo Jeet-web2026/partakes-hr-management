@@ -87,16 +87,6 @@ class MastIntvStepService
         if (array_key_exists('Intv_Step_Name', $changes)) {
             $names = $changes['Intv_Step_Name'];
 
-            if (is_array($names)) {
-                $names = array_map(fn($n) => trim((string) $n), array_values($names));
-
-                if (collect($names)->every(fn($n) => $n === '')) {
-                    $names = null;
-                }
-            } else {
-                $names = null;
-            }
-
             $changes['Intv_Step_Name'] = $names;
         }
 

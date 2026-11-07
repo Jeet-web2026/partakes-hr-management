@@ -41,7 +41,11 @@ class InterviewSteps extends Page
     #[Locked]
     public ?string $editingUin = null;
 
-    /** Default step names, display-only; locked so the client can't change them. */
+    /** Intv_Step_UINs being edited, in display order; locked so the client can't change them. */
+    #[Locked]
+    public array $editStepUins = [];
+
+    /** Default step names (Intv_Step_Placeholder_Type), display-only. */
     #[Locked]
     public array $editPlaceholders = [];
 
@@ -51,10 +55,10 @@ class InterviewSteps extends Page
 
     public string $search = '';
 
-    /** User-defined names, same positions as $editPlaceholders. */
+    /** Saved names (Intv_Step_Name), same positions as $editStepUins ('' = not set). */
     public array $editNames = [];
 
-    /** Status (Stau_UIN) per step row, same positions as $editPlaceholders. */
+    /** Status (Stau_UIN) per row, same positions as $editStepUins. */
     public array $editStatuses = [];
 
     public function mount(): void
@@ -79,47 +83,61 @@ class InterviewSteps extends Page
 
         return $steps
             ->filter(function ($step) use ($term) {
-                $names = $step->name_list;
+                $names = (array) $step->Intv_Step_Name;
 
-                return collect($step->placeholder_list)
+                return collect((array) $step->placeholder_list)
                     ->map(fn($placeholder, $i) => filled($names[$i] ?? null) ? $names[$i] : $placeholder)
                     ->contains(fn($name) => str_contains(mb_strtolower((string) $name), $term));
             })
             ->values();
     }
 
-    public function openEdit(string $uin): void
+    /** Stau_UIN => Stau_Name, used by the table badge and the modal dropdown. */
+    #[Computed]
+    public function statusLabels(): array
     {
-        $step = $this->findStep($uin);
-
-        $this->editingUin = $step->getKey();
-        $this->editStage  = $step->Intv_Stage !== null ? (string) $step->Intv_Stage : null;
-
-        $this->editPlaceholders = MastIntvStep::query()
-            ->where('Intv_Stage', $step->Intv_Stage)
-            ->pluck('Intv_Step_Placeholder_Type')
-            ->values()
-            ->all();
-
-        $names = (array) $step->name_list;
-
-        $this->editNames = collect($this->editPlaceholders)
-            ->keys()
-            ->map(fn($i) => (string) ($names[$i] ?? ''))
-            ->all();
-
-        // One status per row; falls back to the opened step's status if a row has no record.
-        $related = $this->findrelatedSteps((string) $step->Intv_Stage)->values();
-
-        $this->editStatuses = collect($this->editPlaceholders)
-            ->keys()
-            ->map(fn($i) => (string) ($related[$i]->Intv_Step_Stau ?? $step->Intv_Step_Stau))
-            ->all();
-
-        $this->statusOptions = MastStau::query()
+        return MastStau::query()
             ->whereIn('Stau_Name', ['Active', 'Inactive'])
             ->pluck('Stau_Name', 'Stau_UIN')
             ->all();
+    }
+
+    #[Computed]
+    public function stages(): Collection
+    {
+        return InterviewStep::query()
+            ->forOrganisation($this->orgaUin)
+            ->orderBy('Stage_Name')
+            ->get();
+    }
+
+    public function openEdit(string $uin): void
+    {
+        $clicked = $this->findStep($uin);
+
+        // One DB row per step in this stage, in step order.
+        $rows = MastIntvStep::query()
+            ->where('Intv_Stage', $clicked->Intv_Stage)
+            ->orderBy('Intv_Step_Numb')
+            ->get();
+
+        $this->editingUin       = (string) $clicked->getKey();
+        $this->editStage        = $clicked->Intv_Stage !== null ? (string) $clicked->Intv_Stage : null;
+        $this->editStepUins     = $rows->pluck('Intv_Step_UIN')->map(fn($v) => (string) $v)->values()->all();
+        $this->editPlaceholders = $rows->pluck('Intv_Step_Placeholder_Type')->values()->all();
+
+        // Saved name -> shown as value; empty -> placeholder hint shows.
+        $this->editNames = $rows
+            ->map(fn($row) => trim((string) $row->Intv_Step_Name))
+            ->values()
+            ->all();
+
+        $this->editStatuses = $rows
+            ->map(fn($row) => (string) $row->Intv_Step_Stau)
+            ->values()
+            ->all();
+
+        $this->statusOptions = $this->statusLabels;
 
         $this->resetErrorBag();
     }
@@ -128,6 +146,7 @@ class InterviewSteps extends Page
     {
         $this->reset([
             'editingUin',
+            'editStepUins',
             'editNames',
             'editStatuses',
             'editPlaceholders',
@@ -140,7 +159,7 @@ class InterviewSteps extends Page
 
     public function save(): void
     {
-        $count = count($this->editPlaceholders);
+        $count = count($this->editStepUins);
 
         $this->validate([
             'editNames'      => ['required', 'array', 'size:' . $count],
@@ -156,36 +175,41 @@ class InterviewSteps extends Page
             'editStatuses.*.in'       => 'Invalid status selected.',
         ]);
 
-        $names = collect($this->editPlaceholders)
-            ->map(function ($placeholder, $i) {
-                $name = trim((string) ($this->editNames[$i] ?? ''));
-
-                return $name !== '' ? $name : trim((string) $placeholder);
-            })
+        // Blank stays blank (placeholder is only a hint, never saved as a name).
+        $names = collect($this->editStepUins)
+            ->keys()
+            ->map(fn($i) => trim((string) ($this->editNames[$i] ?? '')))
             ->values()
             ->all();
 
-        if (count($names) !== count(array_unique(array_map('mb_strtolower', $names)))) {
+        $filled = array_filter($names, fn($n) => $n !== '');
+
+        if (count($filled) !== count(array_unique(array_map('mb_strtolower', $filled)))) {
             $this->addError('editNames', 'Step names must be unique.');
             return;
         }
 
-        $steps = $this->findrelatedSteps((string) $this->editStage)->values();
+        $rows = MastIntvStep::query()
+            ->whereIn('Intv_Step_UIN', $this->editStepUins)
+            ->get()
+            ->keyBy(fn($row) => (string) $row->Intv_Step_UIN);
 
-        if ($steps->count() !== $count) {
+        if ($rows->count() !== $count) {
             $this->addError('editNames', 'Steps changed while editing. Please close and reopen.');
             return;
         }
 
         try {
-            DB::transaction(function () use ($steps, $names) {
+            DB::transaction(function () use ($rows, $names) {
                 $service = app(MastIntvStepService::class);
 
-                foreach ($steps as $i => $step) {
+                foreach ($this->editStepUins as $i => $stepUin) {
+                    $step = $rows[$stepUin];
+
                     $service->updateStep($step, [
-                        'Intv_Step_Name' => $names[$i],               // this row's name
+                        'Intv_Step_Name' => $names[$i],               // this row's name ('' allowed)
                         'Intv_Step_Stau' => $this->editStatuses[$i],  // this row's status
-                        'Intv_Stage'     => $this->editStage,
+                        'Intv_Stage'     => $step->Intv_Stage,        // keep each row's own stage
                     ], $this->userUin);
                 }
             });
@@ -213,25 +237,5 @@ class InterviewSteps extends Page
         abort_unless($step, 404);
 
         return $step;
-    }
-
-    protected function findrelatedSteps(string $intStageUIN): Collection
-    {
-        $steps = app(MastIntvStepService::class)
-            ->listForOrganisation($this->orgaUin)
-            ->where('Intv_Stage', $intStageUIN);
-
-        abort_unless($steps->isNotEmpty(), 404);
-
-        return $steps;
-    }
-
-    #[Computed]
-    public function stages(): Collection
-    {
-        return InterviewStep::query()
-            ->forOrganisation($this->orgaUin)
-            ->orderBy('Stage_Name')
-            ->get();
     }
 }

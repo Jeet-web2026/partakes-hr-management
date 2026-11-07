@@ -295,16 +295,19 @@
                         <td class="px-5 py-3 whitespace-nowrap align-top">Step {{ $step->Intv_Step_Numb }}</td>
 
                         <td class="px-5 py-3">
+                            @php $names = (array) $step->Intv_Step_Name; @endphp
+
                             <div class="flex flex-wrap gap-1.5">
                                 @foreach ((array) $step->placeholder_list as $j => $placeholder)
                                 @php $custom = filled($names[$j] ?? null); @endphp
+
                                 <span
                                     wire:key="step-{{ $step->Intv_Step_UIN }}-{{ $j }}"
                                     class="inline-flex items-center rounded border px-2.5 py-0.5 text-xs font-medium
-                                            {{ $custom
-                                                ? 'border-[#3c83f6]/30 bg-[#3c83f6]/15 text-[#3c83f6]'
-                                                : 'border-white/10 bg-white/5 text-muted-foreground' }}">
-                                    {{ $custom ? $names[$i] : "e.g. " . $placeholder }}
+                                    {{ $custom
+                                        ? 'border-[#3c83f6]/30 bg-[#3c83f6]/15 text-[#3c83f6]'
+                                        : 'border-white/10 bg-white/5 text-muted-foreground' }}">
+                                    {{ $custom ? $names[$j] : 'e.g. ' . $placeholder }}
                                 </span>
                                 @endforeach
                             </div>
@@ -314,9 +317,9 @@
 
                         <td class="px-5 py-3 align-top">
                             @if ($step->Intv_Step_Stau === 100201)
-                                <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
+                            <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
                             @else
-                                <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
+                            <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
                             @endif
                         </td>
 
@@ -340,7 +343,7 @@
                                     @click.outside="open = false"
                                     x-transition.origin.top.right
                                     class="absolute right-0 z-40 mt-1 w-44 rounded-md border border-white/10 bg-card py-1 shadow-xl">
-                                    
+
                                     @if ($stageActive)
                                     <button
                                         type="button"
@@ -388,26 +391,26 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="closeEdit">
         <div class="w-full max-w-3xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-base font-semibold">Edit interview steps</h3>
                 <button type="button" wire:click="closeEdit"
-                    class="h-8 w-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+                    class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
             <form wire:submit="save" class="space-y-4">
+
+                {{-- Stage (read-only: the rows belong to this stage) --}}
                 <div>
                     <label class="mb-1 block text-sm font-medium">Stage</label>
                     <select
                         wire:model="editStage"
-                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                        disabled
+                        class="h-10 w-full cursor-not-allowed rounded-md border border-white/10 bg-transparent px-3 text-sm text-white opacity-70 focus:outline-none">
                         @foreach ($this->stages as $stage)
-                        <option
-                            value="{{ $stage->Stage_UIN }}"
-
-                            @selected((string) $stage->Stage_UIN === (string) $editStage)
-                            class="bg-slate-800">
+                        <option value="{{ $stage->Stage_UIN }}" class="bg-slate-800">
                             {{ $stage->Stage_Name }}
                         </option>
                         @endforeach
@@ -417,18 +420,21 @@
                     @enderror
                 </div>
 
-                <div class="h-[300px] overflow-y-auto">
+                {{-- Steps (scrollable) --}}
+                <div class="h-[300px] overflow-y-auto pr-1">
                     <p class="mb-2 text-sm font-medium">Steps</p>
+
                     <div class="grid grid-cols-1 gap-2">
-                        @foreach ($editPlaceholders as $i => $placeholder)
-                        <div wire:key="step-row-{{ $i }}" class="flex items-start gap-3">
-                            {{-- Left: step name --}}
+                        @foreach ($editStepUins as $i => $stepUin)
+                        <div wire:key="step-row-{{ $stepUin }}" class="flex items-start gap-3">
+
+                            {{-- Left: saved name or placeholder hint --}}
                             <div class="min-w-0 flex-1">
                                 <textarea
                                     wire:model="editNames.{{ $i }}"
                                     rows="2"
                                     maxlength="100"
-                                    placeholder="e.g. {{ $placeholder }}"
+                                    placeholder="e.g. {{ $editPlaceholders[$i] ?? '' }}"
                                     class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
                                 @error('editNames.' . $i)
                                 <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
@@ -451,18 +457,22 @@
                         </div>
                         @endforeach
                     </div>
+
                     @error('editNames')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 
+                {{-- Actions --}}
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" wire:click="closeEdit"
-                        class="px-3 py-2 rounded border border-white/10 text-sm hover:bg-white/5">
+                        class="rounded border border-white/10 px-3 py-2 text-sm hover:bg-white/5">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="px-3 py-2 rounded bg-[#3c83f6] text-white text-sm hover:bg-[#3c83f6]/90">
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                        class="rounded bg-[#3c83f6] px-3 py-2 text-sm text-white hover:bg-[#3c83f6]/90 disabled:opacity-60">
                         Save
                     </button>
                 </div>
