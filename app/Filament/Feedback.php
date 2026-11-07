@@ -19,6 +19,8 @@ class Feedback extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected string $view = 'filament.dashboard.pages.feedback';
 
     public string $userUin;
