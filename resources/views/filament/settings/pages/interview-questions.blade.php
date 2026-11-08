@@ -311,8 +311,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
     <script src="{{ asset('assets/header-functionality.js') }}"></script>
     <script src="{{ asset('assets/common.js') }}"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     @assets
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
