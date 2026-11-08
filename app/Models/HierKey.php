@@ -50,4 +50,9 @@ class HierKey extends Model
     {
         return $this->belongsTo(User::class, 'DeBy');
     }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(MastStat::class, 'Stau_UIN', 'Stat_UIN');
+    }
 }

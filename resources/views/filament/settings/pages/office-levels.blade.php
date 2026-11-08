@@ -101,7 +101,7 @@
                         </td>
 
                         <td class="px-5 py-3 align-top">
-                            @if ($row->Stau_UIN === 1)
+                            @if ($row->Stau_UIN === 100201)
                             <span class="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Active</span>
                             @else
                             <span class="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Inactive</span>
@@ -226,8 +226,8 @@
                     <select
                         wire:model="formStatus"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary [&>option]:bg-gray-900">
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
+                        <option value="100201">Active</option>
+                        <option value="100202">Inactive</option>
                     </select>
                     @error('formStatus')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>

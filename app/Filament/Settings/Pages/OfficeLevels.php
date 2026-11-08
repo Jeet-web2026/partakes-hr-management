@@ -50,7 +50,7 @@ class OfficeLevels extends Page
     public string $levelFilter = '';
     public string $formLevel = '';
     public string $formName = '';
-    public string $formStatus = '1';
+    public string $formStatus = '100201';
 
     public function mount(): void
     {
@@ -167,7 +167,7 @@ class OfficeLevels extends Page
         $this->validate([
             'formLevel' => ['required', Rule::in(array_column(OfficeLevel::cases(), 'value'))],
             'formName' => ['required', 'string', 'max:100'],
-            'formStatus' => ['required', Rule::in(['1', '0'])],
+            'formStatus' => ['required', Rule::in(['100201', '100202'])],
         ]);
 
         $service = app(MastHierKeyService::class);
@@ -251,7 +251,7 @@ class OfficeLevels extends Page
     protected function resetForm(): void
     {
         $this->reset(['showForm', 'editingUin', 'formLevel', 'formName']);
-        $this->formStatus = '1';
+        $this->formStatus = '100201';
         $this->resetErrorBag();
 
         unset($this->availableLevels);

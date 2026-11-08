@@ -13,7 +13,7 @@ class MastHierKeyService
     public function listForOrganisation(string $orgaUin, string $search = '', ?OfficeLevel $level = null): Collection
     {
         return HierKey::query()
-            ->with(['creator', 'modifier'])
+            ->with(['creator', 'modifier', 'status'])
             ->where('Orga_UIN', $orgaUin)
             ->when($search !== '', fn($q) => $q->where('Hiky_Levl_Name', 'like', "%{$search}%"))
             ->when($level, fn($q) => $q->where('Hiky_Levl', $level->value))
