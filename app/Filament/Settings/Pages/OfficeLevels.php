@@ -23,7 +23,7 @@ class OfficeLevels extends Page
 {
     use HasCompanyHeader, WithPagination;
 
-    protected static ?string $navigationLabel = 'Office Level';
+    protected static ?string $navigationLabel = 'Office Type';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
     protected static ?int $navigationSort = 13;
     protected static ?string $slug = 'office-levels';
@@ -135,7 +135,7 @@ class OfficeLevels extends Page
         $this->resetForm();
 
         if (count($this->availableLevels) === 0) {
-            session()->now('error', 'All office levels have already been created.');
+            session()->now('error', 'All office types have already been created.');
 
             return;
         }
@@ -180,7 +180,7 @@ class OfficeLevels extends Page
                     'Stau_UIN' => (int) $this->formStatus,
                 ], $this->userUin);
 
-                $message = 'Office level updated successfully.';
+                $message = 'Office type updated successfully.';
             } else {
                 $service->create(
                     $this->orgaUin,
@@ -190,7 +190,7 @@ class OfficeLevels extends Page
                     $this->userUin,
                 );
 
-                $message = 'Office level added successfully.';
+                $message = 'Office type added successfully.';
             }
         } catch (ValidationException $e) {
             // Duplicate level for this organisation: show it under the field
@@ -198,7 +198,7 @@ class OfficeLevels extends Page
             return;
         } catch (Throwable $e) {
             report($e);
-            session()->now('error', 'Could not save the office level. Please try again.');
+            session()->now('error', 'Could not save the office type. Please try again.');
             return;
         }
 
@@ -232,7 +232,7 @@ class OfficeLevels extends Page
         } catch (Throwable $e) {
             report($e);
             $this->deletingUin = null;
-            session()->now('error', 'Could not delete the office level. Please try again.');
+            session()->now('error', 'Could not delete the Office Type. Please try again.');
 
             return;
         }
@@ -245,7 +245,7 @@ class OfficeLevels extends Page
             unset($this->levels);
         }
 
-        session()->now('success', 'Office level deleted successfully.');
+        session()->now('success', 'Office type deleted successfully.');
     }
 
     protected function resetForm(): void
