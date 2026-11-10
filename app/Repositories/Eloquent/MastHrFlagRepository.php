@@ -15,6 +15,7 @@ class MastHrFlagRepository implements MastHrFlagRepositoryInterface
 
         return MastHrFlag::query()
             ->forOrganisation($orgaUin)
+            ->available()
             ->when($stage, fn(Builder $q) => $q->where('hr_flag_stge_name', $stage))
             ->when($term !== '', fn(Builder $q) => $q->whereRaw(
                 'LOWER(hr_flag_name) LIKE ?',

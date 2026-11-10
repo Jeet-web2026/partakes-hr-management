@@ -5,6 +5,7 @@ namespace App\Filament\Settings\Pages;
 use App\Enums\HrFlagStage;
 use App\Enums\InterviewStepStatus;
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
+use App\Models\MastHrFlag;
 use App\Services\ApplicationManagement\MastHrFlagService;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -44,6 +45,8 @@ class CandidateFlags extends Page
 
     #[Locked]
     public ?string $deletingUin = null;
+
+    public ?array $placeHolderStages = null;
 
     public bool $showForm = false;
     public string $search = '';
@@ -111,6 +114,7 @@ class CandidateFlags extends Page
     {
         $this->resetForm();
         $this->formStage = HrFlagStage::cases()[0]->value;
+        $this->placeHolderStages = MastHrFlag::forOrganisation($this->orgaUin)->pluck('hr_flag_placeholder')->toArray();
         $this->showForm = true;
     }
 

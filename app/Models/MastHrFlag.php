@@ -31,6 +31,7 @@ class MastHrFlag extends Model
         'Cr_By',
         'Mo_By',
         'Del_By',
+        'is_available'
     ];
 
     protected function casts(): array
@@ -40,6 +41,7 @@ class MastHrFlag extends Model
             'hr_flag_stau' => InterviewStepStatus::class,
             'Cr_On' => 'datetime',
             'Mo_On' => 'datetime',
+            'is_available' => 'boolean'
         ];
     }
 
@@ -85,5 +87,10 @@ class MastHrFlag extends Model
     public function forgetQuestionCache(): void
     {
         Cache::clear();
+    }
+
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query->where('is_available', true);
     }
 }

@@ -62,6 +62,7 @@ class MastHrFlagService
                         'Orga_UIN' => $orgaUin,
                         'Cr_By' => $userId,
                         'Mo_By' => $userId,
+                        'is_available' => 0
                     ]);
                 }
             }

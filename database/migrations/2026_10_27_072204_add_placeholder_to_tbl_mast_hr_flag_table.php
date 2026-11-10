@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('tbl_mast_hr_flag', function (Blueprint $table) {
             $table->string('hr_flag_placeholder')->nullable()->after('hr_flag_name');
             $table->string('hr_flag_name')->nullable()->change();
+            $table->boolean('is_available')->default(1);
         });
     }
 

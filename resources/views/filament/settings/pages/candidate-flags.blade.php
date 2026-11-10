@@ -57,7 +57,7 @@
             </div>
 
             {{-- Add --}}
-            <div  class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 <button
                     type="button"
                     wire:click="openCreate"
@@ -272,6 +272,7 @@
                                 type="text"
                                 wire:model="formName"
                                 maxlength="100"
+                                placeholder="{{ $editingUin ? '' : 'e.g. ' . collect($this->placeHolderStages)->take(3)->implode(', ') }}"
                                 class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
                             @error('formName')
                             <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
