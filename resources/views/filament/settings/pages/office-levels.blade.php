@@ -34,7 +34,7 @@
                         <input
                             type="text"
                             wire:model.live.debounce.300ms="search"
-                            placeholder="Search level name…"
+                            placeholder="Search type name…"
                             class="h-9 w-[200px] sm:w-[250px] lg:w-[350px] rounded-md border border-white/10 bg-transparent pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary">
                     </div>
 
@@ -192,11 +192,11 @@
 
                 {{-- Level: only levels not yet created (plus the current one when editing) --}}
                 <div>
-                    <label class="mb-1 block text-sm font-medium">Level</label>
+                    <label class="mb-1 block text-sm font-medium">Parent Office</label>
                     <select
                         wire:model.live="formLevel"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary [&>option]:bg-slate-900" {{ $editingUin ? 'disabled' : '' }}>
-                        <option value="">Select level</option>
+                        <option value="">Select parent office</option>
                         @foreach ($this->availableLevels as $level)
                         <option value="{{ $level->value }}" class="bg-slate-900">{{ $level->value }} - {{ $level->label() }}</option>
                         @endforeach
@@ -208,7 +208,7 @@
 
                 {{-- Level name --}}
                 <div>
-                    <label class="mb-1 block text-sm font-medium">Level Name</label>
+                    <label class="mb-1 block text-sm font-medium">New Office Type Name</label>
                     <input
                         type="text"
                         wire:model="formName"
