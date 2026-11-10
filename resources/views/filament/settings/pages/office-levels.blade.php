@@ -57,8 +57,8 @@
                         type="button"
                         wire:click="openCreate"
                         @disabled($allLevelsCreated)
-                        aria-label="Add Office Level"
-                        title="{{ $allLevelsCreated ? 'All office levels have already been created' : 'Add Office Level' }}"
+                        aria-label="Add Office Type"
+                        title="{{ $allLevelsCreated ? 'All office types have already been created' : 'Add Office Type' }}"
                         class="inline-flex h-9 w-9 sm:w-auto sm:px-4 items-center justify-center gap-2 rounded-md bg-[#3c83f6] text-sm font-medium text-white transition hover:bg-[#3c83f6]/90 disabled:cursor-not-allowed disabled:opacity-40">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +180,7 @@
 
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-base font-semibold">
-                    {{ $editingUin ? 'Edit office level' : 'Add office level' }}
+                    {{ $editingUin ? 'Edit office type' : 'Add office type' }}
                 </h3>
                 <button type="button" wire:click="closeForm"
                     class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
@@ -258,9 +258,9 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="cancelDelete">
         <div class="w-full max-w-sm rounded-xl border border-white/10 bg-card p-5 shadow-xl">
-            <h3 class="text-base font-semibold">Delete office level?</h3>
+            <h3 class="text-base font-semibold">Delete office type?</h3>
             <p class="mt-2 text-sm text-muted-foreground">
-                The level will be removed from this list. It can't be deleted while offices still use it.
+                The office type will be removed from this list. It can't be deleted while offices still use it.
             </p>
 
             <div class="mt-4 flex justify-end gap-2">
