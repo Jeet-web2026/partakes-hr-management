@@ -2,7 +2,7 @@
     <main class="mt-8">
 
         <!-- Toolbar -->
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-3 mb-3">
             <div class="flex items-center justify-between gap-3">
 
                 {{-- Left side --}}
@@ -41,7 +41,7 @@
                     {{-- Level filter (all levels, so existing rows can be filtered) --}}
                     <select
                         wire:model.live="levelFilter"
-                        class="h-9 rounded-md border border-white/10 bg-transparent px-2 text-sm text-white focus:outline-none">
+                        class="h-9 rounded-md border hidden border-white/10 bg-transparent px-2 text-sm text-white focus:outline-none">
                         <option value="" class="bg-slate-800">All levels</option>
                         @foreach (\App\Enums\OfficeLevel::cases() as $level)
                         <option value="{{ $level->value }}" class="bg-slate-800">{{ $level->label() }}</option>
@@ -77,12 +77,12 @@
         <x-globalresponse />
 
         <!-- Table -->
-        <div class="mt-3 rounded-xl border border-white/10 bg-card overflow-x-auto">
+        <div class="rounded-xl border border-white/10 bg-card overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        <th class="px-5 py-3">Type</th>
                         <th class="px-5 py-3">Type Name</th>
+                        <th class="px-5 py-3">Parent Office</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3">Created By</th>
                         <th class="px-5 py-3">Created On</th>
@@ -93,11 +93,29 @@
                 <tbody>
                     @forelse ($this->levels as $row)
                     <tr wire:key="level-{{ $row->Hiky_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
-                        <td class="px-5 py-3 whitespace-nowrap align-top">Type {{ $row->Hiky_Levl }}</td>
 
                         <td class="px-5 py-3 align-top">
+                            {{ $row->Hiky_Levl_Name }}
+                        </td>
+                        <td class="px-5 py-3 align-top">
                             <span class="inline-flex items-center rounded border border-[#3c83f6]/30 bg-[#3c83f6]/15 px-2.5 py-0.5 text-xs font-medium text-[#3c83f6]">
-                                {{ $row->Hiky_Levl_Name }}
+                                @if ($row->Hiky_Levl == 1)
+                                Primary
+                                @elseif ($row->Hiky_Levl == 2)
+                                Global Office
+                                @elseif ($row->Hiky_Levl == 3)
+                                Continental Office
+                                @elseif ($row->Hiky_Levl == 4)
+                                Country Head Office
+                                @elseif ($row->Hiky_Levl == 5)
+                                Registered Office
+                                @elseif ($row->Hiky_Levl == 6)
+                                Local Head Office
+                                @elseif ($row->Hiky_Levl == 7)
+                                Zonal Head Office
+                                @else
+                                -
+                                @endif
                             </span>
                         </td>
 
@@ -114,7 +132,7 @@
                         </td>
 
                         <td class="px-5 py-3 whitespace-nowrap align-top text-muted-foreground">
-                           {{ $row->CrOn?->format('d M Y H:i') }}
+                            {{ $row->CrOn?->format('d M Y H:i') }}
                         </td>
 
                         <td class="px-5 py-3 text-right align-top">
