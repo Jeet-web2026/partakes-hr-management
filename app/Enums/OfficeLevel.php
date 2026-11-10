@@ -15,13 +15,13 @@ enum OfficeLevel: int
     public function label(): string
     {
         return match ($this) {
-            self::Global => 'Global Office',
-            self::Continental => 'Continental Office',
-            self::CountryHead => 'Country Head Office',
-            self::Registered => 'Registered Office',
-            self::LocalHead => 'Local Head Office',
-            self::ZonalHead => 'Zonal Head Office',
-            self::Branch => 'Branch Office',
+            self::Global => 'Global Office <  Primary',
+            self::Continental => 'Continental Office < Global Office',
+            self::CountryHead => 'Country Head Office < Continental Office',
+            self::Registered => 'Registered Office < Country Head Office',
+            self::LocalHead => 'Local Head Office < Registered Office',
+            self::ZonalHead => 'Zonal Head Office < Local Head Office',
+            self::Branch => 'Branch Office < Zonal Head Office',
         };
     }
 }

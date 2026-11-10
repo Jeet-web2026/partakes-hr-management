@@ -196,9 +196,9 @@
                     <select
                         wire:model.live="formLevel"
                         class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary [&>option]:bg-slate-900" {{ $editingUin ? 'disabled' : '' }}>
-                        <option value="">Select parent office</option>
+                        <option value="">Select Parent Office</option>
                         @foreach ($this->availableLevels as $level)
-                        <option value="{{ $level->value }}" class="bg-slate-900">{{ $level->value }} - {{ $level->label() }}</option>
+                        <option value="{{ $level->value }}" class="bg-slate-900">{{ $level->label() }}</option>
                         @endforeach
                     </select>
                     @error('formLevel')
