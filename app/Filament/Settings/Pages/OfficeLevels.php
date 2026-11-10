@@ -26,12 +26,12 @@ class OfficeLevels extends Page
     protected static ?string $navigationLabel = 'Office Type';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
     protected static ?int $navigationSort = 13;
-    protected static ?string $slug = 'office-levels';
+    protected static ?string $slug = 'office-types';
     public const PER_PAGE_OPTIONS = [50, 100, 250];
 
     public int $perPage = 50;
 
-    protected string $view = 'filament.settings.pages.office-levels';
+    protected string $view = 'filament.settings.pages.office-types';
 
     #[Locked]
     public string $userUin = '';

@@ -69,6 +69,7 @@
                         </svg>
                         <span class="hidden sm:inline">Add</span>
                     </button>
+                    <x-feedback-button page="10000018" />
                 </div>
             </div>
         </div>

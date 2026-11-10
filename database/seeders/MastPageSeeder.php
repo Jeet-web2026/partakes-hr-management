@@ -31,7 +31,7 @@ class MastPageSeeder extends Seeder
         $pageC = [100213, 100213, 100213, 100213, 100211, 100211, 100213, 100213, 100213, 100213, 100213];
         $pageD = [100211, 100213, 100213, 100213, 100213, 100213, 100213, 100213, 100213, 100213, 100213];
 
-        // permissions for the six new settings/management pages (placeholder: same as $pageA)
+        // permissions for the new settings/management pages (placeholder: same as $pageA)
         $pageNew = $pageA;
 
         // [uin, name, description, hit, wallet points, rate points, permission values]
@@ -56,6 +56,7 @@ class MastPageSeeder extends Seeder
             [10000015, 'Designations',         'Manage designations',              0, 0, 0, $pageNew],
             [10000016, 'Interview Questions',  'Manage interview questions',       0, 0, 0, $pageNew],
             [10000017, 'Candidate Flags',      'Manage candidate flags',           0, 0, 0, $pageNew],
+            [10000018, 'Office Types',         'Manage office types',              0, 0, 0, $pageNew],
         ];
 
         $rows = array_map(function (array $p) {
