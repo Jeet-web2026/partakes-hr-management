@@ -81,8 +81,8 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        <th class="px-5 py-3">Level</th>
-                        <th class="px-5 py-3">Level Name</th>
+                        <th class="px-5 py-3">Type</th>
+                        <th class="px-5 py-3">Type Name</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3">Created By</th>
                         <th class="px-5 py-3">Created On</th>
@@ -93,7 +93,7 @@
                 <tbody>
                     @forelse ($this->levels as $row)
                     <tr wire:key="level-{{ $row->Hiky_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
-                        <td class="px-5 py-3 whitespace-nowrap align-top">Level {{ $row->Hiky_Levl }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap align-top">Type {{ $row->Hiky_Levl }}</td>
 
                         <td class="px-5 py-3 align-top">
                             <span class="inline-flex items-center rounded border border-[#3c83f6]/30 bg-[#3c83f6]/15 px-2.5 py-0.5 text-xs font-medium text-[#3c83f6]">
