@@ -18,13 +18,46 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
         }
     </style>
-    <div class="min-h-screen py-6 w-full rounded text-white">
+
+    {{-- NEW: hide the dashboard chrome when shown inside the feedback modal --}}
+    @if ($embed)
+    <style>
+        .fi-topbar,
+        .fi-sidebar,
+        .fi-sidebar-close-overlay { display: none !important; }
+
+        .fi-main-ctn,
+        .fi-main { margin: 0 !important; padding-top: 0 !important; max-width: 100% !important; }
+    </style>
+    @endif
+
+    {{-- CHANGED: no full-screen height when embedded --}}
+    <div class="{{ $embed ? '' : 'min-h-screen' }} py-6 w-full rounded text-white">
 
         <x-globalresponse />
+
+        {{-- NEW: thank-you state after a successful submit inside the modal --}}
+        @if ($submitted)
+        <div class="bg-card border border-white/10 rounded-lg p-8 text-center">
+            <h1 class="text-xl font-medium text-white mb-2">Thank you for your feedback</h1>
+            <p class="text-sm text-white/70 mb-6">This window will close automatically.</p>
+            <button
+                type="button"
+                onclick="closeFeedbackModal()"
+                class="bg-blue-800 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-md transition-colors">
+                Close
+            </button>
+        </div>
+        @else
 
         <form action="{{ route('feedback-store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             <input type="hidden" name="orga_uin" value="{{ $orgaUin }}">
+
+            {{-- NEW: tells the controller to answer with the modal "thank you" redirect --}}
+            @if ($embed)
+            <input type="hidden" name="embed" value="1">
+            @endif
 
             <div class="bg-card border border-white/10 rounded-lg p-8">
                 <h1 class="text-center text-xl font-medium text-white mb-8">
@@ -333,16 +366,42 @@
                     </div>
                 </div>
 
-                <button
-                    type="submit"
-                    class="bg-blue-800 mt-5 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-md transition-colors">
-                    Submit
-                </button>
+                {{-- CHANGED: Cancel button added when shown in the modal --}}
+                <div class="mt-5 flex items-center gap-3">
+                    <button
+                        type="submit"
+                        class="bg-blue-800 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-md transition-colors">
+                        Submit
+                    </button>
+
+                    @if ($embed)
+                    <button
+                        type="button"
+                        onclick="closeFeedbackModal()"
+                        class="rounded-md border border-white/10 px-6 py-2.5 text-sm hover:bg-white/5">
+                        Cancel
+                    </button>
+                    @endif
+                </div>
             </div>
 
         </form>
+        @endif {{-- end of $submitted check --}}
 
     </div>
+
+    {{-- NEW: closes the modal from inside the iframe --}}
+    @if ($embed)
+    <script>
+        function closeFeedbackModal() {
+            window.parent.postMessage({ type: 'feedback-close' }, window.location.origin);
+        }
+
+        @if ($submitted)
+        setTimeout(closeFeedbackModal, 1500);
+        @endif
+    </script>
+    @endif
 
     <script>
         var AGREEMENTS_URL = "";

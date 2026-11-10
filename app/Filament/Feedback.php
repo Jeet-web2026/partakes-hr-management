@@ -33,6 +33,13 @@ class Feedback extends Page
     #[Locked]
     public ?string $lockedPageUin = null;
 
+    #[Locked]
+    public bool $embed = false;
+    #[Locked]
+    public string $returnUrl = '';
+    #[Locked]
+    public bool $submitted = false;
+
     public function mount(): void
     {
         $this->userUin = Session::get('partaker_user_uin');
@@ -42,6 +49,11 @@ class Feedback extends Page
             $this->redirect(route('home'));
             return;
         }
+
+        $this->embed = request()->boolean('embed');
+        $this->submitted = $this->embed && request()->boolean('submitted');
+        $this->returnUrl = $this->safeReturnUrl(request()->query('return'));
+
 
         $this->pages = MasterVerticalPageName::query()
             ->select(['Page_UIN', 'Page_name'])
@@ -66,5 +78,41 @@ class Feedback extends Page
         $this->defaultCountryUin = $this->countryDetails
             ->firstWhere('Code', 'IN')
             ?->Admn_Cutr_Mast_UIN;
+    }
+
+    protected function safeReturnUrl(?string $url): string
+    {
+        $fallback = route('home');
+
+        $url = $url ?: url()->previous($fallback);
+
+        if (str_starts_with($url, '//')) {
+            return $fallback;
+        }
+
+        $parts = parse_url($url);
+
+        if ($parts === false) {
+            return $fallback;
+        }
+
+        $host = $parts['host'] ?? null;
+
+        // Absolute URL on another site
+        if ($host !== null && $host !== request()->getHost()) {
+            return $fallback;
+        }
+
+        // Not an absolute URL and not a site-relative path
+        if ($host === null && ! str_starts_with($url, '/')) {
+            return $fallback;
+        }
+
+        // Never return to the feedback page itself
+        if (str_starts_with(ltrim($parts['path'] ?? '', '/'), 'feedback')) {
+            return $fallback;
+        }
+
+        return $url;
     }
 }
