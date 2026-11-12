@@ -158,7 +158,7 @@ $err = 'mt-1 text-xs text-red-400';
     @if ($showForm)
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="closeForm">
-        <div class="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl border border-white/10 bg-card p-5 shadow-xl">
+        <div class="w-full max-w-5xl overflow-y-auto rounded-xl border border-white/10 bg-card p-5 shadow-xl" style="max-height: 90vh;">
 
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-base font-semibold">{{ $editingUin ? 'Edit branch office' : 'Add branch office' }}</h3>
