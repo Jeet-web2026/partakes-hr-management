@@ -89,6 +89,7 @@
                     <tr class="border-b border-white/10 bg-white/[0.04] text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         <th class="px-5 py-3">Designation</th>
                         <th class="px-5 py-3">Designation Type</th>
+                        <th class="px-5 py-3">Parent Designation</th>
                         <th class="px-5 py-3">Description</th>
                         <th class="px-5 py-3">Status</th>
                         <th class="px-5 py-3 text-right">Action</th>
@@ -100,6 +101,9 @@
                     <tr wire:key="dsig-{{ $designation->getKey() }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                         <td class="px-5 py-3 whitespace-nowrap font-medium">{{ $designation->Dsig_Name }}</td>
                         <td class="px-5 py-3 whitespace-nowrap font-medium capitalize">{{ $designation->Dsig_Type }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap text-muted-foreground">
+                            {{ $designation->parent?->Dsig_Name ?? 'Primary Designation' }}
+                        </td>
                         <td class="px-5 py-3">
                             <div class="line-clamp-2 max-w-2xl text-muted-foreground">{{ $designation->Dsig_Desp ?: '—' }}</div>
                         </td>
@@ -168,7 +172,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-5 py-10 text-center text-muted-foreground">No designations found.</td>
+                        <td colspan="6" class="px-5 py-10 text-center text-muted-foreground">No designations found.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -224,6 +228,7 @@
             </div>
 
             <form wire:submit="save" class="space-y-4">
+                {{-- Type: live, so the Parent Designation list below follows the chosen type --}}
                 <fieldset>
                     <legend class="mb-1 block text-sm font-medium">
                         Designation will be created as per <span class="text-red-400">*</span>
@@ -236,7 +241,7 @@
                                 hover:bg-white/5
                                 has-[:checked]:border-[#3c83f6] has-[:checked]:bg-[#3c83f6]/10
                                 has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-primary">
-                            <input type="radio" wire:model="formType" value="{{ $value }}"
+                            <input type="radio" wire:model.live="formType" value="{{ $value }}"
                                 class="h-4 w-4 accent-[#3c83f6]">
                             <span>{{ $label }}</span>
                         </label>
@@ -247,6 +252,24 @@
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </fieldset>
+
+                {{-- Parent Designation: Primary Designation (0) + designations of the selected type --}}
+                <div>
+                    <label class="mb-1 block text-sm font-medium">Parent Designation <span class="text-red-400">*</span></label>
+                    <select
+                        wire:model="formParent"
+                        wire:key="dsig-parent-{{ $formType }}"
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
+                        <option value="0" class="bg-slate-800">Primary Designation</option>
+                        @foreach ($this->parentOptions as $value => $label)
+                        <option value="{{ $value }}" class="bg-slate-800">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('formParent')
+                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div>
                     <label class="mb-1 block text-sm font-medium">Designation <span class="text-red-400">*</span></label>
                     <input

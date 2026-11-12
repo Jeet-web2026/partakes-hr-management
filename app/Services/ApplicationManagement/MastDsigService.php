@@ -51,8 +51,52 @@ class MastDsigService
         );
     }
 
-    public function create(string $orgUin, string $name, ?string $description, int $status, string $userUin, string $designationType): MastDsig
+    /**
+     * Parent dropdown options: [Dsig_UIN => Dsig_Name] for the selected type in this organisation.
+     * "Primary Designation" (0) is added by the page. While editing, the record itself and all of
+     * its descendants are removed so a designation can never become its own ancestor.
+     *
+     * @return array<int, string>
+     */
+    public function parentOptions(string $orgUin, string $designationType, ?string $exceptDsigUin = null): array
     {
+        $exclude = $exceptDsigUin
+            ? array_merge([(int) $exceptDsigUin], $this->descendantIds((int) $exceptDsigUin))
+            : [];
+
+        return MastDsig::query()
+            ->where('Org_UIN', (int) $orgUin)
+            ->where('Dsig_Type', $designationType)
+            ->when($exclude, fn($q) => $q->whereNotIn('Dsig_UIN', $exclude))
+            ->orderBy('Dsig_Name')
+            ->pluck('Dsig_Name', 'Dsig_UIN')
+            ->all();
+    }
+
+    /** @return int[] */
+    protected function descendantIds(int $dsigUin): array
+    {
+        $all = [];
+        $frontier = [$dsigUin];
+
+        while ($frontier) {
+            $next = MastDsig::whereIn('Parn_Dsig_UIN', $frontier)->pluck('Dsig_UIN')->all();
+            $frontier = array_values(array_diff($next, $all, [$dsigUin]));
+            $all = array_merge($all, $frontier);
+        }
+
+        return $all;
+    }
+
+    public function create(
+        string $orgUin,
+        string $name,
+        ?string $description,
+        int $status,
+        string $userUin,
+        string $designationType,
+        int $parentUin = 0,
+    ): MastDsig {
         return $this->designations->create([
             'Dsig_Name' => $name,
             'Dsig_Desp' => $description,
@@ -60,7 +104,8 @@ class MastDsigService
             'Org_UIN' => (int) $orgUin,
             'CrBy' => (int) $userUin,
             'MoBy' => (int) $userUin,
-            'Dsig_Type' => $designationType
+            'Dsig_Type' => $designationType,
+            'Parn_Dsig_UIN' => $parentUin,
         ]);
     }
 
@@ -74,6 +119,15 @@ class MastDsigService
 
     public function delete(MastDsig $designation): bool
     {
+        if (MastDsig::where('Parn_Dsig_UIN', $designation->getKey())->exists()) {
+            throw ValidationException::withMessages([
+                'designation' => sprintf(
+                    'Cannot delete "%s": it is the parent of other designations.',
+                    $designation->Dsig_Name
+                ),
+            ]);
+        }
+
         $usedBy = HrMastJobAply::query()
             ->where('Job_Intr', $designation->getKey())
             ->count();
@@ -99,6 +153,10 @@ class MastDsigService
 
     public function paginateForOrganisation(string $orgaUin, string $search = '', int $perPage = 50): LengthAwarePaginator
     {
-        return $this->designations->paginateByOrganisation($orgaUin, $search, $perPage);
+        $page = $this->designations->paginateByOrganisation($orgaUin, $search, $perPage);
+
+        $page->getCollection()->load('parent');
+
+        return $page;
     }
 }
