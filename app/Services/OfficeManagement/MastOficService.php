@@ -53,7 +53,7 @@ class MastOficService
     // Adjust table / column names to your geo masters.
     public function countries(): Collection
     {
-        return DB::table('tbl_mast_cutr')->orderBy('Cutr_Comp_Name')->pluck('Cutr_Comp_Name', 'Cutr_UIN');
+        return DB::table('tbl_mast_cutr')->orderBy('Name')->pluck('Name', 'Admn_Cutr_Mast_UIN');
     }
 
     public function states(?string $cutr): Collection
