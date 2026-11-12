@@ -39,15 +39,38 @@ class MastOficService
             ->get();
     }
 
-    // Parent must belong to a higher office type (smaller level number)
-    public function parentOptions(string $orga, int $level, ?string $exceptUin): Collection
+    /**
+     * Parent Office options for the chosen Office Type: every office of that type in this
+     * organisation. "Primary Office" (0) is added by the view. While editing, the office itself
+     * and all of its descendants are removed so it can never become its own ancestor.
+     */
+    public function parentOptions(string $orga, int $hikyUin, ?string $exceptUin = null): Collection
     {
+        $exclude = $exceptUin
+            ? array_merge([(int) $exceptUin], $this->descendantIds((int) $exceptUin))
+            : [];
+
         return MastOfic::query()
             ->where('Orga_UIN', $orga)
-            ->when($exceptUin, fn($q) => $q->whereKeyNot($exceptUin))
-            ->whereHas('hierKey', fn($q) => $q->where('Hiky_Levl', '<', $level))
+            ->where('Hiky_UIN', $hikyUin)
+            ->when($exclude, fn($q) => $q->whereNotIn('Ofic_UIN', $exclude))
             ->orderBy('Ofic_Name')
             ->get(['Ofic_UIN', 'Ofic_Name', 'Ofic_Code']);
+    }
+
+    /** @return int[] */
+    protected function descendantIds(int $oficUin): array
+    {
+        $all = [];
+        $frontier = [$oficUin];
+
+        while ($frontier) {
+            $next = MastOfic::whereIn('Parn_Ofic_UIN', $frontier)->pluck('Ofic_UIN')->all();
+            $frontier = array_values(array_diff($next, $all, [$oficUin]));
+            $all = array_merge($all, $frontier);
+        }
+
+        return $all;
     }
 
     // Adjust table / column names to your geo masters.

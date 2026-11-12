@@ -141,10 +141,10 @@ class BranchOffices extends Page
     #[Computed]
     public function parentOffices(): Collection
     {
-        $level = $this->officeTypes->firstWhere('Hiky_UIN', (int) ($this->form['Hiky_UIN'] ?: 0))?->Hiky_Levl;
+        $hiky = (int) ($this->form['Hiky_UIN'] ?: 0);
 
-        return $level
-            ? app(MastOficService::class)->parentOptions($this->orgaUin, (int) $level, $this->editingUin)
+        return $hiky
+            ? app(MastOficService::class)->parentOptions($this->orgaUin, $hiky, $this->editingUin)
             : collect();
     }
 

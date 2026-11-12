@@ -188,12 +188,17 @@ $err = 'mt-1 text-xs text-red-400';
 
                         <div>
                             <label class="{{ $lbl }}">Parent Office</label>
-                            <select wire:model="form.Parn_Ofic_UIN" class="{{ $sel }}">
-                                <option value="0">— None (top level) —</option>
+                            <select wire:model="form.Parn_Ofic_UIN"
+                                wire:key="ofic-parent-{{ $form['Hiky_UIN'] }}"
+                                class="{{ $sel }}">
+                                <option value="0">Primary Office</option>
                                 @foreach ($this->parentOffices as $p)
                                 <option value="{{ $p->Ofic_UIN }}">{{ $p->Ofic_Name }} ({{ $p->Ofic_Code }})</option>
                                 @endforeach
                             </select>
+                            @if ($form['Hiky_UIN'] && $this->parentOffices->isEmpty())
+                            <p class="mt-1 text-xs text-muted-foreground">No offices of this type yet, so this will be a Primary Office.</p>
+                            @endif
                             @error('form.Parn_Ofic_UIN') <p class="{{ $err }}">{{ $message }}</p> @enderror
                         </div>
 
