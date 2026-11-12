@@ -228,28 +228,6 @@ $err = 'mt-1 text-xs text-red-400';
                             @error('form.Cutr_UIN') <p class="{{ $err }}">{{ $message }}</p> @enderror
                         </div>
 
-                        <div>
-                            <label class="{{ $lbl }}">State</label>
-                            <select wire:model.live="form.Stat_UIN" class="{{ $sel }}" @disabled(! $form['Cutr_UIN'])>
-                                <option value="">Select State</option>
-                                @foreach ($this->states as $uin => $name)
-                                <option value="{{ $uin }}">{{ $name }}</option>
-                                @endforeach
-                            </select>
-                            @error('form.Stat_UIN') <p class="{{ $err }}">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label class="{{ $lbl }}">District</label>
-                            <select wire:model="form.Dist_UIN" class="{{ $sel }}" @disabled(! $form['Stat_UIN'])>
-                                <option value="">Select District</option>
-                                @foreach ($this->districts as $uin => $name)
-                                <option value="{{ $uin }}">{{ $name }}</option>
-                                @endforeach
-                            </select>
-                            @error('form.Dist_UIN') <p class="{{ $err }}">{{ $message }}</p> @enderror
-                        </div>
-
                         @foreach ([
                         ['PinCod_UIN', 'Pincode'],
                         ['Loca_UIN', 'Locality Name'],
