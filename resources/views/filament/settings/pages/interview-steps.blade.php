@@ -275,9 +275,21 @@
 
         </div>
 
-        <div class="flex justify-end items-end mb-3">
+        {{-- Add + Feedback --}}
+        <div class="mb-3 flex items-end justify-end gap-2">
+            <button
+                type="button"
+                wire:click="openAdd"
+                @disabled($this->addableStages->isEmpty())
+                title="{{ $this->addableStages->isEmpty() ? 'All active stages already have interview steps' : 'Add interview steps' }}"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#3c83f6] px-4 text-sm font-medium text-white transition hover:bg-[#3c83f6]/90 disabled:cursor-not-allowed disabled:opacity-50">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add</span>
+            </button>
+
             <x-feedback-button page="10000014" />
         </div>
+
         <!-- Table (visible on all screen sizes) -->
         <div class="rounded-xl border border-white/10 bg-card overflow-x-auto">
             <table class="w-full text-sm">
@@ -293,7 +305,6 @@
 
                 <tbody id="tbody">
                     @forelse ($this->steps as $i => $step)
-                    @php $names = (array) $step->name_list; @endphp
                     <tr wire:key="step-{{ $step->Intv_Step_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                         <td class="px-5 py-3 whitespace-nowrap align-top">Step {{ $step->Intv_Step_Numb }}</td>
 
@@ -385,18 +396,23 @@
             @php($total = $this->steps->count())
             <span id="entriesLabel">Showing {{ $total ? 1 : 0 }} to {{ $total }} of {{ $total }} entries</span>
             <div id="pagination" class="hidden items-center gap-1"></div>
+            @endphp
         </div>
     </main>
 
-    {{-- Edit modal --}}
-    @if ($editingUin)
+    {{-- Add / Edit modal (same modal; always shows all 7 steps; stage selectable only when adding) --}}
+    @if ($editingUin || $isAdding)
+    @php $fixedMap = $this->fixedRowLabels($editStage); @endphp
+
     <div
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         wire:keydown.escape.window="closeEdit">
         <div class="w-full max-w-3xl rounded-xl border border-white/10 bg-card p-5 shadow-xl">
 
             <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-base font-semibold">Edit interview steps</h3>
+                <h3 class="text-base font-semibold">
+                    {{ $isAdding ? 'Add interview steps' : 'Edit interview steps' }}
+                </h3>
                 <button type="button" wire:click="closeEdit"
                     class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
                     <i class="bi bi-x-lg"></i>
@@ -405,39 +421,75 @@
 
             <form wire:submit="save" class="space-y-4">
 
-                {{-- Stage (read-only: the rows belong to this stage) --}}
+                {{-- Stage: selectable when adding, read-only when editing --}}
                 <div>
                     <label class="mb-1 block text-sm font-medium">Stage</label>
+
                     <select
-                        wire:model="editStage"
-                        disabled
-                        class="h-10 w-full cursor-not-allowed rounded-md border border-white/10 bg-transparent px-3 text-sm text-white opacity-70 focus:outline-none">
+                        wire:model{{ $isAdding ? '.live' : '' }}="editStage"
+                        @disabled(! $isAdding)
+                        class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none {{ $isAdding ? '' : 'cursor-not-allowed opacity-70' }}">
+                        @if ($isAdding)
+                        <option value="" class="bg-slate-800">Select stage</option>
+                        @foreach ($this->addableStages as $stage)
+                        <option value="{{ $stage->Stage_UIN }}" class="bg-slate-800">
+                            {{ $stage->Stage_Name }}
+                        </option>
+                        @endforeach
+                        @else
                         @foreach ($this->stages as $stage)
                         <option value="{{ $stage->Stage_UIN }}" class="bg-slate-800">
                             {{ $stage->Stage_Name }}
                         </option>
                         @endforeach
+                        @endif
                     </select>
+
                     @error('editStage')
                     <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Steps (scrollable) --}}
+                {{-- Steps (scrollable) - always all 7 rows --}}
                 <div class="h-[300px] overflow-y-auto pr-1">
                     <p class="mb-2 text-sm font-medium">Steps</p>
 
-                    <div class="grid grid-cols-1 gap-2">
-                        @foreach ($editStepUins as $i => $stepUin)
-                        <div wire:key="step-row-{{ $stepUin }}" class="flex items-start gap-3">
+                    @if (! empty($fixedMap))
+                    <p class="mb-2 text-xs text-muted-foreground">
+                        The last {{ count($fixedMap) }} steps are fixed for this stage and can't be changed.
+                    </p>
+                    @endif
 
+                    <div class="grid grid-cols-1 gap-2">
+                        @foreach ($editPlaceholders as $i => $placeholder)
+                        @php $rowFixed = array_key_exists($i, $fixedMap); @endphp
+
+                        <div wire:key="step-row-{{ $i }}-{{ $rowFixed ? 'fixed' : 'free' }}" class="flex items-start gap-3">
+
+                            @if ($rowFixed)
+                            {{-- Fixed row: static name + Active, nothing bound --}}
+                            <div class="min-w-0 flex-1">
+                                <textarea
+                                    rows="2"
+                                    readonly
+                                    class="w-full cursor-not-allowed resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm opacity-70 focus:outline-none">{{ $fixedMap[$i] }}</textarea>
+                            </div>
+
+                            <div class="w-32 shrink-0">
+                                <select
+                                    disabled
+                                    class="w-full cursor-not-allowed rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm opacity-70 focus:outline-none [&>option]:bg-gray-900">
+                                    <option>{{ $statusOptions[\App\Services\ApplicationManagement\MastIntvStepService::STATUS_ACTIVE] ?? 'Active' }}</option>
+                                </select>
+                            </div>
+                            @else
                             {{-- Left: saved name or placeholder hint --}}
                             <div class="min-w-0 flex-1">
                                 <textarea
                                     wire:model="editNames.{{ $i }}"
                                     rows="2"
                                     maxlength="100"
-                                    placeholder="e.g. {{ $editPlaceholders[$i] ?? '' }}"
+                                    placeholder="e.g. {{ $placeholder }}"
                                     class="w-full resize-none rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
                                 @error('editNames.' . $i)
                                 <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
@@ -457,6 +509,7 @@
                                 <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
+                            @endif
                         </div>
                         @endforeach
                     </div>
@@ -476,7 +529,7 @@
                         wire:loading.attr="disabled"
                         wire:target="save"
                         class="rounded bg-[#3c83f6] px-3 py-2 text-sm text-white hover:bg-[#3c83f6]/90 disabled:opacity-60">
-                        Save
+                        {{ $isAdding ? 'Add' : 'Save' }}
                     </button>
                 </div>
             </form>

@@ -30,6 +30,7 @@ class InterviewSteps extends Page
 
     protected string $view = 'filament.settings.pages.interview-steps';
 
+    /** Selected stage (Stage_UIN). Read-only when editing, selectable when adding. */
     public ?string $editStage = null;
 
     #[Locked]
@@ -41,11 +42,15 @@ class InterviewSteps extends Page
     #[Locked]
     public ?string $editingUin = null;
 
+    /** True while the modal is in "Add" mode. */
+    #[Locked]
+    public bool $isAdding = false;
+
     /** Intv_Step_UINs being edited, in display order; locked so the client can't change them. */
     #[Locked]
     public array $editStepUins = [];
 
-    /** Default step names (Intv_Step_Placeholder_Type), display-only. */
+    /** Default step names (Intv_Step_Placeholder_Type), display-only. Also defines the row count. */
     #[Locked]
     public array $editPlaceholders = [];
 
@@ -55,10 +60,10 @@ class InterviewSteps extends Page
 
     public string $search = '';
 
-    /** Saved names (Intv_Step_Name), same positions as $editStepUins ('' = not set). */
+    /** Saved names (Intv_Step_Name), same positions as $editPlaceholders ('' = not set). */
     public array $editNames = [];
 
-    /** Status (Stau_UIN) per row, same positions as $editStepUins. */
+    /** Status (Stau_UIN) per row, same positions as $editPlaceholders. */
     public array $editStatuses = [];
 
     public function mount(): void
@@ -111,6 +116,51 @@ class InterviewSteps extends Page
             ->get();
     }
 
+    /** Active stages that don't have any steps yet (the only ones that can be added). */
+    #[Computed]
+    public function addableStages(): Collection
+    {
+        $used = MastIntvStep::query()
+            ->where('Orga_UIN', $this->orgaUin)
+            ->pluck('Intv_Stage')
+            ->map(fn($v) => (string) $v)
+            ->unique();
+
+        return $this->stages
+            ->filter(fn($stage) => (int) $stage->Stage_Status === MastIntvStepService::STATUS_ACTIVE
+                && ! $used->contains((string) $stage->Stage_UIN))
+            ->values();
+    }
+
+    /**
+     * Fixed rows for a stage: row index (0-based) => fixed step name.
+     * Empty for normal stages; Offer Accepted => last three rows. Resolved server-side.
+     */
+    public function fixedRowLabels(?string $stageUin): array
+    {
+        if (! $stageUin) {
+            return [];
+        }
+
+        $stage = $this->stages->firstWhere('Stage_UIN', $stageUin);
+
+        return $stage ? MastIntvStepService::fixedStepMap($stage->Stage_Name) : [];
+    }
+
+    /** Opens the modal with all 7 default steps, regardless of the selected stage. */
+    public function openAdd(): void
+    {
+        $this->closeEdit();
+
+        $count = count(MastIntvStepService::DEFAULT_STEPS);
+
+        $this->isAdding         = true;
+        $this->statusOptions    = $this->statusLabels;
+        $this->editPlaceholders = MastIntvStepService::DEFAULT_STEPS;
+        $this->editNames        = array_fill(0, $count, '');
+        $this->editStatuses     = array_fill(0, $count, (string) MastIntvStepService::STATUS_ACTIVE);
+    }
+
     public function openEdit(string $uin): void
     {
         $clicked = $this->findStep($uin);
@@ -121,6 +171,7 @@ class InterviewSteps extends Page
             ->orderBy('Intv_Step_Numb')
             ->get();
 
+        $this->isAdding         = false;
         $this->editingUin       = (string) $clicked->getKey();
         $this->editStage        = $clicked->Intv_Stage !== null ? (string) $clicked->Intv_Stage : null;
         $this->editStepUins     = $rows->pluck('Intv_Step_UIN')->map(fn($v) => (string) $v)->values()->all();
@@ -145,6 +196,7 @@ class InterviewSteps extends Page
     public function closeEdit(): void
     {
         $this->reset([
+            'isAdding',
             'editingUin',
             'editStepUins',
             'editNames',
@@ -159,27 +211,37 @@ class InterviewSteps extends Page
 
     public function save(): void
     {
-        $count = count($this->editStepUins);
+        $count = count($this->editPlaceholders);
+
+        if ($count === 0) {
+            $this->addError('editStage', 'Please select a stage.');
+            return;
+        }
+
+        // Add: stage must be one of the addable stages. Edit: stage must belong to this org.
+        $stageRule = $this->isAdding
+            ? Rule::in($this->addableStages->pluck('Stage_UIN')->map(fn($v) => (string) $v)->all())
+            : Rule::exists('tbl_mast_intv_stage', 'Stage_UIN')->where('Orga_UIN', $this->orgaUin);
 
         $this->validate([
             'editNames'      => ['required', 'array', 'size:' . $count],
             'editNames.*'    => ['nullable', 'string', 'max:100'],
             'editStatuses'   => ['required', 'array', 'size:' . $count],
             'editStatuses.*' => ['required', Rule::in(array_keys($this->statusOptions))],
-            'editStage'      => [
-                'required',
-                Rule::exists('tbl_mast_intv_stage', 'Stage_UIN')->where('Orga_UIN', $this->orgaUin),
-            ],
+            'editStage'      => ['required', $stageRule],
         ], [
+            'editStage.required'      => 'Please select a stage.',
+            'editStage.in'            => 'Invalid stage selected.',
             'editStatuses.*.required' => 'Please select a status.',
             'editStatuses.*.in'       => 'Invalid status selected.',
         ]);
 
+        // Fixed rows (Offer Accepted: last three) always use their fixed names, whatever the client sent.
+        $fixedMap = $this->fixedRowLabels($this->editStage);
+
         // Blank stays blank (placeholder is only a hint, never saved as a name).
-        $names = collect($this->editStepUins)
-            ->keys()
-            ->map(fn($i) => trim((string) ($this->editNames[$i] ?? '')))
-            ->values()
+        $names = collect(range(0, $count - 1))
+            ->map(fn($i) => $fixedMap[$i] ?? trim((string) ($this->editNames[$i] ?? '')))
             ->all();
 
         $filled = array_filter($names, fn($n) => $n !== '');
@@ -189,43 +251,65 @@ class InterviewSteps extends Page
             return;
         }
 
-        $rows = MastIntvStep::query()
-            ->whereIn('Intv_Step_UIN', $this->editStepUins)
-            ->get()
-            ->keyBy(fn($row) => (string) $row->Intv_Step_UIN);
-
-        if ($rows->count() !== $count) {
-            $this->addError('editNames', 'Steps changed while editing. Please close and reopen.');
-            return;
-        }
+        $wasAdding = $this->isAdding;
 
         try {
-            DB::transaction(function () use ($rows, $names) {
-                $service = app(MastIntvStepService::class);
+            if ($wasAdding) {
+                app(MastIntvStepService::class)->addForStage(
+                    $this->orgaUin,
+                    $this->userUin,
+                    (string) $this->editStage,
+                    $names,
+                    $this->editStatuses
+                );
+            } else {
+                $rows = MastIntvStep::query()
+                    ->whereIn('Intv_Step_UIN', $this->editStepUins)
+                    ->get()
+                    ->keyBy(fn($row) => (string) $row->Intv_Step_UIN);
 
-                foreach ($this->editStepUins as $i => $stepUin) {
-                    $step = $rows[$stepUin];
-
-                    $service->updateStep($step, [
-                        'Intv_Step_Name' => $names[$i],               // this row's name ('' allowed)
-                        'Intv_Step_Stau' => $this->editStatuses[$i],  // this row's status
-                        'Intv_Stage'     => $step->Intv_Stage,        // keep each row's own stage
-                    ], $this->userUin);
+                if ($rows->count() !== $count) {
+                    $this->addError('editNames', 'Steps changed while editing. Please close and reopen.');
+                    return;
                 }
-            });
+
+                DB::transaction(function () use ($rows, $names, $fixedMap) {
+                    $service = app(MastIntvStepService::class);
+
+                    foreach ($this->editStepUins as $i => $stepUin) {
+                        // Fixed rows are never updated.
+                        if (array_key_exists($i, $fixedMap)) {
+                            continue;
+                        }
+
+                        $step = $rows[$stepUin];
+
+                        $service->updateStep($step, [
+                            'Intv_Step_Name' => $names[$i],               // this row's name ('' allowed)
+                            'Intv_Step_Stau' => $this->editStatuses[$i],  // this row's status
+                            'Intv_Stage'     => $step->Intv_Stage,        // keep each row's own stage
+                        ], $this->userUin);
+                    }
+                });
+            }
         } catch (ValidationException $e) {
-            $this->addError('editNames', $e->validator->errors()->first());
+            $errors = $e->errors();
+            $key    = array_key_exists('editStage', $errors) ? 'editStage' : 'editNames';
+
+            $this->addError($key, (string) collect($errors)->flatten()->first());
             return;
         } catch (Throwable $e) {
             report($e);
-            session()->now('error', 'Could not update the interview step. Please try again.');
+            session()->now('error', 'Could not save the interview steps. Please try again.');
             return;
         }
 
-        unset($this->steps);
+        unset($this->steps, $this->addableStages);
         $this->closeEdit();
 
-        session()->now('success', 'Interview step updated successfully.');
+        session()->now('success', $wasAdding
+            ? 'Interview steps added successfully.'
+            : 'Interview step updated successfully.');
     }
 
     protected function findStep(string $uin)

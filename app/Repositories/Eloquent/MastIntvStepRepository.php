@@ -11,7 +11,7 @@ class MastIntvStepRepository implements MastIntvStepRepositoryInterface
 {
     public function queryForOrganisation(string $orgaUin): Builder
     {
-        return MastIntvStep::query()->forOrganisation($orgaUin)->orderBy('Intv_Step_Numb');
+        return MastIntvStep::query()->forOrganisation($orgaUin)->orderBy('Intv_Step_UIN')->orderBy('Intv_Step_Numb');
     }
 
     public function allForOrganisation(string $orgaUin): Collection
