@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'contact_app' => [
+        'settings_url' => env('CONTACT_APP_SETTINGS_URL', '#'),
+    ],
+
 ];

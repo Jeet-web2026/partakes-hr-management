@@ -69,27 +69,29 @@
                         <a href="{{ request()->is('applications/*')
                             ? '/candidate-management'
                             : (request()->is('settings/*') ? '/dashboard' : $backurl) }}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">
-                        <i class="ri-arrow-left-long-line"></i>
-                        Back
+                            class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">
+                            <i class="ri-arrow-left-long-line"></i>
+                            Back
                         </a>
 
 
                         <a href="{{ $backurlforSettings }}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">
-                        <i class="ri-home-9-line"></i>
-                        Home
+                            class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">
+                            <i class="ri-home-9-line"></i>
+                            Home
                         </a>
 
 
-                        <A href="{{ \Filament\Facades\Filament::getPanel('settings')->getUrl() }}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">
-                        <i class="bi bi-gear"></i>
-                        Settings
-                        </a>
+                        <button type="button"
+                            onclick="document.getElementById('settingsChooser').showModal()"
+                            class="flex w-full items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition">
+                            <i class="bi bi-gear"></i>
+                            Settings
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <x-settings-chooser-modal />
 </header>
