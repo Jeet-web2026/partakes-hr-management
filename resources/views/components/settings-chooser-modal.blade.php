@@ -22,7 +22,7 @@
             <span class="text-xs text-muted-foreground">Offices, designations, interview steps</span>
         </a>
 
-        <a href="{{ config('services.contact_app.settings_url') }}/?token={{ session('partaker_access_token') }}"
+        <a href="{{ route('contact-app.settings') }}"
             class="flex flex-col items-center gap-2 justify-center rounded-xl border border-white/10 p-6 text-center transition hover:border-primary hover:bg-white/5">
             <i class="ri-contacts-book-line text-5xl text-primary"></i>
             <span class="font-semibold text-xl">Contact App Settings</span>

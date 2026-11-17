@@ -14,8 +14,8 @@ use App\Services\Common\TinyUrlService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Validation\Rule;
 
 class HomeController extends Controller
 {
@@ -227,5 +227,35 @@ class HomeController extends Controller
             'short_url'  => $this->tinyUrlService->shortUrlFor($link),
             'expires_at' => $link->Link_Expy_On->toIso8601String(),
         ], 201);
+    }
+
+    public function settings()
+    {
+        $userUIN = session('partaker_user_uin');
+        $orgaUIN = session('selected_orga_uin');
+
+        abort_unless($userUIN && $orgaUIN, 403);
+
+        $response = Http::withHeaders([
+            'X-API-KEY' => config('services.contact_app.api_key'),
+            'Accept'    => 'application/json',
+        ])
+            ->timeout(10)
+            ->post(config('services.contact_app.settings_url') . '/api/session-link', [
+                'user_uin' => $userUIN,
+                'orga_uin' => $orgaUIN,
+            ]);
+
+        $link = $response->json('data.link');
+
+        if ($response->failed() || ! $response->json('success') || ! $link) {
+            logger()->error('Contact app session-link failed', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            return back()->with('error', 'Could not open Contact App settings.');
+        }
+
+        return redirect()->away($link);
     }
 }

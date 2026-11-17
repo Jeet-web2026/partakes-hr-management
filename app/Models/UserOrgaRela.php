@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserOrgaRela extends Model
 {
-    protected $table = 'tbl_user_orga_rela';
+    protected $table = 'admn_user_orga_rela';
     protected $primaryKey = 'id';
     public $timestamps = false;
 
