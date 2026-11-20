@@ -229,7 +229,7 @@ class HomeController extends Controller
         ], 201);
     }
 
-    public function settings()
+    public function contactAppRedirection(string $pageName)
     {
         $userUIN = session('partaker_user_uin');
         $orgaUIN = session('selected_orga_uin');
@@ -244,6 +244,7 @@ class HomeController extends Controller
             ->post(config('services.contact_app.settings_url') . '/api/session-link', [
                 'user_uin' => $userUIN,
                 'orga_uin' => $orgaUIN,
+                'page'     => $pageName,
             ]);
 
         $link = $response->json('data.link');

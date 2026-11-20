@@ -4,7 +4,6 @@ namespace App\Filament\Candidatemanagement\Pages;
 
 use App\Filament\Candidatemanagement\Pages\Common\HasCompanyHeader;
 use App\Models\InterviewStep;
-use App\Models\MastHrFlag;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Session;

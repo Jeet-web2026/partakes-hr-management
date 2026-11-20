@@ -18,8 +18,8 @@ Route::middleware('partaker.session')->group(function () {
         Route::get('agreements-name/data', 'agreementNamesData')->name('agreements-name.data');
         Route::get('/generate-link', 'generateLink')
             ->name('tiny-url.store');
-        Route::get('contact-app/settings', 'settings')
-            ->name('contact-app.settings');
+        Route::get('contact-app/redirection/{pageName}', 'contactAppRedirection')
+            ->name('contact-app.redirection');
     });
 
     Route::controller(AgreementNameController::class)->group(function () {
