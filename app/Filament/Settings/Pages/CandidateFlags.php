@@ -19,6 +19,7 @@ use Livewire\Attributes\On;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\WithPagination;
 use Throwable;
+use App\Models\InterviewStep;
 
 class CandidateFlags extends Page
 {
@@ -113,9 +114,9 @@ class CandidateFlags extends Page
     public function openCreate(): void
     {
         $this->resetForm();
-        $this->formStage = HrFlagStage::cases()[0]->value;
         $this->placeHolderStages = MastHrFlag::forOrganisation($this->orgaUin)->pluck('hr_flag_placeholder')->toArray();
         $this->showForm = true;
+        $this->formStage = array_key_first($this->stageOptions);
     }
 
     public function openEdit(string $uin): void
@@ -124,7 +125,7 @@ class CandidateFlags extends Page
 
         $this->resetErrorBag();
         $this->editingUin = $flag->getKey();
-        $this->formStage = $flag->hr_flag_stge_name->value;
+        $this->formStage = $flag->hr_flag_stge_name;
         $this->formName = $flag->hr_flag_name ?? '';
         $this->formStatus = $flag->hr_flag_stau->value;
         $this->showForm = true;
@@ -138,7 +139,7 @@ class CandidateFlags extends Page
     public function save(): void
     {
         $this->validate([
-            'formStage' => ['required', Rule::enum(HrFlagStage::class)],
+            'formStage' => ['required', Rule::in(array_keys($this->stageOptions))],
             'formName' => ['nullable', 'string', 'max:100'],
             'formStatus' => ['required', Rule::enum(InterviewStepStatus::class)],
         ]);
@@ -155,7 +156,13 @@ class CandidateFlags extends Page
 
                 $message = 'Flag updated successfully.';
             } else {
-                $service->create($this->orgaUin, $this->formStage, $this->formName, $this->formStatus, $this->userUin);
+                $service->create(
+                    $this->orgaUin,
+                    $this->formStage,
+                    $this->formName,
+                    $this->formStatus,
+                    $this->userUin
+                );
 
                 $message = 'Flag added successfully.';
             }
@@ -227,5 +234,16 @@ class CandidateFlags extends Page
         abort_unless($flag, 404);
 
         return $flag;
+    }
+
+    #[Computed]
+    public function stageOptions(): array
+    {
+        return InterviewStep::query()
+            ->active()
+            ->forOrganisation($this->orgaUin)
+            ->orderBy('Stage_Sort')
+            ->pluck('Stage_Name', 'Stage_UIN')
+            ->all();
     }
 }

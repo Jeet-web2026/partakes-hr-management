@@ -37,7 +37,7 @@ class MastHrFlag extends Model
     protected function casts(): array
     {
         return [
-            'hr_flag_stge_name' => HrFlagStage::class,
+            'hr_flag_stge_name' => "string",
             'hr_flag_stau' => InterviewStepStatus::class,
             'Cr_On' => 'datetime',
             'Mo_On' => 'datetime',

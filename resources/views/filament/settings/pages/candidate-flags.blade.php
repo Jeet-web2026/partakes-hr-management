@@ -98,7 +98,7 @@
                 <tbody id="tbody">
                     @forelse ($this->flags as $flag)
                     <tr wire:key="flag-{{ $flag->hr_flag_UIN }}" class="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
-                        <td class="px-5 py-3 whitespace-nowrap">{{ $flag->hr_flag_stge_name->label() }}</td>
+                        <td class="px-5 py-3 whitespace-nowrap">{{ $flag->hr_flag_stge_name }}</td>
                         <td class="px-5 py-3">
                             <div @class([ 'line-clamp-2 max-w-2xl' , 'italic text-gray-400 dark:text-gray-500'=> blank($flag->hr_flag_name),
                                 ])>
@@ -257,8 +257,8 @@
                             <select
                                 wire:model="formStage"
                                 class="h-10 w-full rounded-md border border-white/10 bg-transparent px-3 text-sm text-white focus:outline-none">
-                                @foreach (\App\Enums\HrFlagStage::cases() as $stage)
-                                <option value="{{ $stage->value }}" class="bg-slate-800">{{ $stage->label() }}</option>
+                                @foreach ($this->stageOptions as $value => $label)
+                                <option value="{{ $value }}" class="bg-slate-800">{{ $label }}</option>
                                 @endforeach
                             </select>
                             @error('formStage')

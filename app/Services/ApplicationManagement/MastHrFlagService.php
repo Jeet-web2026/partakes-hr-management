@@ -5,6 +5,7 @@ namespace App\Services\ApplicationManagement;
 use App\Enums\HrFlagStage;
 use App\Enums\InterviewStepStatus;
 use App\Jobs\CreateDefaultHrFlagsJob;
+use App\Models\InterviewStep;
 use App\Models\MastHrFlag;
 use App\Repositories\Contracts\MastHrFlagRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,10 +22,10 @@ class MastHrFlagService
         return $this->flags
             ->listForOrganisation($orgaUin, $search, $stage?->value)
             ->sort(fn(MastHrFlag $a, MastHrFlag $b) => [
-                $a->hr_flag_stge_name->order(),
+                $a->hr_flag_stge_name,
                 $a->Cr_On->getTimestamp(),
             ] <=> [
-                $b->hr_flag_stge_name->order(),
+                $b->hr_flag_stge_name,
                 $b->Cr_On->getTimestamp(),
             ])
             ->values();
@@ -69,21 +70,41 @@ class MastHrFlagService
         });
     }
 
-    public function create(string $orgaUin, HrFlagStage|string $stage, string $name, InterviewStepStatus|string $status, string $userId): MastHrFlag
-    {
-        $stage = $stage instanceof HrFlagStage ? $stage : HrFlagStage::from($stage);
+    public function create(
+        string $orgaUin,
+        string $stageUin,
+        string $name,
+        InterviewStepStatus|string $status,
+        string $userId
+    ): MastHrFlag {
         $name = trim($name);
 
-        $this->assertNameIsFree($orgaUin, $stage, $name);
+        $this->assertStageIsValid($orgaUin, $stageUin);
+        $this->assertNameIsFree($orgaUin, $stageUin, $name);
 
         return $this->flags->create([
-            'hr_flag_stge_name' => $stage,
-            'hr_flag_name' => $name,
-            'hr_flag_stau' => $status,
-            'Orga_UIN' => $orgaUin,
-            'Cr_By' => $userId,
-            'Mo_By' => $userId,
+            'hr_flag_stge_name' => $stageUin,
+            'hr_flag_name'      => $name,
+            'hr_flag_stau'      => $status,
+            'Orga_UIN'          => $orgaUin,
+            'Cr_By'             => $userId,
+            'Mo_By'             => $userId,
         ]);
+    }
+
+    protected function assertStageIsValid(string $orgaUin, string $stageUin): void
+    {
+        $exists = InterviewStep::query()
+            ->active()
+            ->forOrganisation($orgaUin)
+            ->whereKey($stageUin)
+            ->exists();
+
+        if (! $exists) {
+            throw ValidationException::withMessages([
+                'formStage' => 'The selected stage is not available.',
+            ]);
+        }
     }
 
     // Only stage, name and status can change; everything else in $data is ignored.
@@ -91,11 +112,7 @@ class MastHrFlagService
     {
         $changes = array_intersect_key($data, array_flip(['hr_flag_stge_name', 'hr_flag_name', 'hr_flag_stau']));
 
-        $stage = isset($changes['hr_flag_stge_name'])
-            ? ($changes['hr_flag_stge_name'] instanceof HrFlagStage
-                ? $changes['hr_flag_stge_name']
-                : HrFlagStage::from($changes['hr_flag_stge_name']))
-            : $flag->hr_flag_stge_name;
+        $stage = $flag->hr_flag_stge_name;
 
         $name = isset($changes['hr_flag_name']) ? trim($changes['hr_flag_name']) : $flag->hr_flag_name;
 
@@ -113,11 +130,15 @@ class MastHrFlagService
         return $this->flags->softDelete($flag, $userId);
     }
 
-    protected function assertNameIsFree(string $orgaUin, HrFlagStage $stage, string $name, ?string $ignoreUin = null): void
-    {
-        if ($this->flags->nameExists($orgaUin, $stage->value, $name, $ignoreUin)) {
+    protected function assertNameIsFree(
+        string $orgaUin,
+        string $stageUin,
+        string $name,
+        ?string $ignoreUin = null
+    ): void {
+        if ($this->flags->nameExists($orgaUin, $stageUin, $name, $ignoreUin)) {
             throw ValidationException::withMessages([
-                'hr_flag_name' => 'This flag already exists in the selected stage.',
+                'formName' => 'This flag already exists in the selected stage.',
             ]);
         }
     }
