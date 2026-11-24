@@ -38,6 +38,7 @@ return [
     'contact_app' => [
         'settings_url' => env('CONTACT_APP_SETTINGS_URL', '#'),
         'api_key' => env('CONTACT_APP_API_KEY', '1234567890'),
+        'form_link_validity' => env('CONTACT_APP_LINK_VALIDITY')
     ],
 
 ];

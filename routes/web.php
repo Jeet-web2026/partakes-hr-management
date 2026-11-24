@@ -76,6 +76,16 @@ Route::controller(JobApplicationManagementController::class)->group(function () 
 
     Route::get('/apply/{submitTime}/success', 'success')
         ->name('job-application.success');
+
+    Route::get(
+        '/organisations/{orguin}/applications/{uin}/employee-profile/create',
+        'createDocumentfillingapplicationLink'
+    )->middleware('partaker.session')->name('employees.profile.create');
+
+
+    Route::get('/employee-profile/form/{uin}', 'documentVerificationForm')
+        ->middleware('signed', 'partaker.session')
+        ->name('employee-profile.form');
 });
 
 Route::fallback(function () {

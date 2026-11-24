@@ -408,7 +408,7 @@ $(document).ready(function () {
                     </button>
 
                     <div id="row-${esc(r.id)}"
-                        class="hidden absolute right-0 mt-1 w-36 rounded-md border border-white/10 bg-card shadow-xl z-20 p-1">
+                        class="hidden absolute right-0 mt-1 w-fit rounded-md border border-white/10 bg-card shadow-xl z-20 p-1">
                         ${menuItemPdf(r)}
                     </div>
                 </div>
@@ -416,11 +416,31 @@ $(document).ready(function () {
         </tr>`;
     }
 
-    function menuItemPdf(r) {   
-        return `<a href="${esc(r.viewDataUrl)}" rel="noopener"
-               class="flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5">
-               <i class="ri-eye-line"></i>
-               View Profile
+    function menuItemPdf(r) {
+        const itemClass =
+            "flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-white/5 whitespace-nowrap";
+
+        const viewProfile = `
+    <a href="${esc(r.viewDataUrl)}" rel="noopener" class="${itemClass}">
+        <i class="ri-eye-line"></i>
+        View Profile
+    </a>`;
+
+        if (!r.canManageEmployeeProfile) {
+            return viewProfile;
+        }
+
+        return `
+            ${viewProfile}
+            <div class="my-1 border-t border-white/10"></div>
+            <button type="button" data-employee-link-url="${esc(r.addEmployeeProfileUrl)}"
+                class="${itemClass} w-full text-left">
+                <i class="ri-user-add-line"></i>
+                Add Employee Profile
+            </button>
+            <a href="${esc(r.verifyEmployeeProfileUrl)}" rel="noopener" class="${itemClass}">
+                <i class="ri-shield-check-line"></i>
+                Verify Employee Profile
             </a>`;
     }
 
@@ -1057,4 +1077,108 @@ $(document).ready(function () {
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") closeModal();
     });
+
+    (function () {
+        const byId = (id) => document.getElementById(id);
+        let generateUrl = null;
+
+        function openInviteModal(url) {
+            generateUrl = url;
+            byId("employee-invite-error").classList.add("hidden");
+            byId("employee-invite-result").classList.add("hidden");
+            byId("employee-invite-link").value = "";
+            byId("employee-invite-copy").textContent = "Copy";
+            byId("employee-invite-generate").disabled = false;
+            byId("employee-invite-generate").querySelector("span").textContent =
+                "Generate Link";
+
+            const modal = byId("employee-invite-modal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeInviteModal() {
+            const modal = byId("employee-invite-modal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+            generateUrl = null;
+        }
+
+        async function generateInviteLink() {
+            const btn = byId("employee-invite-generate");
+            const label = btn.querySelector("span");
+            const errorBox = byId("employee-invite-error");
+
+            errorBox.classList.add("hidden");
+            btn.disabled = true;
+            label.textContent = "Generating...";
+
+            try {
+                const res = await fetch(generateUrl, {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content ?? "",
+                    },
+                });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || !json.success) {
+                    throw new Error(json.message || "Could not generate link.");
+                }
+
+                byId("employee-invite-link").value = json.data.link;
+                byId("employee-invite-expiry").textContent = json.expires_at
+                    ? `Expires: ${json.expires_at}`
+                    : "";
+                byId("employee-invite-result").classList.remove("hidden");
+                label.textContent = "Generate New Link";
+            } catch (err) {
+                errorBox.textContent = err.message;
+                errorBox.classList.remove("hidden");
+                label.textContent = "Generate Link";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function copyInviteLink() {
+            const input = byId("employee-invite-link");
+            const btn = byId("employee-invite-copy");
+            try {
+                await navigator.clipboard.writeText(input.value);
+            } catch {
+                input.select();
+                document.execCommand("copy"); // fallback when the page isn't on HTTPS
+            }
+            btn.textContent = "Copied!";
+            setTimeout(() => (btn.textContent = "Copy"), 1500);
+        }
+
+        document.addEventListener("click", (e) => {
+            // "Add Employee Profile" in the row menu
+            const trigger = e.target.closest("[data-employee-link-url]");
+            if (trigger) {
+                e.preventDefault();
+                trigger.parentElement.classList.add("hidden"); // close the row dropdown
+                openInviteModal(trigger.dataset.employeeLinkUrl);
+                return;
+            }
+
+            if (e.target.closest("[data-invite-close]"))
+                return closeInviteModal();
+            if (e.target.closest("#employee-invite-generate"))
+                return generateInviteLink();
+            if (e.target.closest("#employee-invite-copy"))
+                return copyInviteLink();
+
+            // click on the dark backdrop closes it
+            if (e.target === byId("employee-invite-modal")) closeInviteModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeInviteModal();
+        });
+    })();
 });

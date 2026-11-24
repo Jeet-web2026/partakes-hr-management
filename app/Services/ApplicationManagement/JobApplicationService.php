@@ -12,13 +12,16 @@ use App\Models\MastStat;
 use App\Models\PinCode;
 use App\Models\ShareLink;
 use App\Services\Agreement\AgreementService;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use RuntimeException;
 use Throwable;
 
 class JobApplicationService
@@ -118,7 +121,7 @@ class JobApplicationService
         $search = $filters['search'] ?? null;
 
         $query = HrMastJobAply::query()
-            ->with('country', 'interestedpositionDetails')
+            ->with('country', 'interestedpositionDetails', 'stage', 'step')
             ->when($filters['company_id'] ?? null, fn($q, $companyId) => $q->where('Orga_UIN', $companyId))
             ->when($search, function ($q, $term) {
                 $q->where(function ($q) use ($term) {
@@ -143,6 +146,11 @@ class JobApplicationService
         $perPage = min((int) ($filters['per_page'] ?? 100), 250);
 
         return $query->paginate($perPage)->through(function (HrMastJobAply $application) {
+            $canManageEmployeeProfile = $this->isEmployeeDocumentUpdate($application);
+            $routeParams = [
+                'orguin' => $application->Orga_UIN,
+                'uin'    => $application->Aply_UIN,
+            ];
             return [
                 'id'          => (string) $application->Aply_UIN,
                 'fullName'    => trim(implode(' ', array_filter([
@@ -194,6 +202,13 @@ class JobApplicationService
                 'companyId'  => $application->Orga_UIN,
                 'linkId'     => $application->Link_UIN,
                 'appliedOn'  => $application->CrBy?->format('Y-m-d H:i'),
+                'canManageEmployeeProfile' => $canManageEmployeeProfile,
+                'addEmployeeProfileUrl'    => $canManageEmployeeProfile
+                    ? route('employees.profile.create', $routeParams)
+                    : null,
+                'verifyEmployeeProfileUrl' => $canManageEmployeeProfile
+                    ? null
+                    : null,
             ];
         });
     }
@@ -201,6 +216,30 @@ class JobApplicationService
     public function bioDataDisk(): string
     {
         return config('filesystems.job_application_disk', config('filesystems.default'));
+    }
+
+    private function isEmployeeDocumentUpdate(HrMastJobAply $application): bool
+    {
+        return $this->sameName($application->stage?->Stage_Name, 'Offer Accepted')
+            && $this->sameName($this->stepName($application->step), 'Employee document update');
+    }
+
+    private function stepName(?MastIntvStep $step): ?string
+    {
+        $raw = $step?->Intv_Step_Name;
+        if ($raw === null) {
+            return null;
+        }
+
+        $decoded = json_decode($raw, true);
+
+        return is_string($decoded) ? $decoded : $raw;
+    }
+
+    private function sameName(?string $actual, string $expected): bool
+    {
+        return $actual !== null
+            && mb_strtolower(trim($actual)) === mb_strtolower($expected);
     }
 
     public function findForOrganisation(string $orguin, int $uin): HrMastJobAply
@@ -336,5 +375,41 @@ class JobApplicationService
         $stateUin = PinCode::query()->where('pin_code_No', $pincode)->value('Stat_UIN');
 
         return MastStat::query()->where('Stat_UIN', $stateUin)->value('Stat_Comp_Name');
+    }
+
+    public function makeFormUrl(string $orguin, string $uin): array
+    {
+        $application = HrMastJobAply::query()
+            ->with(['stage', 'step'])
+            ->where('Orga_UIN', $orguin)
+            ->where('Aply_UIN', $uin)
+            ->firstOrFail();
+
+        abort_unless(
+            $this->isEmployeeDocumentUpdate($application),
+            403,
+            'Employee profile link is not available at this stage.'
+        );
+
+        $response = Http::baseUrl(rtrim((string) config('services.contact_app.settings_url'), '/'))
+            ->withHeaders(['X-Api-Key' => (string) config('services.contact_app.api_key')])
+            ->acceptJson()
+            ->timeout(10)
+            ->post("/api/generate-invite-link", [
+                'orga_uin' => $application->Orga_UIN,
+                'user_uin' => session('partaker_user_uin'),
+            ])
+            ->throw();
+
+        $link = $response->json('data.link');
+
+        if (! $link) {
+            throw new RuntimeException('Contact app returned no invite link.');
+        }
+
+        return [
+            'link'       => $link,
+            'expires_at' => Carbon::parse($response->json('expires_at')),
+        ];
     }
 }

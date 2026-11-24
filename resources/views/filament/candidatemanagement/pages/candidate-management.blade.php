@@ -565,7 +565,7 @@
                             </div>
 
                         </div>
-                        
+
                         <x-feedback-button page="10000012" />
 
                     </div>
@@ -723,6 +723,50 @@
 
                 <tbody id="tbody"></tbody>
             </table>
+        </div>
+
+        <div id="employee-invite-modal"
+            class="hidden fixed inset-0 z-[100] items-center justify-center bg-black/60 p-4"
+            role="dialog" aria-modal="true" aria-labelledby="employee-invite-title">
+            <div class="w-full max-w-lg rounded-xl border border-white/10 bg-card p-6 shadow-2xl">
+
+                <div class="flex items-center justify-between">
+                    <h3 id="employee-invite-title" class="flex items-center gap-2 text-lg font-semibold">
+                        <i class="ri-send-plane-line text-blue-400"></i>
+                        Generate Invite Link
+                    </h3>
+                    <button type="button" data-invite-close
+                        class="h-8 w-8 inline-flex items-center justify-center rounded text-muted-foreground hover:bg-white/10"
+                        aria-label="Close">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+
+                <p class="mt-4 text-sm text-muted-foreground">
+                    Generate a unique, single-use link to invite someone to add their contact information.
+                    The link will expire after 24 hours or once it has been used.
+                </p>
+
+                <p id="employee-invite-error" class="hidden mt-3 text-sm text-red-400"></p>
+
+                <div id="employee-invite-result" class="hidden mt-4">
+                    <div class="flex gap-2">
+                        <input id="employee-invite-link" type="text" readonly
+                            class="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 focus:outline-none">
+                        <button type="button" id="employee-invite-copy"
+                            class="rounded-md bg-white/10 px-4 text-sm font-medium hover:bg-white/20">
+                            Copy
+                        </button>
+                    </div>
+                    <p id="employee-invite-expiry" class="mt-2 text-xs text-muted-foreground"></p>
+                </div>
+
+                <button type="button" id="employee-invite-generate"
+                    class="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60">
+                    <i class="ri-magic-line"></i>
+                    <span>Generate Link</span>
+                </button>
+            </div>
         </div>
 
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -88,5 +89,15 @@ class HrMastJobAply extends Model
     public function queryHistory(): HasMany
     {
         return $this->hasMany(IntvQueryAndStatus::class, 'Appl_UIN', 'Aply_UIN');
+    }
+
+    public function stage(): BelongsTo
+    {
+        return $this->belongsTo(InterviewStep::class, 'Stage_UIN', 'Stage_UIN');
+    }
+
+    public function step(): BelongsTo
+    {
+        return $this->belongsTo(MastIntvStep::class, 'Intv_Step_UIN', 'Intv_Step_UIN');
     }
 }

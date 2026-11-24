@@ -11,12 +11,17 @@ use App\Services\ApplicationManagement\JobApplicationService;
 use App\Services\ApplicationManagement\MastDsigService;
 use App\Services\Common\TinyUrlService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class JobApplicationManagementController extends Controller
 {
@@ -101,7 +106,6 @@ class JobApplicationManagementController extends Controller
         ]);
     }
 
-    // Streams the PDF so the iframe works without exposing the storage path
     public function resume(string $orguin, int $uin)
     {
         $application = $this->applications->findForOrganisation($orguin, $uin);
@@ -144,5 +148,34 @@ class JobApplicationManagementController extends Controller
             ->get(['Intv_Step_UIN', 'Intv_Step_Name']);
 
         return response()->json($steps);
+    }
+
+    public function createDocumentfillingapplicationLink(string $orguin, string $uin): JsonResponse
+    {
+        try {
+            $issued = $this->applications->makeFormUrl($orguin, $uin);
+        } catch (ModelNotFoundException) {
+            return response()->json(['success' => false, 'message' => 'Application not found.'], 404);
+        } catch (HttpExceptionInterface $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getStatusCode());
+        } catch (ConnectionException | RequestException $e) {
+            return response()->json(['success' => false, 'message' => 'Contact service is unavailable. Try again.'], 502);
+        } catch (\Throwable $e) {
+            Log::info("applink", [$e]);
+            return response()->json(['success' => false, 'message' => 'Could not generate link.'], 500);
+        }
+
+        return response()->json([
+            'success'    => true,
+            'data'       => ['link' => $issued['link']],
+            'expires_at' => $issued['expires_at']->toDateTimeString(),
+        ]);
+    }
+
+    public function form(string $uin)
+    {
+        return view('employee-profile.form', [
+            'applicationUin' => $uin,
+        ]);
     }
 }
