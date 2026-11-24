@@ -46,7 +46,6 @@ class AdmnUserOrgaRelaSeeder extends Seeder
     {
         DB::transaction(function () {
             $this->seedOrganisations();
-            $this->ensureUsersExist();
             $this->seedUserOrganisationLinks();
         });
     }
