@@ -140,8 +140,8 @@ $assets = [
                         <hr class="border-white/10">
 
                         <div class="space-y-1.5">
-                            <label for="question" class="label">Question <span class="text-red-500">*</span></label>
-                            <select id="question" name="question" required class="input">
+                            <label for="question" class="label">Question</label>
+                            <select id="question" name="question" class="input">
                                 <option value="">Select question</option>
                                 @foreach ($questions as $q)
                                 <option value="{{ $q->intv_qstn_UIN }}" class="bg-slate-900"
@@ -152,15 +152,15 @@ $assets = [
                         </div>
 
                         <div class="space-y-1.5">
-                            <label for="answer" class="label">Answer <span class="text-red-500">*</span></label>
-                            <textarea id="answer" name="answer" rows="4" required class="input"
+                            <label for="answer" class="label">Answer</label>
+                            <textarea id="answer" name="answer" rows="4" class="input"
                                 placeholder="Write the candidate's answer">{{ old('answer') }}</textarea>
                             @error('answer') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="space-y-1.5">
-                            <label for="marks" class="label">Marks <span class="text-red-500">*</span></label>
-                            <input type="number" id="marks" name="marks" required class="input"
+                            <label for="marks" class="label">Marks</label>
+                            <input type="number" id="marks" name="marks" class="input"
                                 placeholder="Enter the marks"
                                 value="{{ old('marks') }}">
                             @error('marks') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror

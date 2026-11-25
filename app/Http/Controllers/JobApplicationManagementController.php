@@ -124,9 +124,9 @@ class JobApplicationManagementController extends Controller
             'step'     => ['required', 'integer'],
             'flags'    => ['nullable', 'array'],
             'flags.*'  => ['uuid'],
-            'question' => ['required', 'uuid'],
-            'answer'   => ['required', 'string', 'max:5000'],
-            'marks'    => ['required', 'integer', 'min:0', 'max:100'],
+            'question' => ['nullable', 'uuid'],
+            'answer'   => ['nullable', 'string', 'max:5000'],
+            'marks'    => ['nullable', 'integer', 'min:0', 'max:100'],
         ]);
 
         $userUin = Session::get('partaker_user_uin');
