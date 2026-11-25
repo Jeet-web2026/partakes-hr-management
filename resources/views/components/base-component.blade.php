@@ -95,6 +95,10 @@
             object-fit: cover;
         }
 
+        .bg-card {
+            background-color: #0F172B !important;
+        }
+
         /* footer css */
     </style>
     {{--default css--}}
