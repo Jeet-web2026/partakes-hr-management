@@ -11,6 +11,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -178,14 +179,16 @@ class EmployeePosting extends Page
                 return $data;
             })
             ->schema([
-                $this->lookupSelect('branchOffice', 'Branch Office'),
-                $this->lookupSelect('designation', 'Designation'),
-                $this->lookupSelect('department', 'Department'),
-                $this->lookupSelect('project', 'Project'),
-                $this->lookupSelect('reportingHead', 'Reporting Head'),
-                DatePicker::make('Strt_Dt')->label('Start Date'),
-                DatePicker::make('End_Dt')->label('End Date')->afterOrEqual('Strt_Dt'),
-                $this->lookupSelect('status', 'Status'),
+                Grid::make(2)->schema([
+                    $this->lookupSelect('branchOffice', 'Branch Office'),
+                    $this->lookupSelect('designation', 'Designation'),
+                    $this->lookupSelect('department', 'Department'),
+                    $this->lookupSelect('project', 'Project'),
+                    $this->lookupSelect('reportingHead', 'Reporting Head'),
+                    $this->lookupSelect('status', 'Status'),
+                    DatePicker::make('Strt_Dt')->label('Start Date'),
+                    DatePicker::make('End_Dt')->label('End Date')->afterOrEqual('Strt_Dt'),
+                ]),
             ])
             ->action(function (array $data, array $arguments): void {
                 $application = $this->findApplication($arguments);

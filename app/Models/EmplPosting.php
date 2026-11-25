@@ -87,15 +87,15 @@ class EmplPosting extends Model
         return $this->belongsTo(MastDsig::class, 'Dsig_UIN', 'Dsig_UIN');
     }
 
-    // public function department(): BelongsTo
-    // {
-    //     return $this->belongsTo(MastDept::class, 'Dept_UIN', 'Dept_UIN');
-    // }
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(MastDept::class, 'Dept_UIN', 'Dept_UIN');
+    }
 
-    // public function project(): BelongsTo
-    // {
-    //     return $this->belongsTo(MastProj::class, 'Proj_UIN', 'Proj_UIN');
-    // }
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(MastProj::class, 'Proj_UIN', 'Proj_UIN');
+    }
 
     public function reportingHead(): BelongsTo
     {
