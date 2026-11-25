@@ -150,4 +150,10 @@
             </div>
         </div>
     </div>
+    <script>
+        var AGREEMENTS_URL = "{{ route('job-applications.index') }}";
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
+    <script src="{{ asset('assets/base-agreement-page-functionalities.js') }}"></script>
+    <script src="{{ asset('assets/common.js') }}"></script>
 </x-filament-panels::page>

@@ -52,4 +52,13 @@ class InterviewStep extends Model
     {
         return $this->hasOne(HrMastJobAply::class, 'Stage_UIN', 'Stage_UIN');
     }
+
+    public function scopeWithoutEntryFor(Builder $query, string $orgaUin, int|string $aplyUin): Builder
+    {
+        return $query
+            ->forOrganisation($orgaUin)
+            ->whereDoesntHave('hasStep', fn(Builder $entry) => $entry
+                ->where('Orga_UIN', $orgaUin)
+                ->where('Aply_UIN', $aplyUin));
+    }
 }

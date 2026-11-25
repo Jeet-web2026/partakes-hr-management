@@ -296,7 +296,7 @@ class JobApplicationService
         return [
             'orguin'             => $orguin,
             'application'        => $application,
-            'stages'             => (clone $stages)->whereDoesntHave('hasStep')
+            'stages'             => (clone $stages)->withoutEntryFor($orguin, $uin)
                 ->get(),
             'steps'              => $steps,
             'flags'              => $flags,
@@ -342,17 +342,15 @@ class JobApplicationService
 
             $application->flags()->sync($data['flags'] ?? []);
 
-            if (isset($data['question']) && isset($data['answer']) && isset($data['marks'])) {
-                $application->queryHistory()->create([
-                    'Org_UIN'       => $application->Orga_UIN,
-                    'Stage_UIN'     => $data['stage'],
-                    'Intv_Step_UIN' => $data['step'],
-                    'Ques_UIN'      => $data['question'],
-                    'Qury_Answer'   => $data['answer'],
-                    'Qury_Marks'    => $data['marks'],
-                    'CrBy'          => $userId,
-                ]);
-            }
+            $application->queryHistory()->create([
+                'Org_UIN'       => $application->Orga_UIN,
+                'Stage_UIN'     => $data['stage'],
+                'Intv_Step_UIN' => $data['step'],
+                'Ques_UIN'      => $data['question'],
+                'Qury_Answer'   => $data['answer'],
+                'Qury_Marks'    => $data['marks'],
+                'CrBy'          => $userId,
+            ]);
         });
     }
 
