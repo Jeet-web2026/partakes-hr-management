@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tbl_mast_intv_query_and_status_update', function (Blueprint $table) {
-            $table->uuid('Ques_UIN')->change();
+            $table->uuid('Ques_UIN')->nullable()->change();
         });
     }
 
