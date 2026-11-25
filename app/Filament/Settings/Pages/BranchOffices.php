@@ -23,9 +23,9 @@ class BranchOffices extends Page
 {
     use HasCompanyHeader, WithPagination;
 
-    protected static ?string $navigationLabel = 'Branch Office';
+    protected static ?string $navigationLabel = 'Branch Information';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 10;
     protected static ?string $slug = 'branch-offices';
     public const PER_PAGE_OPTIONS = [50, 100, 250];
 

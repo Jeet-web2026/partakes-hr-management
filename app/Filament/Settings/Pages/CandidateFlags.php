@@ -25,9 +25,9 @@ class CandidateFlags extends Page
 {
     use HasCompanyHeader, WithPagination;
 
-    protected static ?string $navigationLabel = 'Candidate Flags';
+    protected static ?string $navigationLabel = 'Stage Flags Label';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 13;
     protected static ?string $slug = 'candidate-flags';
     public const PER_PAGE_OPTIONS = [50, 100, 250];
 

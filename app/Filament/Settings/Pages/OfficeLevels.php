@@ -23,9 +23,9 @@ class OfficeLevels extends Page
 {
     use HasCompanyHeader, WithPagination;
 
-    protected static ?string $navigationLabel = 'Office Type';
+    protected static ?string $navigationLabel = 'Office Hierarchy';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 9;
     protected static ?string $slug = 'office-types';
     public const PER_PAGE_OPTIONS = [50, 100, 250];
 

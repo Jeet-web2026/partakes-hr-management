@@ -24,7 +24,7 @@ class Designations extends Page
 
     protected static ?string $navigationLabel = 'Designations';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 13;
     protected static ?string $slug = 'designations';
 
     public const PER_PAGE_OPTIONS = [50, 100, 250];

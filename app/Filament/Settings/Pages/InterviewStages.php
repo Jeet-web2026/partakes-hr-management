@@ -22,9 +22,9 @@ class InterviewStages extends Page
     private const NAME_COLUMN = 'Stage_Name';
     private const ACTIVE_COLUMN = 'Stage_Status';
 
-    protected static ?string $navigationLabel = 'Interview Stages';
+    protected static ?string $navigationLabel = 'Recruitment Stages';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 11;
     protected static ?string $slug = 'interview-stages';
 
     protected string $view = 'filament.settings.pages.interview-stages';

@@ -23,9 +23,9 @@ class InterviewSteps extends Page
 {
     use HasCompanyHeader;
 
-    protected static ?string $navigationLabel = 'Interview Steps';
+    protected static ?string $navigationLabel = 'Recruitment Steps';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 12;
     protected static ?string $slug = 'interview-steps';
 
     protected string $view = 'filament.settings.pages.interview-steps';
