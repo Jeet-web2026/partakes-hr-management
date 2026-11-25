@@ -52,6 +52,8 @@ class HomeController extends Controller
             abort(Response::HTTP_UNAUTHORIZED, 'No session token found. Please re-open the link with a valid token.');
         }
 
+        dd($userUin);
+
         $companyInformation = $this->agreementService->getCompanyInformation($userUin);
 
         if ($companyInformation->isEmpty()) {
