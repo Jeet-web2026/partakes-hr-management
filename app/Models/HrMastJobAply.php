@@ -46,6 +46,7 @@ class HrMastJobAply extends Model
         'State',
         'Stage_UIN',
         'Intv_Step_UIN',
+        'IS_Vf'
     ];
 
     protected $casts = [
@@ -99,5 +100,10 @@ class HrMastJobAply extends Model
     public function step(): BelongsTo
     {
         return $this->belongsTo(MastIntvStep::class, 'Intv_Step_UIN', 'Intv_Step_UIN');
+    }
+
+    public function isVerified(): HasOne
+    {
+        return $this->hasOne(MastStau::class, 'Stau_UIN', 'IS_Vf');
     }
 }

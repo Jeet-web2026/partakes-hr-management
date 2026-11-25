@@ -121,7 +121,7 @@ class JobApplicationService
         $search = $filters['search'] ?? null;
 
         $query = HrMastJobAply::query()
-            ->with('country', 'interestedpositionDetails', 'stage', 'step')
+            ->with('country', 'interestedpositionDetails', 'stage', 'step', 'isVerified')
             ->when($filters['company_id'] ?? null, fn($q, $companyId) => $q->where('Orga_UIN', $companyId))
             ->when($search, function ($q, $term) {
                 $q->where(function ($q) use ($term) {
@@ -209,6 +209,7 @@ class JobApplicationService
                 'verifyEmployeeProfileUrl' => $canManageEmployeeProfile
                     ? null
                     : null,
+                'isVerified' => $application->isVerified?->Stau_Name,
             ];
         });
     }

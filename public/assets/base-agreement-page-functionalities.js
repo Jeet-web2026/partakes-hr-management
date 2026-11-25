@@ -349,7 +349,13 @@ $(document).ready(function () {
 
     // ---------- Desktop column definitions (same order as <thead>) ----------
     const columns = [
-        { key: "FaNm", render: (r) => esc(r.firstName) },
+        {
+            key: "FaNm",
+            render: (r) =>
+                (r.isVerified === null
+                    ? '<span class="ml-1 inline-block size-1.5 rounded-full bg-yellow-400 me-2 align-middle" title="Not verified"></span>'
+                    : "") + esc(r.firstName),
+        },
         { key: "MiNm", render: (r) => esc(r.middleName) },
         { key: "SuNm", render: (r) => esc(r.surname) },
         { key: "Gend", render: (r) => esc(cap(r.gender)) },
