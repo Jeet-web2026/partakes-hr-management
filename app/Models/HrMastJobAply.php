@@ -46,7 +46,9 @@ class HrMastJobAply extends Model
         'State',
         'Stage_UIN',
         'Intv_Step_UIN',
-        'IS_Vf'
+        'IS_Vf',
+        'Vr_By',
+        'Vr_At'
     ];
 
     protected $casts = [
@@ -55,6 +57,7 @@ class HrMastJobAply extends Model
         'Own_Lptp'  => 'boolean',
         'Drvi_Lisc' => 'boolean',
         'Rlca'      => 'boolean',
+        'Vr_At'     => 'datetime',
     ];
 
     public function country(): HasOne
@@ -105,5 +108,10 @@ class HrMastJobAply extends Model
     public function isVerified(): HasOne
     {
         return $this->hasOne(MastStau::class, 'Stau_UIN', 'IS_Vf');
+    }
+
+    public function verifiedBy(): HasOne
+    {
+        return $this->hasOne(User::class, 'User_UIN', 'Vr_By');
     }
 }
