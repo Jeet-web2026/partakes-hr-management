@@ -17,7 +17,9 @@
     return $posting?->{$key}?->format('d M Y') ?? '-';
     }
 
-    return $posting?->{$key} ? ($posting->displayName($key) ?: '-') : '-';
+    $column = \App\Models\EmplPosting::LOOKUPS[$key][1];
+
+    return $posting?->{$key}?->getAttribute($column) ?: '-';
     };
     @endphp
 

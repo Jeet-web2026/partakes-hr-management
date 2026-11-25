@@ -205,8 +205,7 @@ class EmployeePosting extends Page
                 ])->save();
 
                 unset($this->applications);
-
-                Notification::make()->title('Posting saved')->success()->send();
+                session('success', 'Posting updated successfully.');
             });
     }
 
