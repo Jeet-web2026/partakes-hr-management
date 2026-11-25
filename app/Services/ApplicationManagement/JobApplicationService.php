@@ -399,6 +399,7 @@ class JobApplicationService
             ->post("/api/generate-invite-link", [
                 'orga_uin' => $application->Orga_UIN,
                 'user_uin' => session('partaker_user_uin'),
+                'uin' => $uin
             ])
             ->throw();
 

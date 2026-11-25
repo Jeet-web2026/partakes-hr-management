@@ -114,4 +114,14 @@ class HrMastJobAply extends Model
     {
         return $this->hasOne(User::class, 'User_UIN', 'Vr_By');
     }
+
+    public function posting(): HasOne
+    {
+        return $this->hasOne(EmplPosting::class, 'Aply_UIN', 'Aply_UIN');
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return trim(implode(' ', array_filter([$this->FaNm, $this->MiNm, $this->SuNm])));
+    }
 }
