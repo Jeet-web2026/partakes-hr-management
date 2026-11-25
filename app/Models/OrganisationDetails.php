@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrganisationDetails extends Model
 {
-    protected $table = "admn_orga_mast";
+    protected $table = "tbl_mast_orga";
     protected $primaryKey = 'Orga_UIN';
     public $incrementing = false;
     protected $keyType = 'int';
