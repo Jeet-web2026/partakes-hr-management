@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tbl_empl_posting', function (Blueprint $table) {
-            $table->bigIncrements('Post_UIN')->nullable();
+            $table->bigIncrements('Post_UIN');
             $table->unsignedBigInteger('Orga_UIN')->nullable()->index();
             $table->unsignedBigInteger('User_UIN')->nullable()->index();
             $table->unsignedBigInteger('Ofic_UIN')->nullable()->index();
