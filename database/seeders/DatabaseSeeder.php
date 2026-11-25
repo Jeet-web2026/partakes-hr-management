@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             MastPageSeeder::class,
             MastStatSeeder::class,
             MastDistSeeder::class,
+            MastDeptSeeder::class,
+            MastProjSeeder::class,
         ]);
     }
 }
