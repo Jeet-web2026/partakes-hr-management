@@ -204,11 +204,12 @@ $assets = [
                                     <span class="hidden text-slate-500 sm:inline">· {{ $h->CrOn->diffForHumans() }}</span>
                                     @endif
                                 </div>
-
+                                @if(!empty($h->Qury_Marks))
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-300 ring-1 ring-inset ring-blue-500/30">
                                     <i class="bi bi-star-fill text-[10px]"></i>
                                     {{ $h->Qury_Marks }} marks
                                 </span>
+                                @endif
                             </div>
 
                             {{-- stage / step badges --}}
@@ -220,18 +221,21 @@ $assets = [
                                     <i class="bi bi-list-check text-slate-400"></i> {{ $h->step_name }}
                                 </span>
                             </div>
-
+                            @if(!empty($h->question_text))
                             {{-- question --}}
                             <div class="mt-4">
                                 <p class="label">Question</p>
                                 <p class="mt-1 text-sm font-medium text-slate-100">{{ $h->question_text }}</p>
                             </div>
+                            @endif
 
+                            @if(!empty($h->Qury_Answer))
                             {{-- answer --}}
                             <div class="mt-3 rounded-md border border-white/5 bg-slate-950/40 p-3">
                                 <p class="label">Answer</p>
                                 <p class="mt-1 whitespace-pre-line break-words text-sm text-slate-300">{{ $h->Qury_Answer }}</p>
                             </div>
+                            @endif
                         </div>
                     </li>
 
