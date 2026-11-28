@@ -48,7 +48,8 @@ class HrMastJobAply extends Model
         'Intv_Step_UIN',
         'IS_Vf',
         'Vr_By',
-        'Vr_At'
+        'Vr_At',
+        'Vr_Type'
     ];
 
     protected $casts = [
