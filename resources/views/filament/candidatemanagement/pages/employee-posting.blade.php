@@ -324,10 +324,149 @@
             </div>
         </div>
     </div>
+
+    {{-- Hidden elements required by the JS files. Do not remove. --}}
+    <div wire:ignore style="display: none !important" aria-hidden="true">
+        <select id="perPageSelect">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="250">250</option>
+        </select>
+
+        {{-- Date filter --}}
+        <div data-menu>
+            <button type="button" data-menu-toggle="calMenuForFilter">
+                <p class="showdateRange"></p>
+            </button>
+            <div id="calMenuForFilter" class="hidden">
+                <button id="closeDateRange" type="button"></button>
+                <select id="statusFilter">
+                    <option value="">All Stages</option>
+                </select>
+                <input id="agreementDateRange">
+                <button id="clearDate" type="button"></button>
+                <button id="applyDate" type="button"></button>
+            </div>
+        </div>
+
+        {{-- Status filter --}}
+        <div data-menu>
+            <button type="button" data-menu-toggle="statusMenuForFilter">
+                <span id="statusFilterLabel">Status</span>
+            </button>
+            <div id="statusMenuForFilter" class="hidden">
+                <button id="closeStatusFilter" type="button"></button>
+                @foreach (['new', 'shortlisted', 'interview_scheduled', 'selected', 'offer_letter_issued', 'accepted'] as $value)
+                <input type="checkbox" class="status-checkbox" value="{{ $value }}">
+                @endforeach
+                <button id="clearStatusFilter" type="button"></button>
+                <button id="applyStatusFilter" type="button"></button>
+            </div>
+        </div>
+
+        {{-- Search --}}
+        <div data-menu>
+            <button id="searchToggle" type="button" data-menu-toggle="searchMenu"></button>
+            <input id="searchInputDesktop" type="text">
+        </div>
+        <div id="searchMenu" class="hidden">
+            <input id="searchInput" type="text">
+        </div>
+
+        {{-- Calendar --}}
+        <div data-menu>
+            <button type="button" data-menu-toggle="calMenu"></button>
+            <div id="calMenu" class="hidden">
+                <button id="calPrev" type="button"></button>
+                <div id="calTitle"></div>
+                <button id="calNext" type="button"></button>
+                <div id="calendarDays"></div>
+                <button id="calToday" type="button"></button>
+                <span id="calCount"></span>
+                <div id="calList"></div>
+            </div>
+        </div>
+
+        {{-- Generate link --}}
+        <a id="generateLinkBtn"
+            href="javascript:void(0)"
+            data-url="{{ url('') }}"
+            data-csrf="{{ csrf_token() }}"
+            data-share-type="candidate"
+            data-share-id="{{ $recordId ?? '' }}"></a>
+
+        <div id="linkModal" class="hidden">
+            <div data-close-modal></div>
+            <h3 id="linkModalTitle"></h3>
+            <button type="button" data-close-modal></button>
+            <p id="linkLoading"></p>
+            <p id="linkError" class="hidden"></p>
+            <div id="linkResult" class="hidden">
+                <input id="linkInput" type="text" readonly>
+                <button id="linkCopyBtn" type="button"></button>
+                <span id="linkExpiry"></span>
+            </div>
+        </div>
+
+        {{-- Columns menu and table --}}
+        @php
+        $jsColumns = ['FaNm', 'MiNm', 'SuNm', 'Gend', 'DOB', 'MoTu', 'Cutr_UIN', 'PinCod_UIN', 'Mo_No', 'Own_Mo', 'Mo_Type', 'MO_OS', 'Emai', 'Own_Lptp', 'Lptp_OS', 'Drvi_Lisc', 'Vcle_Type_Lisc', 'Rlca', 'Rlca_Area', 'Job_Intr', 'Job_Type'];
+        $jsChecked = ['FaNm', 'SuNm', 'DOB', 'Mo_No', 'Emai', 'Job_Intr', 'Job_Type'];
+        $jsSortable = ['FaNm', 'SuNm', 'DOB', 'Job_Intr'];
+        @endphp
+
+        <div data-menu>
+            <button type="button" data-menu-toggle="colsMenu"></button>
+            <div id="colsMenu" class="hidden">
+                @foreach ($jsColumns as $col)
+                <input type="checkbox" data-col="{{ $col }}" @checked(in_array($col, $jsChecked))>
+                @endforeach
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    @foreach ($jsColumns as $col)
+                    <th data-col="{{ $col }}" @class(['hidden' => ! in_array($col, $jsChecked)])>
+                        @if (in_array($col, $jsSortable))
+                        <button type="button" data-sort="{{ $col }}" class="sort-btn">
+                            <span class="sort-icon"></span>
+                        </button>
+                        @endif
+                    </th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+
+        <div id="mobileAgreementList"></div>
+        <span id="entriesLabel"></span>
+        <div id="pagination"></div>
+
+        {{-- Employee invite modal --}}
+        <div id="employee-invite-modal" class="hidden">
+            <h3 id="employee-invite-title"></h3>
+            <button type="button" data-invite-close></button>
+            <p id="employee-invite-error" class="hidden"></p>
+            <div id="employee-invite-result" class="hidden">
+                <input id="employee-invite-link" type="text" readonly>
+                <button type="button" id="employee-invite-copy"></button>
+                <p id="employee-invite-expiry"></p>
+            </div>
+            <button type="button" id="employee-invite-generate"><span></span></button>
+        </div>
+
+        <x-common.generate-link-modal />
+    </div>
+
     <script>
         var AGREEMENTS_URL = "{{ route('job-applications.index') }}";
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.0.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('assets/base-agreement-page-functionalities.js') }}"></script>
     <script src="{{ asset('assets/common.js') }}"></script>
 </x-filament-panels::page>
