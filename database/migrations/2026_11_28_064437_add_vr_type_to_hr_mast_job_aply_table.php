@@ -8,14 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('hr_mast_job_aply', function (Blueprint $table) {
+        Schema::table('HR_mast_job_aply', function (Blueprint $table) {
             $table->string('Vr_Type')->nullable()->after('Vr_At');
         });
     }
 
     public function down(): void
     {
-        Schema::table('hr_mast_job_aply', function (Blueprint $table) {
+        Schema::table('HR_mast_job_aply', function (Blueprint $table) {
             $table->dropColumn('Vr_Type');
         });
     }
