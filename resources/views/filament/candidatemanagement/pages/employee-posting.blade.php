@@ -260,8 +260,8 @@
                                     <x-filament::icon-button icon="heroicon-m-ellipsis-vertical" label="Actions" color="gray" />
                                 </x-slot>
                                 <x-filament::dropdown.list>
-                                    <x-filament::dropdown.list.item icon="heroicon-m-pencil-square" x-on:click="close"
-                                        wire:click="mountAction('editPosting', { application: {{ (int) $application->Aply_UIN }} })">
+                                    <x-filament::dropdown.list.item tag="a" icon="heroicon-m-pencil-square"
+                                        :href="\App\Filament\Candidatemanagement\Pages\EditEmployeePosting::getUrl(['record' => $application->Aply_UIN])">
                                         Edit
                                     </x-filament::dropdown.list.item>
                                 </x-filament::dropdown.list>
@@ -428,7 +428,7 @@
             <thead>
                 <tr>
                     @foreach ($jsColumns as $col)
-                    <th data-col="{{ $col }}" @class(['hidden' => ! in_array($col, $jsChecked)])>
+                    <th data-col="{{ $col }}" @class(['hidden'=> ! in_array($col, $jsChecked)])>
                         @if (in_array($col, $jsSortable))
                         <button type="button" data-sort="{{ $col }}" class="sort-btn">
                             <span class="sort-icon"></span>
